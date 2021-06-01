@@ -1,7 +1,7 @@
 {
   "name": "iso20022-core-connector",
   "version": "0.0.1",
-  "description": "ISO2022 Core Connector for Mojaloop",
+  "description": "ISO20022 Core Connector for Mojaloop",
   "main": "index.js",
   "scripts": {
     "test": "npm test",
@@ -9,9 +9,8 @@
     "lint:fix": "eslint --ext .js,.ts src --color --fix",
     "prettier": "prettier --write 'src/**/*.{ts,js,json}'",
     "build": "tsc -p ./tsconfig.json",
-    "copyStaticFiles": "cp src/api.yaml build/src/api.yaml",
-    "postbuild": "npm run copyStaticFiles"
-    
+    "postbuild": "npm run copyStaticFiles",
+    "copyStaticFiles": "cp src/api.yaml build/src/"
   },
   "repository": {
     "type": "git",

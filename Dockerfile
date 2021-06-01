@@ -15,7 +15,6 @@ WORKDIR /opt/app
 COPY package.json package-lock.json* /opt/app/
 RUN npm ci --production
 COPY --from=builder /opt/app/build/src .
-COPY --from=builder /opt/app/src/api.yaml .
 
 EXPOSE 3000
 
