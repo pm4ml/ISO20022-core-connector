@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Payments System of Record Service
+  title: ISO 20022 Core Connector
   description: API that provides a transaction data system of record service for the ModusBox Mojaloop Payments Manager product.
   version: 0.0.1
 

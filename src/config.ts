@@ -17,8 +17,6 @@ export interface ServiceConfig {
     inboundPort: number;
 }
 
-const Config: ServiceConfig = {
+export const Config: ServiceConfig = {
     inboundPort: env.get('LISTEN_PORT').default('3000').asPortNumber(),
 };
-
-export { Config };

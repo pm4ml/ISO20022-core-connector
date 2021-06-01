@@ -50,8 +50,9 @@ export default class Server {
 
         let validator;
         try {
+            const apiSpecPath = path.join(__dirname, 'api.yaml');
             validator = await oas({
-                file: path.join(__dirname, 'api.yaml'),
+                file: apiSpecPath,
                 endpoint: '/openapi.json',
                 uiEndpoint: '/',
             });
