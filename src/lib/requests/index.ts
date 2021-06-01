@@ -5,7 +5,7 @@
  *  specified in the corresponding source code repository.                *
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
- *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *       Murthy Kakarlamudi - murthy@modusbox.com                         *
  **************************************************************************/
 
 import * as http from 'http';
@@ -106,7 +106,8 @@ class Requests {
             });
     }
 
-    put(url: string, body: any): Promise<RequestResponse<Record<string, unknown>>> {
+    put(url: string, body: Record<string, unknown>):
+    Promise<RequestResponse<Record<string, unknown>>> {
         const reqOpts = {
             method: 'PUT' as RequestMethod,
             uri: buildUrl(this.endpoint, url),
@@ -126,7 +127,8 @@ class Requests {
             });
     }
 
-    post(url: string, body: any): Promise<RequestResponse<Record<string, unknown>>> {
+    post(url: string, body: Record<string, unknown>):
+    Promise<RequestResponse<Record<string, unknown>>> {
         const reqOpts = {
             method: 'POST' as RequestMethod,
             uri: buildUrl(this.endpoint, url),

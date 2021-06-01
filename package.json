@@ -19,7 +19,7 @@
   "authors": [
     "Steven Oderayi <steven.oderayi@modusbox.com>"
   ],
-  "license": "(C)2021 ModusBox Inc. All Rights Reserved",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/pm4ml/ISO20022-core-connector/issues"
   },

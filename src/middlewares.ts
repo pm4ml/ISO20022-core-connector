@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /**************************************************************************
  *  (C) Copyright ModusBox Inc. 2019 - All rights reserved.               *
  *                                                                        *
@@ -5,7 +6,7 @@
  *  specified in the corresponding source code repository.                *
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
- *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *       Murthy Kakarlamudi - murthy@modusbox.com                         *
  **************************************************************************/
 
 import * as util from 'util';
@@ -86,7 +87,7 @@ const createRouter = (handlerMap: HandlerMap): Router.IMiddleware<any, any> => {
         for(const [method, handler] of Object.entries(methods)) {
             // we have to do the following to work around typescript not allowing strings to index
             // methods on the Router type. It is probably the only typesafe way of doing this.
-            let routerFunc: Function;
+            let routerFunc: (...args: Array<any>) => void;
 
             switch (method) {
                 case 'get':
