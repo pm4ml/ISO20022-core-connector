@@ -1,0 +1,137 @@
+openapi: 3.0.1
+info:
+  title: Payments System of Record Service
+  description: API that provides a transaction data system of record service for the ModusBox Mojaloop Payments Manager product.
+  version: 0.0.1
+
+paths:
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: This endpoint checks the health of the service.
+      tags:
+        - Health
+      responses:
+        200:
+          description: Returns a success response code if the service is healthy.
+
+  /transactionRecords/search:
+    post:
+      requestBody:
+        description: Transaction record search object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRecordSearch'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionRecord'
+
+  /transactionRecords:
+    post:
+      summary: Creates a new transaction record
+      description: This endpoint persists a transaction record
+      tags:
+        - Transaction Record
+      requestBody:
+        description: Transaction record to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRecordCreationRequest'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionRecord'
+
+  /transactionRecords/{uniqueId}:
+    get:
+      summary: Returns transaction records for the specified unique identifier
+      parameters:
+        - name: uniqueId
+          in: path
+          description: UUID or other unique ID of the transaction
+          required: true
+          schema:
+            type: string
+        - name: eventType
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionRecord'
+
+
+
+components:
+  schemas:
+
+    TransactionRecordCreationRequest:
+      type: object
+      properties:
+        uniqueId:
+          type: string
+        eventTimestamp:
+          type: string
+        eventType:
+          type: string
+        data:
+          type: object
+      required:
+        - uniqueId
+        - eventTimestamp
+        - eventType
+        - data
+
+    TransactionRecord:
+      type: object
+      properties:
+        transactionRecordId:
+          type: integer
+        uniqueId:
+          type: string
+        insertTimestamp:
+          type: string
+        eventTimestamp:
+          type: string
+        eventType:
+          type: string
+        data:
+          type: object
+      required:
+        - transactionRecordId
+        - uniqueId
+        - insertTimestamp
+        - eventTimestamp
+        - eventType
+        - data
+
+    TransactionRecordSearch:
+      type: object
+      properties:
+        uniqueIdLike:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+        dataQueryExpression:
+          type: object
