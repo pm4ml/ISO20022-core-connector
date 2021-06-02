@@ -14,46 +14,10 @@ const healthCheck = async (ctx: ApiContext): Promise<void> => {
     ctx.body = JSON.stringify({ status: 'ok' });
 };
 
-//  const postTransactionRecords = async (ctx: ApiContext) => {
-//      const model = new TransactionRecordModel({});
-//      const result = await model.createTransactionRecord(
-//          { db: ctx.state.db },
-//          ctx.request.body
-//      );
-//      ctx.body = result;
-//  };
-
-//  const getTransactionRecordsByUniqueId = async (ctx: ApiContext) => {
-//      const model = new TransactionRecordModel({});
-//      const result = await model.getTransactionRecordsByUniqueId(
-//          { db: ctx.state.db },
-//          ctx.params.uniqueId
-//      );
-//      ctx.body = result;
-//  };
-
-//  const searchTransactionRecords = async (ctx: ApiContext) => {
-//      const model = new TransactionRecordModel({});
-//      const result = await model.searchTransactionRecords(
-//          { db: ctx.state.db },
-//          ctx.request.body,
-//      );
-//      ctx.body = result;
-//  }
-
 const Handlers: HandlerMap = {
     '/health': {
         get: healthCheck,
     },
-    //  '/transactionRecords': {
-    //      post: postTransactionRecords,
-    //  },
-    //  '/transactionRecords/{uniqueId}': {
-    //      get: getTransactionRecordsByUniqueId,
-    //  },
-    //  '/transactionRecords/search': {
-    //      post: searchTransactionRecords,
-    //  }
 };
 
 export default Handlers;

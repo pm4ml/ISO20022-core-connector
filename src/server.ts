@@ -5,7 +5,7 @@
  *  specified in the corresponding source code repository.                *
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
- *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *       Murthy Kakarlamudi - murthy@modusbox.com                         *
  **************************************************************************/
 
 import Koa from 'koa';
@@ -44,7 +44,7 @@ export default class Server {
 
         this._logger = new Logger.Logger({
             ctx: {
-                app: 'payments-system-of-record',
+                app: 'iso20022-core-connector',
             },
         });
 
@@ -86,10 +86,10 @@ export default class Server {
     }
 
     async start(): Promise<void> {
-        await new Promise(resolve => this._server.listen(this._conf.inboundPort, resolve));
+        await new Promise(resolve => this._server.listen(this._conf.port, resolve));
         if(this._logger) {
             this._logger.log(
-                `Serving inbound API on port ${this._conf.inboundPort}`,
+                `Serving API on port ${this._conf.port}`,
             );
         }
     }
@@ -99,7 +99,7 @@ export default class Server {
             return;
         }
         await new Promise(resolve => this._server.close(resolve));
-        console.log('inbound shut down complete');
+        console.log('API shut down complete');
     }
 
     _createServer(): http.Server {

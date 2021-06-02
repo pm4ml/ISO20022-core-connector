@@ -5,7 +5,7 @@
  *  specified in the corresponding source code repository.                *
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
- *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *       James Bush - james.bush@modusbox.com                             *
  **************************************************************************/
 
 import { Config } from './config';
