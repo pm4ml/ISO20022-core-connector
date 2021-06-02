@@ -1,0 +1,20 @@
+openapi: 3.0.1
+info:
+  title: ISO 20022 Core Connector
+  description: ISO 20022 Core Connector for Mojaloop
+  version: 0.0.1
+
+paths:
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: This endpoint checks the health of the service.
+      tags:
+        - Health
+      responses:
+        200:
+          description: Returns a success response code if the service is healthy.
+
+components:
+  schemas: {}
