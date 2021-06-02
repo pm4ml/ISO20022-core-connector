@@ -9,8 +9,8 @@
     "lint:fix": "eslint --ext .js,.ts src --color --fix",
     "prettier": "prettier --write 'src/**/*.{ts,js,json}'",
     "build": "tsc -p ./tsconfig.json",
-    "postbuild": "npm run copyStaticFiles",
-    "copyStaticFiles": "cp src/api.yaml build/src/"
+    "postbuild": "npm run copystatic",
+    "copystatic": "cp src/api.yaml build/src/"
   },
   "repository": {
     "type": "git",
