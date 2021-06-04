@@ -9,6 +9,7 @@
  **************************************************************************/
 
 import { ApiContext, HandlerMap } from '../types';
+import { OutboundHandler } from './Outbound';
 
 const healthCheck = async (ctx: ApiContext): Promise<void> => {
     ctx.body = JSON.stringify({ status: 'ok' });
@@ -17,6 +18,9 @@ const healthCheck = async (ctx: ApiContext): Promise<void> => {
 const Handlers: HandlerMap = {
     '/health': {
         get: healthCheck,
+    },
+    '/outbound/iso20022': {
+        post: OutboundHandler,
     },
 };
 
