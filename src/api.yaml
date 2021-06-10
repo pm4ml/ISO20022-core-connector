@@ -505,6 +505,24 @@ components:
                                             properties:
                                               Ccy:
                                                 type: string 
+                              CdtrAgt:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    FinInstnId:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          BICFI:
+                                            type: array
+                                            maxItems: 1
+                                            items:
+                                              type: string
+
                               Cdtr:
                                 type: array
                                 maxItems: 1

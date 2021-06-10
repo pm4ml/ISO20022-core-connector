@@ -15,6 +15,7 @@ export interface IPostQuotesBody {
         partyIdInfo: {
             partyIdType: string,
             partyIdentifier: string,
+            fspId: string
         }
     },
     payer: {

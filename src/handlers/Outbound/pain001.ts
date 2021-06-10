@@ -11,7 +11,7 @@
 import { IPostQuotesBody } from '~/interfaces/quotes';
 import { ApiContext } from '~/types';
 
-const pain001ToPostQuotes = (pain001Body: Record<string, any>): IPostQuotesBody => {
+const pain001ToPostQuotesBody = (pain001Body: Record<string, any>): IPostQuotesBody => {
     const PmtInf = pain001Body.Document.CstmrCdtTrfInitn[0].PmtInf[0];
 
     const quotesBody: IPostQuotesBody = {
@@ -21,8 +21,7 @@ const pain001ToPostQuotes = (pain001Body: Record<string, any>): IPostQuotesBody 
             partyIdInfo: {
                 partyIdType: 'MSISDN',
                 partyIdentifier: PmtInf.CdtTrfTxInf[0].Cdtr[0].CtctDtls[0].MobNb[0],
-                // TODO: not sure where to get this value, provided mapping (Document.CstmrCdtTrfInitn.PmtInf.CdtTrfTxInf.CdrAgt.FinInstnId.BICFI)is not correct.
-                // fspId: PmtInf.CdtTrfTxInf[0].CdrAgt[0].FinInstnId[0].BICFI[0],
+                fspId: PmtInf.CdtTrfTxInf[0].CdtrAgt[0].FinInstnId[0].BICFI[0],
             },
         },
         payer: {
@@ -49,8 +48,7 @@ const pain001ToPostQuotes = (pain001Body: Record<string, any>): IPostQuotesBody 
 };
 
 export const pain001Handler = async (ctx: ApiContext): Promise<void> => {
-    console.log(ctx.request.body);
-    const quotesBody = pain001ToPostQuotes(ctx.request.body);
+    const quotesBody = pain001ToPostQuotesBody(ctx.request.body);
     console.log(quotesBody);
     ctx.body = JSON.stringify({ status: 'ok' });
 };

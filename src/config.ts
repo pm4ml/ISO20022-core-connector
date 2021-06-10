@@ -14,9 +14,11 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export interface ServiceConfig {
-    port: number;
+    port: number,
+    outboundEndpoint: string
 }
 
 export const Config: ServiceConfig = {
     port: env.get('LISTEN_PORT').default('3000').asPortNumber(),
+    outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
 };
