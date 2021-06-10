@@ -299,11 +299,14 @@ paths:
         content:
           application/xml:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/PAIN.001'
-                - $ref: '#/components/schemas/PAIN.002'
-                - $ref: '#/components/schemas/PAIN.008'
-                - $ref: '#/components/schemas/PAIN.013'
+              $ref: '#/components/schemas/PAIN.001'
+              #$ref: './xsd/pain.001.001.10_1.xsd'
+              # oneOf:
+                #- $ref: '#/components/schemas/PAIN.001'
+                # - $ref: '#/components/schemas/PAIN.002'
+                # - $ref: '#/components/schemas/PAIN.008'
+                # - $ref: '#/components/schemas/PAIN.013'
+        required: true
       responses:
         200:
           description: OK
@@ -315,100 +318,228 @@ components:
       type: object
       description: ISO 20022 PAIN.001 message
       xml:
-        name: 'Document'
-        namespace: 'http://www.w3.org/2001/XMLSchema-instance'
+        namespace: 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.10'
       properties:
-        CstmrCdtTrfInitn:
+        Document:
           type: object
           properties:
-            GrpHdr:
+            CstmrCdtTrfInitn:
+              type: array
+              maxItems: 1
+              items:
+                type: object
+                properties:
+                  GrpHdr:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        MsgId:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        CreDtTm:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        NbOfTxs:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        InitgPty:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              Nm:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: string
+                              Id:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:  
+                                    OrgId:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          AnyBIC:
+                                            type: array
+                                            maxItems: 1
+                                            items:
+                                              type: string
+                  PmtInf:
+                    type: array
+                    maxItems: 1
+                    items:
+                      type: object
+                      properties:
+                        PmtInfId:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        PmtMtd:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        ReqdExctnDt:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              Dt:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: string
+                                  format: date
+                        Dbtr:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              CtctDtls:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    MobNb:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                        DbtrAcct:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              Id:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    Othr:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          Id:
+                                            type: array
+                                            maxItems: 1
+                                            items:
+                                              type: string
+                        DbtrAgt:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              FinInstnId:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    BICFI:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                                    Nm:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                        ChrgBr:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        CdtTrfTxInf:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              PmtId:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    EndToEndId:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                              Amt:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    InstdAmt:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          _:
+                                            type: string
+                                          $:
+                                            type: object
+                                            properties:
+                                              Ccy:
+                                                type: string 
+                              Cdtr:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:  
+                                    CtctDtls:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          MobNb:
+                                            type: array
+                                            maxItems: 1
+                                            items:
+                                              type: string
+            $:
               type: object
               properties:
-                MsgId:
+                xmlns:
                   type: string
-                CreDtTm:
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.10'
+                xmlns:xsi:
                   type: string
-                NbOfTxs:
-                  type: integer
-                InitgPty:
-                  type: object
-                  properties:
-                    Nm:
-                      type: string
-                    Id:
-                      type: object
-                      properties:
-                        OrgId:
-                          type: object
-                          properties:
-                            AnyBIC:
-                              type: string
-                PmtInf:
-                  type: object
-                  properties:
-                    PmtInfId:
-                      type: string
-                    PmtMtd:
-                      type: string
-                    ReqdExctnDt:
-                      type: object
-                      properties:
-                        Dt:
-                          type: string
-                    Dbtr:
-                      type: object
-                      properties:
-                        CtctDtls:
-                          type: object
-                          properties:
-                            MobNb:
-                              type: string
-                    DbtrAcct:
-                      type: object
-                      properties:
-                        Id:
-                          type: object
-                          properties:
-                            Othr:
-                              type: object
-                              properties:
-                                Id:
-                                  type: string
-                    DbtrAgt:
-                      type: object
-                      properties:
-                        FinInstnId:
-                          type: object
-                          properties:
-                            BICFI:
-                              type: string
-                            Nm:
-                              type: string
-                    ChrgBr:
-                      type: string
-                    CdtTrfTxInf:
-                      type: object
-                      properties:
-                        PmtId:
-                          type: object
-                          properties:
-                            EndToEndId:
-                              type: string
-                        Amt:
-                          type: object
-                          properties:
-                            InstdAmt:
-                              type: string
-                              # TODO: Nee to represent the currency attribute ("Ccy") of InstdAmt
-                        Cdtr:
-                          type: object
-                          properties:
-                            CtctDtls:
-                              type: object
-                              properties:
-                                MobNb:
-                                  type: string
-                        
+                  pattern: 'http://www.w3.org/2001/XMLSchema-instance'
+              required:
+                - xmlns
 
+          required:
+            - CstmrCdtTrfInitn
+            - $
+      required: 
+        - Document
                     
-

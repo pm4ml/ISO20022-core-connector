@@ -24,3 +24,7 @@ export interface ApiContext extends Koa.Context {
 export interface HandlerMap {
     [key: string]: { [key: string]: (ctx: ApiContext, next?: Koa.Next) => void };
 }
+
+export interface OutboundHandlerMap {
+    [key: string]: (ctx: ApiContext, next?: Koa.Next) => void
+}
