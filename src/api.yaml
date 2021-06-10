@@ -299,10 +299,8 @@ paths:
         content:
           application/xml:
             schema:
-              $ref: '#/components/schemas/PAIN.001'
-              #$ref: './xsd/pain.001.001.10_1.xsd'
-              # oneOf:
-                #- $ref: '#/components/schemas/PAIN.001'
+              oneOf:
+                - $ref: '#/components/schemas/PAIN.001'
                 # - $ref: '#/components/schemas/PAIN.002'
                 # - $ref: '#/components/schemas/PAIN.008'
                 # - $ref: '#/components/schemas/PAIN.013'
@@ -317,8 +315,6 @@ components:
     PAIN.001:
       type: object
       description: ISO 20022 PAIN.001 message
-      xml:
-        namespace: 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.10'
       properties:
         Document:
           type: object
