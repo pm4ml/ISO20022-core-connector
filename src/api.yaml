@@ -334,12 +334,13 @@ components:
                           type: array
                           maxItems: 1
                           items:
-                            type: string
+                            $ref: '#/components/schemas/UUID'
                         CreDtTm:
                           type: array
                           maxItems: 1
                           items:
                             type: string
+                            format: date-time
                         NbOfTxs:
                           type: array
                           maxItems: 1
@@ -383,7 +384,7 @@ components:
                           type: array
                           maxItems: 1
                           items:
-                            type: string
+                            $ref: '#/components/schemas/UUID'
                         PmtMtd:
                           type: array
                           maxItems: 1
@@ -484,7 +485,7 @@ components:
                                       type: array
                                       maxItems: 1
                                       items:
-                                        type: string
+                                        $ref: '#/components/schemas/UUID'
                               Amt:
                                 type: array
                                 maxItems: 1
@@ -538,4 +539,9 @@ components:
             - $
       required: 
         - Document
-                    
+  
+    UUID:
+      title: ID
+      type: string
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
