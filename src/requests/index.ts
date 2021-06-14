@@ -8,32 +8,25 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-export interface IPostQuotesBody {
-    quoteId: string,
-    transactionId: string,
-    payee: {
-        partyIdInfo: {
-            partyIdType: string,
-            partyIdentifier: string,
-            fspId: string
-        }
-    },
-    payer: {
-        partyIdInfo: {
-            partyIdType: string,
-            partyIdentifier: string,
-            fspId: string
-        }
-    },
-    amountType: string,
-    amount: {
-        currency: string,
-        amount: number,
-    },
-    transactionType: {
-        scenario: string,
-        initiator: string,
-        initiatorType: string
-    },
-    expiration: string
+import * as util from 'util';
+
+export class HTTPResponseError extends Error {
+    params: any;
+
+    constructor(params: { msg: string; [key: string]: any }) {
+        super(params.msg);
+        this.params = params;
+    }
+
+    getData(): any {
+        return this.params;
+    }
+
+    toString(): string {
+        return util.inspect(this.params);
+    }
+
+    toJSON(): string {
+        return JSON.stringify(this.params);
+    }
 }

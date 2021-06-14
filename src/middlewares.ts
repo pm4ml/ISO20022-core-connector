@@ -16,7 +16,7 @@ import { Logger } from '@mojaloop/sdk-standard-components';
 import { ApiContext, HandlerMap } from './types';
 
 import randomPhrase from './lib/randomphrase';
-import { HTTPResponseError } from './lib/requests';
+import { HTTPResponseError } from './requests';
 
 /**
  * Log raw to console as a last resort
