@@ -300,8 +300,9 @@ paths:
           application/xml:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/PAIN.001'
-                # - $ref: '#/components/schemas/PAIN.002'
+                - $ref: '#/components/schemas/CAMT.003'
+                - $ref: '#/components/schemas/PACS.008'
+                # - $ref: '#/components/schemas/PAIN.001'
                 # - $ref: '#/components/schemas/PAIN.008'
                 # - $ref: '#/components/schemas/PAIN.013'
         required: true
@@ -309,12 +310,248 @@ paths:
         200:
           description: OK
 
-
 components:
   schemas:
+    CAMT.003:
+      type: object
+      description: ISO 20022 CAMT.003 message (Get Parties Request)
+      properties:
+        Document:
+          type: object
+          properties:
+            GetAcct:
+              type: array
+              maxItems: 1
+              items:
+                type: object
+                properties:
+                  AcctQryDef:
+                    type: array
+                    maxItems: 1
+                    items:
+                      type: object
+                      properties:
+                        AcctCrit:
+                          type: array
+                          maxItems: 1
+                          items: 
+                            type: object
+                            properties: 
+                              NewCrit:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    SchCrit:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          AcctId:
+                                            type: array
+                                            maxItems: 1
+                                            items:
+                                              type: object
+                                              properties:
+                                                EQ:
+                                                  type: array
+                                                  maxItems: 1
+                                                  items:
+                                                    type: object
+                                                    properties:
+                                                      Othr:
+                                                        type: array
+                                                        maxItems: 1
+                                                        items:
+                                                          type: object
+                                                          properties:
+                                                            Id:
+                                                              type: array
+                                                              maxItems: 1
+                                                              items:
+                                                                type: string
+      required:
+        - Document
+
+    PACS.008:
+      type: object
+      description: ISO 20022 PACS.008 message (Transfer Request)
+      properties:
+        Document:
+          type: object
+          properties:
+            FIToFICstmrCdtTrf:
+              type: array
+              maxItems: 1
+              items:
+                type: object
+                properties:
+                  GrpHdr:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        MsgId:
+                          type: array
+                          maxItems: 1
+                          items:
+                            $ref: '#/components/schemas/UUID'
+                        CreDtTm:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                            format: date-time
+                        NbOfTxs:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: integer
+                        SttlmInf:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              SttlmMtd:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: string
+                  CdtTrfTxInf:
+                    type: array
+                    maxItems: 1
+                    items:
+                      type: object
+                      properties:
+                        PmtId:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              EndToEndId:
+                                type: array
+                                maxItems: 1
+                                items: 
+                                  $ref: '#/components/schemas/UUID'
+                        Cndtn:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties: 
+                              Condition:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: string
+                        IntrBkSttlmAmt:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              _:
+                                type: string
+                              $:
+                                type: object
+                                properties:
+                                  Ccy:
+                                    type: string            
+                        ChrgBr:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                        Dbtr:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              CtctDtls:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    MobNb:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                        DbtrAgt:
+                          type: array
+                          maxItems: 1
+                          items: 
+                            type: object
+                            properties:
+                              FinInstnId:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    BICFI:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                                    Nm:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                        CdtrAgt:
+                          type: array
+                          maxItems: 1
+                          items: 
+                            type: object
+                            properties:
+                              FinInstnId:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    BICFI:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                                    Nm:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string
+                        Cdtr:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              CtctDtls:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    MobNb:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: string     
+          required:
+            - FIToFICstmrCdtTrf
+      required:
+        - Document
+    
     PAIN.001:
       type: object
-      description: ISO 20022 PAIN.001 message
+      description: ISO 20022 PAIN.001 message (Quote Request)
       properties:
         Document:
           type: object
@@ -557,7 +794,53 @@ components:
             - $
       required: 
         - Document
-  
+    
+    PACS.002:
+      type: object
+      description: ISO 20022 PACS.002 message (Transfer Fulfilment) - REMOVE - This is outward message
+      properties:
+        Document:
+          type: object
+          properties:
+            FIToFIPmtStsRpt:
+              type: array
+              maxItems: 1
+              items:
+                type: object
+                properties:
+                  GrpHdr:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        MsgId:
+                          type: array
+                          maxItems: 1
+                          items:
+                            $ref: '#/components/schemas/UUID'
+                        CreDtTm:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                            format: date-time
+                        Flflmnt:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: object
+                            properties:
+                              Fulfilment:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: string
+
+          required:
+              - FIToFIPmtStsRpt
+      required:
+          - Document
+    
     UUID:
       title: ID
       type: string

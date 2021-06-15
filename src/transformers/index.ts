@@ -8,7 +8,9 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { AmountType, IDType, IPostQuotesRequestBody, IPostTransfersRequestBody, TransactionType } from '~/interfaces';
+import {
+    AmountType, IDType, IPostTransfersRequestBody, TransactionType,
+} from '~/interfaces';
 
 /**
  * Translates ISO 20022 pain.001 to POST transfers request body
@@ -51,6 +53,7 @@ export const pain001ToPostTransfersBody = (pain001Body: Record<string, any>): IP
  * @param pain001Body
  * @returns {IPostTransfersRequestBody}
  */
+/**
 export const pain001ToPostQuotesBody = (pain001Body: Record<string, any>): IPostQuotesRequestBody => {
     const PmtInf = pain001Body.Document.CstmrCdtTrfInitn[0].PmtInf[0];
 
@@ -86,3 +89,4 @@ export const pain001ToPostQuotesBody = (pain001Body: Record<string, any>): IPost
 
     return quotesBody;
 };
+*/

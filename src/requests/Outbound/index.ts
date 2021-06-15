@@ -9,7 +9,7 @@
  **************************************************************************/
 
 import axios, { AxiosResponse } from 'axios';
-import { IPostQuotesRequestBody, IPostTransfersRequestBody } from '~/interfaces';
+import { IPostTransfersRequestBody } from '~/interfaces';
 import { Config } from '~/config';
 
 const request = axios.create({
@@ -31,5 +31,5 @@ const buildHeaders = () => {
     return headers;
 };
 
-export const postQuotes = (quotesBody: IPostQuotesRequestBody): Promise<AxiosResponse<any>> => request.post('/quotes', quotesBody, { headers: buildHeaders() });
+// export const postQuotes = (quotesBody: IPostQuotesRequestBody): Promise<AxiosResponse<any>> => request.post('/quotes', quotesBody, { headers: buildHeaders() });
 export const postTransfers = (transfersBody: IPostTransfersRequestBody): Promise<AxiosResponse<any>> => request.post('/transfers', transfersBody, { headers: buildHeaders() });

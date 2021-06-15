@@ -63,35 +63,35 @@ export interface IExtensionItem {
     value: string,
 }
 
-export interface IPostQuotesRequestBody {
-    quoteId: string,
-    transactionId: string,
-    payee: {
-        partyIdInfo: {
-            partyIdType: string,
-            partyIdentifier: string,
-            fspId: string
-        }
-    },
-    payer: {
-        partyIdInfo: {
-            partyIdType: string,
-            partyIdentifier: string,
-            fspId: string
-        }
-    },
-    amountType: string,
-    amount: {
-        currency: string,
-        amount: number,
-    },
-    transactionType: {
-        scenario: string,
-        initiator: string,
-        initiatorType: string
-    },
-    expiration: string
-}
+// export interface IPostQuotesRequestBody {
+//     quoteId: string,
+//     transactionId: string,
+//     payee: {
+//         partyIdInfo: {
+//             partyIdType: string,
+//             partyIdentifier: string,
+//             fspId: string
+//         }
+//     },
+//     payer: {
+//         partyIdInfo: {
+//             partyIdType: string,
+//             partyIdentifier: string,
+//             fspId: string
+//         }
+//     },
+//     amountType: string,
+//     amount: {
+//         currency: string,
+//         amount: number,
+//     },
+//     transactionType: {
+//         scenario: string,
+//         initiator: string,
+//         initiatorType: string
+//     },
+//     expiration: string
+// }
 
 export interface IPostTransfersRequestBody {
     homeTransactionId: string,
