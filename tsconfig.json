@@ -13,7 +13,7 @@
     "declaration": true,
     "sourceMap": true,
     "noEmit": false,
-    "rootDir": "./",
+    "rootDir": "./src",
     "outDir": "build",
     "strict": true,
     "noImplicitAny": true,

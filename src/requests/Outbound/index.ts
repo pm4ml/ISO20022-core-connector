@@ -8,20 +8,24 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ApiContext, HandlerMap } from '../types';
-import { OutboundHandler } from './Outbound';
+import axios, { AxiosResponse } from 'axios';
+import { Config } from '~/config';
 
-const healthCheck = async (ctx: ApiContext): Promise<void> => {
-    ctx.body = JSON.stringify({ status: 'ok' });
+const request = axios.create({
+    baseURL: Config.outboundEndpoint,
+});
+
+/**
+ * Utility method to build a set of headers required by the SDK outbound API
+ *
+ * @returns {object} - Object containing key/value pairs of HTTP headers
+ */
+const buildHeaders = () => {
+    const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Date: new Date().toUTCString(),
+    };
+
+    return headers;
 };
-
-const Handlers: HandlerMap = {
-    '/health': {
-        get: healthCheck,
-    },
-    '/outbound/iso20022': {
-        post: OutboundHandler,
-    },
-};
-
-export default Handlers;

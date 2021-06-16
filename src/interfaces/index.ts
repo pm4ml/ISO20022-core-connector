@@ -7,21 +7,7 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
-
-import { ApiContext, HandlerMap } from '../types';
-import { OutboundHandler } from './Outbound';
-
-const healthCheck = async (ctx: ApiContext): Promise<void> => {
-    ctx.body = JSON.stringify({ status: 'ok' });
-};
-
-const Handlers: HandlerMap = {
-    '/health': {
-        get: healthCheck,
-    },
-    '/outbound/iso20022': {
-        post: OutboundHandler,
-    },
-};
-
-export default Handlers;
+export interface IExtensionItem {
+    key: string,
+    value: string,
+}
