@@ -11,3 +11,12 @@ export interface IExtensionItem {
     key: string,
     value: string,
 }
+
+export enum IDType {
+    ACCOUNT_ID = 'ACCOUNT_ID',
+}
+
+export interface IGetPartiesParams {
+    idType: IDType.ACCOUNT_ID,
+    idValue: string,
+}

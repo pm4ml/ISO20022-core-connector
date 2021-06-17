@@ -372,6 +372,33 @@ components:
                                                               maxItems: 1
                                                               items:
                                                                 type: string
+                                                          required:
+                                                            - Id
+                                                    required:
+                                                      - Othr
+                                              required:
+                                                - EQ
+                                        required:
+                                          - AcctId
+                                  required:
+                                    - SchCrit
+                            required:
+                              - NewCrit
+                      required:
+                        - AcctCrit
+                required:
+                  - AcctQryDef
+            $:
+              type: object
+              properties:
+                xmlns:
+                  type: string
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07'
+              required:
+                - xmlns
+          required:
+            - GetAcct
+            - $
       required:
         - Document
 
@@ -544,8 +571,17 @@ components:
                                       maxItems: 1
                                       items:
                                         type: string     
+            $:
+              type: object
+              properties:
+                xmlns:
+                  type: string
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.10'
+              required:
+                - xmlns                                        
           required:
             - FIToFICstmrCdtTrf
+            - $
       required:
         - Document
     

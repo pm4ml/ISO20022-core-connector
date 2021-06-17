@@ -9,10 +9,12 @@
  **************************************************************************/
 
 import axios, { AxiosResponse } from 'axios';
-import { Config } from '~/config';
+import { Config } from '../../config';
+import { IGetPartiesParams } from '../../interfaces';
 
 const request = axios.create({
     baseURL: Config.outboundEndpoint,
+    timeout: Config.requestTimeout,
 });
 
 /**
@@ -29,3 +31,5 @@ const buildHeaders = () => {
 
     return headers;
 };
+
+export const getParties = (params: IGetPartiesParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });

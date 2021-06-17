@@ -18,6 +18,7 @@ export interface ServiceConfig {
     outboundEndpoint: string,
     autoAcceptParties: boolean,
     autoAcceptQuotes: boolean,
+    requestTimeout: number | undefined,
 }
 
 export const Config: ServiceConfig = {
@@ -25,4 +26,5 @@ export const Config: ServiceConfig = {
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
     autoAcceptParties: env.get('AUTO_ACCEPT_PARTY').required().asBool(),
     autoAcceptQuotes: env.get('AUTO_ACCEPT_QUOTES').required().asBool(),
+    requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
 };

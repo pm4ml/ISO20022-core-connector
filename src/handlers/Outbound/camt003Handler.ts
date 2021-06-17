@@ -8,23 +8,17 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { IDType, IGetPartiesParams } from '../interfaces';
+import { getParties } from '../../requests/Outbound';
+import { camt003ToGetPartiesParams } from '../../transformers';
+import { ApiContext } from '../../types';
 
-
-/**
- * Translates ISO 20022 camt.003 to an object with parties lookup parameters.
- *
- * @param camt003Body
- * @returns {object}
- */
-export const camt003ToGetPartiesParams = (camt003Body: Record<string, any>): IGetPartiesParams => {
-    const idValue = camt003Body.Document.GetAcct[0]
-        .AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
-
-    const getPartiesParams: IGetPartiesParams = {
-        idType: IDType.ACCOUNT_ID,
-        idValue,
-    };
-
-    return getPartiesParams;
+export const camt003Handler = async (ctx: ApiContext): Promise<void> => {
+    try {
+        const params = camt003ToGetPartiesParams(ctx.request.body);
+        await getParties(params);
+        // TODO: translate response to ISO and respond properly back to ISO system
+    } catch (e) {
+        // TODO: translate error to ISO and respond properly to ISO system
+        ctx.state.logger.error(e);
+    }
 };

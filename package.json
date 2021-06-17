@@ -1,6 +1,6 @@
 {
   "name": "iso20022-core-connector",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ISO20022 Core Connector for Mojaloop",
   "main": "index.js",
   "scripts": {
@@ -16,9 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/pm4ml/ISO20022-core-connector.git"
   },
-  "authors": [
-    "Steven Oderayi <steven.oderayi@modusbox.com>"
-  ],
+  "author": "Steven Oderayi <steven.oderayi@modusbox.com>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/pm4ml/ISO20022-core-connector/issues"

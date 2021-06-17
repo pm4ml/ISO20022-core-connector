@@ -7,11 +7,11 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
-import { ApiContext, OutboundHandlerMap } from '~/types';
-import { pain001Handler } from '../Outbound/pain001';
+import { ApiContext, OutboundHandlerMap } from '../../types';
+import { camt003Handler } from '../Outbound/camt003Handler';
 
 const xmlnsToHandlersMap: OutboundHandlerMap = {
-    'urn:iso:std:iso:20022:tech:xsd:pain.001.001.10': pain001Handler,
+    'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07': camt003Handler,
 };
 
 const handleError = (err: Error, ctx: ApiContext) => {
@@ -21,13 +21,11 @@ const handleError = (err: Error, ctx: ApiContext) => {
 export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     let response;
     try {
-        const namespace = ctx.request.body.Document && ctx.request.body.Document.$ && ctx.request.body.Document.$.xmlns;
-        const handler = (namespace && xmlnsToHandlersMap[namespace]) || undefined;
-        if(handler) {
-            response = await handler(ctx);
-            ctx.response.status = 200;
-            ctx.response.body = response;
-        } else throw new Error(`Couldn't find handler for namesapace ${namespace}.`);
+        const namespace = ctx.request.body.Document.$.xmlns;
+        const handler = xmlnsToHandlersMap[namespace];
+        response = await handler(ctx);
+        ctx.response.status = 200;
+        ctx.response.body = response;
     } catch (err) {
         handleError(err, ctx);
     }
