@@ -4,7 +4,8 @@
   "description": "ISO20022 Core Connector for Mojaloop",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "npm run test:unit",
+    "test:unit": "jest",
     "lint": "eslint --ext .js,.ts src --color",
     "lint:fix": "eslint --ext .js,.ts src --color --fix",
     "prettier": "prettier --write 'src/**/*.{ts,js,json}'",
