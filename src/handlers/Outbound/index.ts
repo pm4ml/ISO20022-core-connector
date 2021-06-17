@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import { ApiContext, OutboundHandlerMap } from '../../types';
-import { camt003Handler } from '../Outbound/camt003Handler';
+import camt003Handler from '../Outbound/camt003Handler';
 
 const xmlnsToHandlersMap: OutboundHandlerMap = {
     'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07': camt003Handler,

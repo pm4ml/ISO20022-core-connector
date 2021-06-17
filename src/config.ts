@@ -10,21 +10,23 @@
 
 import * as env from 'env-var';
 import * as dotenv from 'dotenv';
+import { Logger } from '@mojaloop/sdk-standard-components';
 
 dotenv.config();
 
 export interface ServiceConfig {
-    port: number,
+    port?: number,
     outboundEndpoint: string,
-    autoAcceptParties: boolean,
+    autoAcceptParty: boolean,
     autoAcceptQuotes: boolean,
-    requestTimeout: number | undefined,
+    requestTimeout?: number,
+    logger?: Logger.Logger
 }
 
 export const Config: ServiceConfig = {
     port: env.get('LISTEN_PORT').default('3000').asPortNumber(),
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
-    autoAcceptParties: env.get('AUTO_ACCEPT_PARTY').required().asBool(),
+    autoAcceptParty: env.get('AUTO_ACCEPT_PARTY').required().asBool(),
     autoAcceptQuotes: env.get('AUTO_ACCEPT_QUOTES').required().asBool(),
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
 };

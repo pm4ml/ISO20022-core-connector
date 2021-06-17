@@ -43,18 +43,6 @@ const createErrorHandler = () => async (
 };
 
 /**
- * tag each incoming request with a unique identifier
- * @return {Function}
- */
-const createRequestIdGenerator = () => async (
-    ctx: ApiContext,
-    next: () => Promise<any>,
-): Promise<void> => {
-    ctx.request.id = randomPhrase();
-    await next();
-};
-
-/**
  * Add a log context for each request, log the receipt and handling thereof
  * @param logger
  * @return {Function}
@@ -132,7 +120,6 @@ const createRouter = (handlerMap: HandlerMap): Router.IMiddleware<any, any> => {
 
 export default {
     createErrorHandler,
-    createRequestIdGenerator,
     createLogger,
     createRouter,
 };

@@ -12,7 +12,7 @@ import { getParties } from '../../requests/Outbound';
 import { camt003ToGetPartiesParams } from '../../transformers';
 import { ApiContext } from '../../types';
 
-export const camt003Handler = async (ctx: ApiContext): Promise<void> => {
+export default async (ctx: ApiContext): Promise<void> => {
     try {
         const params = camt003ToGetPartiesParams(ctx.request.body);
         await getParties(params);
