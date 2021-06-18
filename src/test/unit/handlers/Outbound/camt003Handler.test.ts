@@ -17,12 +17,6 @@ import * as xml2js from 'xml2js';
 import camt003Handler from '../../../../handlers/Outbound/camt003Handler';
 import { IDType, IGetPartiesParams } from '../../../../interfaces';
 
-// jest.disableAutomock();
-
-// import { camt003ToGetPartiesParams } from '../../../../transformers'
-// jest.mock('../../../../transformers');
-// const mockedCamt003tarsnformer = mocked(camt003ToGetPartiesParams, true);
-
 import { getParties } from '../../../../requests/Outbound'
 jest.mock('../../../../requests/Outbound');
 const mockedGetParties = mocked(getParties, true);
@@ -53,14 +47,17 @@ describe('camt003Handler', () => {
 
     it('should initiate get parties call given correct params', async () => {
         const params: IGetPartiesParams = { idType: IDType.ACCOUNT_ID, idValue: '1234567' }
-        expect(xmlStr).toBeTruthy();
-        expect(ctx.request.body);
         await camt003Handler(ctx as any);
-        // expect(mockedCamt003tarsnformer).toBeCalledWith(ctx.request.body);
         expect(mockedGetParties).toBeCalledWith(params);
     });
 
     it('should handle exception when get parties call fails', async () => {
-
+        const params: IGetPartiesParams = { idType: IDType.ACCOUNT_ID, idValue: '1234567' }
+        const error = new Error('Mojaloop Connector unreachable');
+        mockedGetParties.mockRejectedValue(error);
+        ctx.state.logger.error = jest.fn();
+        await camt003Handler(ctx as any);
+        expect(mockedGetParties).toBeCalledWith(params);
+        expect(ctx.state.logger.error).toBeCalledWith(error);
     });
 });
