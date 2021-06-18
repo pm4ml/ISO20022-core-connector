@@ -117,8 +117,11 @@ describe('Server', () => {
             expect(spy).toHaveBeenCalledTimes(0);
         });
 
-        it('should shut down server if server is instantiated', async () => {
-
+        it('should shut down server if server was started/instantiated', async () => {
+            await server.setupApi();
+            const spy = jest.spyOn(server._server, 'close');
+            await server.stop();
+            expect(spy).toHaveBeenCalledTimes(1);
         });
     });
 })
