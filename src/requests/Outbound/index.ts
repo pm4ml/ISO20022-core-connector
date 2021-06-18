@@ -22,7 +22,7 @@ const request = axios.create({
  *
  * @returns {object} - Object containing key/value pairs of HTTP headers
  */
-const buildHeaders = () => {
+export const buildHeaders = (): Record<string, any> => {
     const headers = {
         'Content-Type': 'application/json',
         Accept: 'application/json',
