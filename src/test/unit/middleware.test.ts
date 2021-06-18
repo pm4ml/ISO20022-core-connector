@@ -17,6 +17,12 @@ describe('middleware', () => {
         });
     });
 
+    describe('createRequestIdGenerator', () => {
+        it('should return a middleware that generates randomphrase as request Id for all requests', () => {
+
+        });
+    })
+
     describe('createLogger', async() => {
         it('should return a middleware that returns a configured logger instance', async () => {
 
