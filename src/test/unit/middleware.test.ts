@@ -12,6 +12,7 @@
 
 import { Logger } from '@mojaloop/sdk-standard-components';
 import { mocked } from 'ts-jest/utils';
+
 import randomPhrase from '../../lib/randomphrase';
 jest.mock('../../lib/randomphrase');
 const mockedRandomPhrase = mocked(randomPhrase, true);
