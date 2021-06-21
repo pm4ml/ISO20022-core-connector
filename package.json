@@ -2,17 +2,20 @@
   "name": "iso20022-core-connector",
   "version": "0.0.3",
   "description": "ISO20022 Core Connector for Mojaloop",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "npm run test:unit",
-    "test:unit": "jest",
-    "test:coverage": "",
+    "audit:resolve": "SHELL=sh resolve-audit --production",
+    "audit:check": "SHELL=sh check-audit --production",
+    "build": "tsc -p ./tsconfig.json",
+    "copystatic": "cp src/api.yaml build/",
     "lint": "eslint --ext .js,.ts src --color",
     "lint:fix": "eslint --ext .js,.ts src --color --fix",
     "prettier": "prettier --write 'src/**/*.{ts,js,json}'",
-    "build": "tsc -p ./tsconfig.json",
     "postbuild": "npm run copystatic",
-    "copystatic": "cp src/api.yaml build/"
+    "test": "jest --ci --reporters=default --reporters=jest-junit --env=node test/unit/",
+    "test:coverage": "jest --coverage",
+    "updates:check": "npm-check-updates",
+    "updates:update": "npm-check-updates -u && npm install"
   },
   "repository": {
     "type": "git",
@@ -20,6 +23,12 @@
   },
   "author": "Steven Oderayi <steven.oderayi@modusbox.com>",
   "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/pm4ml/ISO20022-core-connector/issues"
   },
@@ -35,40 +44,43 @@
   },
   "devDependencies": {
     "@types/jest": "26.0.23",
-    "@types/koa": "2.13.1",
-    "@types/koa-bodyparser": "4.3.0",
-    "@types/koa-router": "7.4.1",
-    "@types/koa-xml-body": "2.0.2",
+    "@types/koa": "2.13.3",
+    "@types/koa-bodyparser": "4.3.1",
+    "@types/koa-router": "7.4.2",
     "@types/koa__cors": "3.0.2",
-    "@types/node": "14.14.37",
-    "@typescript-eslint/eslint-plugin": "4.19.0",
-    "@typescript-eslint/parser": "4.19.0",
+    "@types/node": "15.12.4",
+    "@types/xml2js": "^0.4.8",
+    "@typescript-eslint/eslint-plugin": "4.27.0",
+    "@typescript-eslint/parser": "4.27.0",
     "eslint-config-airbnb-typescript": "12.3.1",
-    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-import": "2.23.4",
     "eslint-plugin-jsx-a11y": "6.4.1",
-    "eslint-plugin-prettier": "3.3.1",
-    "eslint-plugin-react": "7.23.1",
+    "eslint-plugin-prettier": "3.4.0",
+    "eslint-plugin-react": "7.24.0",
     "jest": "27.0.4",
-    "prettier": "2.2.1",
+    "jest-junit": "12.2.0",
+    "npm-audit-resolver": "2.3.1",
+    "npm-check-updates": "11.7.1",
+    "prettier": "2.3.1",
     "prettier-eslint": "12.0.0",
     "prettier-eslint-cli": "5.0.1",
     "supertest": "6.1.3",
     "ts-jest": "27.0.3",
-    "typescript": "4.2.3",
+    "typescript": "4.3.4",
     "xml2js": "0.4.23"
   },
   "dependencies": {
     "@koa/cors": "3.1.0",
-    "@mojaloop/api-snippets": "12.3.16",
-    "@mojaloop/sdk-standard-components": "15.10.4",
+    "@mojaloop/api-snippets": "12.4.3",
+    "@mojaloop/sdk-standard-components": "15.11.0",
     "axios": "0.21.1",
-    "dotenv": "8.2.0",
-    "env-var": "7.0.0",
+    "dotenv": "10.0.0",
+    "env-var": "7.0.1",
     "koa": "2.13.1",
     "koa-bodyparser": "4.3.0",
-    "koa-oas3": "2.3.0",
+    "koa-oas3": "2.3.1",
     "koa-router": "10.0.0",
     "koa-xml-body": "2.2.0",
-    "tslib": "2.1.0"
+    "tslib": "2.3.0"
   }
 }

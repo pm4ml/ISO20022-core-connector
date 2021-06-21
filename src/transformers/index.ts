@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { IDType, IGetPartiesParams } from '../interfaces';
+import { ICAMT003Body, IDType, IGetPartiesParams } from '../interfaces';
 
 
 /**
@@ -17,8 +17,10 @@ import { IDType, IGetPartiesParams } from '../interfaces';
  * @param camt003Body
  * @returns {object}
  */
-export const camt003ToGetPartiesParams = (camt003Body: Record<string, any>): IGetPartiesParams => {
-    const idValue = camt003Body.Document.GetAcct[0]
+export const camt003ToGetPartiesParams = (camt003Body: string | Record<string, unknown> | ICAMT003Body)
+: IGetPartiesParams => {
+    const body = camt003Body as ICAMT003Body;
+    const idValue = body.Document.GetAcct[0]
         .AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
 
     const getPartiesParams: IGetPartiesParams = {

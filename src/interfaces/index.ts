@@ -20,3 +20,33 @@ export interface IGetPartiesParams {
     idType: IDType.ACCOUNT_ID,
     idValue: string,
 }
+
+export interface INamespacedXMLDoc extends Record<string, unknown> {
+    Document: {
+        $: {
+            xmlns: string
+        }
+    }
+}
+
+export interface ICAMT003Body extends Record<string, unknown> {
+    Document: {
+        GetAcct: [{
+            AcctQryDef: [{
+                AcctCrit: [{
+                    NewCrit: [{
+                        SchCrit: [{
+                            AcctId: [{
+                                EQ: [{
+                                    Othr: [{
+                                        Id: [string]
+                                    }]
+                                }]
+                            }]
+                        }]
+                    }]
+                }]
+            }]
+        }]
+    }
+}

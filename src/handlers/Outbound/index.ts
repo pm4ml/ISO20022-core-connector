@@ -7,6 +7,7 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
+import { INamespacedXMLDoc } from '~/interfaces';
 import { ApiContext, OutboundHandlerMap } from '../../types';
 import camt003Handler from '../Outbound/camt003Handler';
 
@@ -20,14 +21,17 @@ const handleError = (err: Error, ctx: ApiContext) => {
 
 export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     let response;
+    const body = ctx.request.body as INamespacedXMLDoc;
+    const namespace = body.Document.$.xmlns;
+    const handler = xmlnsToHandlersMap[namespace];
+
     try {
-        const namespace = ctx.request.body.Document.$.xmlns;
-        const handler = xmlnsToHandlersMap[namespace];
         response = await handler(ctx);
         ctx.response.status = 200;
         ctx.response.body = response;
     } catch (err) {
         handleError(err, ctx);
     }
+
     return undefined;
 };
