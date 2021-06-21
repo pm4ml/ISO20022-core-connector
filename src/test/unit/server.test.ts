@@ -51,10 +51,6 @@ describe('Server', () => {
             expect(server.setupApi()).rejects.toThrowError(error);
         });
 
-        it('should return server instance if api specification was loaded correctly', async () => {
-            expect(server.setupApi()).resolves.toBe(server);
-        });
-
         it('should not create logger if one is not passed', async () => {
             const spy = jest.spyOn(middlewares, 'createLogger');
             const conf = { ...config, logger: undefined };
@@ -72,7 +68,7 @@ describe('Server', () => {
         });
 
         it('should return http.Server instance on successful setup', async () => {
-            expect(server.setupApi()).resolves.toBe(server);
+            expect(await server.setupApi()).toBe(server._server);
         });
     });
 
