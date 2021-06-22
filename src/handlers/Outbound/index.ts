@@ -32,6 +32,4 @@ export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     } catch (err) {
         handleError(err, ctx);
     }
-
-    return undefined;
 };
