@@ -8,20 +8,25 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ApiContext, HandlerMap } from '../types';
-import { OutboundHandler } from './Outbound';
+import * as util from 'util';
 
-const healthCheck = async (ctx: ApiContext): Promise<void> => {
-    ctx.body = JSON.stringify({ status: 'ok' });
-};
+export class HTTPResponseError extends Error {
+    params: any;
 
-const Handlers: HandlerMap = {
-    '/health': {
-        get: healthCheck,
-    },
-    '/outbound/iso20022': {
-        post: OutboundHandler,
-    },
-};
+    constructor(params: { msg: string; [key: string]: any }) {
+        super(params.msg);
+        this.params = params;
+    }
 
-export default Handlers;
+    getData(): any {
+        return this.params;
+    }
+
+    toString(): string {
+        return util.inspect(this.params);
+    }
+
+    toJSON(): string {
+        return JSON.stringify(this.params);
+    }
+}

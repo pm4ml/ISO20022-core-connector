@@ -10,6 +10,7 @@
 
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
+import xmlBodyParser from 'koa-xml-body';
 import { oas } from 'koa-oas3';
 import cors from '@koa/cors';
 
@@ -37,16 +38,11 @@ export default class Server {
         this._conf = conf;
         this._api = null;
         this._server = null;
+        this._logger = conf.logger;
     }
 
     async setupApi(): Promise<http.Server> {
         this._api = new Koa<ApiContext>();
-
-        this._logger = new Logger.Logger({
-            ctx: {
-                app: 'iso20022-core-connector',
-            },
-        });
 
         let validator;
         try {
@@ -76,7 +72,10 @@ export default class Server {
 
         this._api.use(middlewares.createErrorHandler());
         this._api.use(middlewares.createRequestIdGenerator());
-        this._api.use(middlewares.createLogger(this._logger));
+        if(this._logger) {
+            this._api.use(middlewares.createLogger(this._logger));
+        }
+        this._api.use(xmlBodyParser());
         this._api.use(bodyParser());
         this._api.use(validator);
         this._api.use(middlewares.createRouter(handlers));

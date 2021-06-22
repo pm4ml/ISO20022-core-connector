@@ -6,3 +6,5 @@ node_modules
 .swp
 .vscode
 .env
+junit.xml
+coverage

@@ -2,6 +2,7 @@
   "exclude": [
     "node_modules",
     "build",
+    "src/test"
   ],
   "compilerOptions": {
     "target": "es2018",
@@ -13,7 +14,7 @@
     "declaration": true,
     "sourceMap": true,
     "noEmit": false,
-    "rootDir": "./",
+    "rootDir": "./src",
     "outDir": "build",
     "strict": true,
     "noImplicitAny": true,
@@ -36,5 +37,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": false
-  }
+  },
 }

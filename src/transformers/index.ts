@@ -8,20 +8,25 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ApiContext, HandlerMap } from '../types';
-import { OutboundHandler } from './Outbound';
+import { ICAMT003Body, IDType, IGetPartiesParams } from '../interfaces';
 
-const healthCheck = async (ctx: ApiContext): Promise<void> => {
-    ctx.body = JSON.stringify({ status: 'ok' });
+
+/**
+ * Translates ISO 20022 camt.003 to an object with parties lookup parameters.
+ *
+ * @param camt003Body
+ * @returns {object}
+ */
+export const camt003ToGetPartiesParams = (camt003Body: string | Record<string, unknown> | ICAMT003Body)
+: IGetPartiesParams => {
+    const body = camt003Body as ICAMT003Body;
+    const idValue = body.Document.GetAcct[0]
+        .AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
+
+    const getPartiesParams: IGetPartiesParams = {
+        idType: IDType.ACCOUNT_ID,
+        idValue,
+    };
+
+    return getPartiesParams;
 };
-
-const Handlers: HandlerMap = {
-    '/health': {
-        get: healthCheck,
-    },
-    '/outbound/iso20022': {
-        post: OutboundHandler,
-    },
-};
-
-export default Handlers;

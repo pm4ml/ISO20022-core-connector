@@ -8,20 +8,17 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ApiContext, HandlerMap } from '../types';
-import { OutboundHandler } from './Outbound';
+import { getParties } from '../../requests/Outbound';
+import { camt003ToGetPartiesParams } from '../../transformers';
+import { ApiContext } from '../../types';
 
-const healthCheck = async (ctx: ApiContext): Promise<void> => {
-    ctx.body = JSON.stringify({ status: 'ok' });
+export default async (ctx: ApiContext): Promise<void> => {
+    try {
+        const params = camt003ToGetPartiesParams(ctx.request.body);
+        await getParties(params);
+        // TODO: translate response to ISO and respond properly back to ISO system
+    } catch (e) {
+        // TODO: translate error to ISO and respond properly to ISO system
+        ctx.state.logger.error(e);
+    }
 };
-
-const Handlers: HandlerMap = {
-    '/health': {
-        get: healthCheck,
-    },
-    '/outbound/iso20022': {
-        post: OutboundHandler,
-    },
-};
-
-export default Handlers;

@@ -3,9 +3,10 @@ info:
   title: ISO 20022 Core Connector
   description: ISO 20022 Core Connector for Mojaloop
   version: 0.0.1
+  license:
+    name: Apache-2.0
 
 paths:
-
   /health:
     get:
       summary: Health check endpoint
@@ -15,6 +16,390 @@ paths:
       responses:
         200:
           description: Returns a success response code if the service is healthy.
+  
+  /inbound/parties/:idType/:idValue:
+    get:
+      summary: GET parties
+      description: GET parties
+      tags:
+        - PartiesByTypeAndID
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not Found - The resource specified in the URI was not found.
+          content:
+            application/json:
+              schema:
+                title: NotFoundError
+                type: object
+                properties:
+                  statusCode: 
+                    description: Mojaloop error code
+                required:
+                  - statusCode
+
+  /inbound/quoterequests:
+    post:
+      summary: Quotes request
+      description: Quotes request
+      tags:
+        - postQuotes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: QuotesPostRequest
+              type: object
+              properties:
+                from:
+                  title: Payer party
+                  description: Information about the Payer
+                  type: object
+                  properties:
+                    idType:
+                      description: Payer's identity type
+                    idValue:
+                      description: Payer's identifier
+                    idSubValue:
+                      description: Payer's sub-id
+                    fspId:
+                      description: Payer's FSP ID
+                    extensionList:
+                      description: Extension list
+                    displayName:
+                      description: Payer's display name
+                    dateOfBirth:
+                      description: Payer's birth date
+                    firstName:
+                      description: Payer's first name
+                    middleName:
+                      description: Payer's middle name
+                    lastName:
+                      description: Payer's last name
+                to:
+                  title: Payee party
+                  description: Information about the Payee
+                  type: object
+                  properties:
+                    idType:
+                      description: Payee's identity type
+                    idValue:
+                      description: Payee's identifier
+                    idSubValue:
+                      description: Payee's sub-id
+                    fspId:
+                      description: Payee's FSP ID
+                    extensionList:
+                      description: Extension list
+                    displayName:
+                      description: Payee's display name
+                    dateOfBirth:
+                      description: Payee's birth date
+                    firstName:
+                      description: Payee's first name
+                    middleName:
+                      description: Payee's middle name
+                    lastName:
+                      description: Payee's last name
+                quoteId:
+                  description: Quote ID
+                transactionId: 
+                  description: Common ID (decided by the Payer FSP) between the FSPs for the future transaction object.
+                amountType:
+                  description: Amount type - SEND or RECEIVE
+                amount:
+                  description: Quote amount.
+                currency:
+                  description: Quote currency.
+                transactionType:
+                  description: Transaction scenario
+                initiator:
+                  description: Initiator
+                initiatorType:
+                  description: Initiator type
+                feeAmount:
+                  description: Fee amount
+                feeCurrency:
+                  description: Fee currency
+                geoCode:
+                  description: Geo code
+                note:
+                  description: Note
+                expiration:
+                  description: Quote expiration
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: Quote response
+                type: object
+                properties:
+                  quoteId:
+                    description: Quote ID
+                  transactionId:
+                    description: Transaction ID
+                  transferAmount:
+                    description: Transfer amount
+                  payeeReceiveAmount:
+                    description: Payee receive amount
+                  transferAmountCurrency:
+                    description: Transfer amount currency
+                  payeeReceiveAmountCurrency:
+                    description: Payee receive amount currency
+                  expiration:
+                    description: Transfer expiration
+        500:
+          description: Quote error
+          content:
+            application/json:
+              schema:
+                title: Quote error
+                type: object
+                properties:
+                  statusCode: 
+                    description: Mojaloop error code
+                required:
+                  - statusCode 
+  
+  /inbound/transfers:
+    post:
+      summary: Transfer request
+      description: Transfer request
+      tags:
+        - postTransfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: TransfersPostRequest
+              type: object
+              oneOf:
+                - properties:
+                    transferId:
+                      description: Transfer ID
+                    quote:
+                      description: Quote response
+                      type: object
+                      properties:
+                        quoteId:
+                          description: Quote ID
+                        transactionId:
+                          description: Transaction ID
+                        transferAmount:
+                          description: Transfer amount
+                        payeeReceiveAmount:
+                          description: Payee receive amount
+                        payeeReceiveAmountCurrency:
+                          description: Payee receive amount currency
+                        expiration:
+                          description: Quote expiration
+                    from:
+                      title: Payer party
+                      description: Information about the Payer
+                      type: object
+                      properties:
+                        idType:
+                          description: Payer's identity type
+                        idValue:
+                          description: Payer's identifier
+                        idSubValue:
+                          description: Payer's sub-id
+                        fspId:
+                          description: Payer's FSP ID
+                        extensionList:
+                          description: Extension list
+                        displayName:
+                          description: Payer's display name
+                        dateOfBirth:
+                          description: Payer's birth date
+                        firstName:
+                          description: Payer's first name
+                        middleName:
+                          description: Payer's middle name
+                        lastName:
+                          description: Payer's last name
+                    to:
+                      title: Payee party
+                      description: Information about the Payee
+                      type: object
+                      properties:
+                        idType:
+                          description: Payee's identity type
+                        idValue:
+                          description: Payee's identifier
+                        idSubValue:
+                          description: Payee's sub-id
+                        fspId:
+                          description: Payee's FSP ID
+                        extensionList:
+                          description: Extension list
+                        displayName:
+                          description: Payee's display name
+                        dateOfBirth:
+                          description: Payee's birth date
+                        firstName:
+                          description: Payee's first name
+                        middleName:
+                          description: Payee's middle name
+                        lastName:
+                          description: Payee's last name
+                    amount:
+                      description: Amount
+                    amountType:
+                      description: Amount type
+                    currency:
+                      description: Currency
+                    transactionType:
+                      description: Transactioon type
+                    note:
+                      description: Note
+                - properties:
+                    transferId:
+                      description: Transfer ID
+                    currency:
+                      description: Currency
+                    amount:
+                      description: Amount
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: Transfer response
+                type: object
+                properties:
+                  homeTransactionId:
+                    description: Backend transaction identifier
+        500:
+          description: Tranfer error
+          content:
+            application/json:
+              schema:
+                title: Tranfer error
+                type: object
+                properties:
+                  statusCode: 
+                    description: Mojaloop error code
+                required:
+                  - statusCode 
+
+  /outbound/iso20022:
+    post:
+      summary: POST ISO 20022 message
+      description: POST ISO 20022 message
+      tags:
+        - postISO20022
+      requestBody:
+        content:
+          application/xml:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CAMT.003'
+        required: true
+      responses:
+        200:
+          description: OK
 
 components:
-  schemas: {}
+  schemas:
+    CAMT.003:
+      type: object
+      description: ISO 20022 CAMT.003 message (Get Parties Request)
+      properties:
+        Document:
+          type: object
+          properties:
+            GetAcct:
+              type: array
+              maxItems: 1
+              items:
+                type: object
+                properties:
+                  AcctQryDef:
+                    type: array
+                    maxItems: 1
+                    items:
+                      type: object
+                      properties:
+                        AcctCrit:
+                          type: array
+                          maxItems: 1
+                          items: 
+                            type: object
+                            properties: 
+                              NewCrit:
+                                type: array
+                                maxItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    SchCrit:
+                                      type: array
+                                      maxItems: 1
+                                      items:
+                                        type: object
+                                        properties:
+                                          AcctId:
+                                            type: array
+                                            maxItems: 1
+                                            items:
+                                              type: object
+                                              properties:
+                                                EQ:
+                                                  type: array
+                                                  maxItems: 1
+                                                  items:
+                                                    type: object
+                                                    properties:
+                                                      Othr:
+                                                        type: array
+                                                        maxItems: 1
+                                                        items:
+                                                          type: object
+                                                          properties:
+                                                            Id:
+                                                              type: array
+                                                              maxItems: 1
+                                                              items:
+                                                                type: string
+                                                          required:
+                                                            - Id
+                                                    required:
+                                                      - Othr
+                                              required:
+                                                - EQ
+                                        required:
+                                          - AcctId
+                                  required:
+                                    - SchCrit
+                            required:
+                              - NewCrit
+                      required:
+                        - AcctCrit
+                required:
+                  - AcctQryDef
+            $:
+              type: object
+              properties:
+                xmlns:
+                  type: string
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07'
+              required:
+                - xmlns
+          required:
+            - GetAcct
+            - $
+      required:
+        - Document
+
+    UUID:
+      title: ID
+      type: string
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$

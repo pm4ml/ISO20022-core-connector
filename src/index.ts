@@ -8,6 +8,7 @@
  *       James Bush - james.bush@modusbox.com                             *
  **************************************************************************/
 
+import { Logger } from '@mojaloop/sdk-standard-components';
 import { Config } from './config';
 import Server from './server';
 
@@ -15,7 +16,12 @@ if(require.main === module) {
     (async () => {
         // this module is main i.e. we were started as a server;
         // not used in unit test or "require" scenarios
-        const server = new Server(Config);
+        const logger = new Logger.Logger({
+            ctx: {
+                app: 'iso20022-core-connector',
+            },
+        });
+        const server = new Server({ ...Config, logger });
 
         // handle SIGTERM to exit gracefully
         process.on('SIGTERM', async () => {

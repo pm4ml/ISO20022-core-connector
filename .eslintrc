@@ -3,6 +3,7 @@
   "plugins": ["@typescript-eslint", "import"],
   "extends": ["airbnb-typescript", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
+  "ignorePatterns": ["src/test"],
   "parserOptions": {
     "project": "./tsconfig.json",
     "sourceType": "module"
@@ -61,7 +62,7 @@
     "max-len": [
       "warn",
       {
-        "code": 100,
+        "code": 120,
         "ignoreStrings": true,
         "ignoreTemplateLiterals": true,
         "ignoreComments": true
