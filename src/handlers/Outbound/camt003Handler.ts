@@ -15,8 +15,9 @@ import { ApiContext } from '../../types';
 export default async (ctx: ApiContext): Promise<void> => {
     try {
         const params = camt003ToGetPartiesParams(ctx.request.body);
-        await getParties(params);
+        const res = await getParties(params);
         // TODO: translate response to ISO and respond properly back to ISO system
+        ctx.state.logger.debug(JSON.stringify(res.data));
     } catch (e) {
         // TODO: translate error to ISO and respond properly to ISO system
         ctx.state.logger.error(e);
