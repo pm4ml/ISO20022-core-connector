@@ -152,10 +152,10 @@ jobs:
           name: Build Docker local image
           command: |
             echo "Building Docker image: local"
-            docker build --build-arg NPM_TOKEN=${NPM_TOKEN} -t $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:local .
+            docker build --build-arg NPM_TOKEN=${NPM_TOKEN} -t $CIRCLE_PROJECT_USERNAME/${CIRCLE_PROJECT_REPONAME,}:local .
       - run:
           name: Save docker image to workspace
-          command: docker save -o /tmp/docker-image.tar $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:local
+          command: docker save -o /tmp/docker-image.tar $CIRCLE_PROJECT_USERNAME/${CIRCLE_PROJECT_REPONAME,}:local
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -173,7 +173,7 @@ jobs:
           <<: *defaults_license_scanner
       - run:
           name: Run the license-scanner
-          command: cd /tmp/license-scanner && mode=docker dockerImages=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:local make run
+          command: cd /tmp/license-scanner && mode=docker dockerImages=$CIRCLE_PROJECT_USERNAME/${CIRCLE_PROJECT_REPONAME,}:local make run
       - store_artifacts:
           path: /tmp/license-scanner/results
           prefix: licenses
@@ -254,7 +254,7 @@ workflows:
                     echo 'export IMAGE_TAG=$CIRCLE_BRANCH' >> $BASH_ENV
                   fi
           lint-dockerfile: false
-          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          image: $CIRCLE_PROJECT_USERNAME/${CIRCLE_PROJECT_REPONAME,}
           tag: $IMAGE_TAG
           registry: $DOCKER_REGISTRY
           docker-username: DOCKER_USER
