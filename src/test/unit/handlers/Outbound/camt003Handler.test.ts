@@ -15,7 +15,7 @@ import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
 import * as xml2js from 'xml2js';
 import camt003Handler from '../../../../handlers/Outbound/camt003Handler';
-import { IDType, IGetPartiesParams } from '../../../../interfaces';
+import { IPartyIdType, IPartiesByIdParams  } from '../../../../interfaces';
 
 import { getParties } from '../../../../requests/Outbound'
 jest.mock('../../../../requests/Outbound');
@@ -46,13 +46,13 @@ describe('camt003Handler', () => {
     })
 
     it('should initiate get parties call given correct params', async () => {
-        const params: IGetPartiesParams = { idType: IDType.ACCOUNT_ID, idValue: '1234567' }
+        const params: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' }
         await camt003Handler(ctx as any);
         expect(mockedGetParties).toBeCalledWith(params);
     });
 
     it('should handle exception when get parties call fails', async () => {
-        const params: IGetPartiesParams = { idType: IDType.ACCOUNT_ID, idValue: '1234567' }
+        const params: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' }
         const error = new Error('Mojaloop Connector unreachable');
         mockedGetParties.mockRejectedValue(error);
         ctx.state.logger.error = jest.fn();
