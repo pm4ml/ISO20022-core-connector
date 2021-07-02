@@ -37,7 +37,7 @@ export interface IParty {
     accounts?: Array<IAccount>,
     partyIdInfo: IPartyIdInfo,
     merchantClassificationCode?: string,
-    name?: string,
+    name: string,
     personalInfo?: IPartyPersonalInfo
 }
 
@@ -51,7 +51,7 @@ export interface IPartyIdInfo {
     partyIdType: IPartyIdType,
     partyIdentifier: string,
     partySubIdOrType?: string,
-    fspId?: string,
+    fspId: string,
     extensionList?: Array<IExtensionItem>
 }
 

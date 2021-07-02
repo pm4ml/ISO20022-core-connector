@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { IErrorInformation } from '~/interfaces';
+import { ICamt003, IErrorInformation } from '~/interfaces';
 import { getParties } from '../../requests/Outbound';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
@@ -28,7 +28,7 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        const params = camt003ToGetPartiesParams(ctx.request.body);
+        const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
         ctx.state.logger.debug(JSON.stringify(res.data));
         if(res.data.body.errorInformation) {

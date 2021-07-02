@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import { v4 as uuidv4 } from 'uuid';
-import * as XML from '../lib/xmlUtils';
+import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, IPartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error,
@@ -21,12 +21,11 @@ import {
  * @param ICAMT003
  * @returns {IPartiesByIdParams}
  */
-export const camt003ToGetPartiesParams = (camt003: string | Record<string, unknown> | ICamt003)
+export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICamt003)
 : IPartiesByIdParams => {
     const body = camt003 as ICamt003;
-    const idValue = body.Document.GetAcct[0]
-        .AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
-
+    // eslint-disable-next-line max-len
+    const idValue = body.Document.GetAcct[0].AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
     const getPartiesParams: IPartiesByIdParams = {
         idType: IPartyIdType.ACCOUNT_ID,
         idValue,
@@ -111,6 +110,7 @@ export const partiesByIdResponseToCamt004 = (
  * @returns {ICamt004}
  */
 export const fspiopErrorToCamt004Error = (errorInformation: IErrorInformation): { body: string, status: number } => {
+    // TODO: Map FSPIOP Error code/description to ISO 20022 Code/Desc
     const MsgId = uuidv4();
     const Cd = errorInformation.errorCode;
     const Desc = errorInformation.errorDescription;
@@ -140,5 +140,6 @@ export const fspiopErrorToCamt004Error = (errorInformation: IErrorInformation): 
     let xml = XML.fromJsObject(camt004Error);
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
+    // TODO: Deside appropriate status code based on mapping
     return { body: xml, status: 400 };
 };
