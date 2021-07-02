@@ -8,11 +8,11 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import { v4 as uuidv4 } from 'uuid';
+import * as XML from '../lib/xmlUtils';
 import {
     ICamt003, IPartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error,
 } from '../interfaces';
-import * as XML from '../lib/xmlUtils';
 
 
 /**
@@ -105,7 +105,7 @@ export const partiesByIdResponseToCamt004 = (
 };
 
 /**
- * Translates ML's GET /parties/{Type}/{ID} response to ISO 20022 camt.004 response.
+ * Translates FSPIOP ErrorInformation to ISO 20022 camt.004 error response
  *
  * @param partiesByIdResponse
  * @returns {ICamt004}
