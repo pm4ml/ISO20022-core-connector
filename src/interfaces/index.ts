@@ -86,9 +86,7 @@ export interface ICamt003 extends Record<string, unknown> {
             {
                 GrpHdr: [{
                     MsgId: [string]
-                }]
-            },
-            {
+                }],
                 AcctQryDef: [{
                     AcctCrit: [{
                         NewCrit: [{

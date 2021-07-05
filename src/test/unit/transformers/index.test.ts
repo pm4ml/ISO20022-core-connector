@@ -85,9 +85,9 @@ describe('transformers', () => {
                 errorCode: '3100',
                 errorDescription: 'Party not found'
             }
-            const isoResponse = fspiopErrorToCamt004Error(mockErrInfo);
+            const isoResponse = fspiopErrorToCamt004Error(mockErrInfo, '1234567');
             expect(XSD.validate(isoResponse.body, xsdPath))
-            expect(isoResponse.status).toBe(400);
+            expect(isoResponse.status).toBe(404);
         });
     });
 });

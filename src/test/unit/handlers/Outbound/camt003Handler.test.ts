@@ -74,7 +74,7 @@ describe('camt003Handler', () => {
         expect(XML.fromXml(ctx.response.body)).toBeTruthy();
         expect(XSD.validate(ctx.response.body, xsdPath)).toBe(true);
         expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.status).toEqual(400);
+        expect(ctx.response.status).toEqual(404);
     });
 
     it('should translate happy path response to camt.004', async() => {
