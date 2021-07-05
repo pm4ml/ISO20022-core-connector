@@ -82,23 +82,30 @@ export interface INamespacedXMLDoc extends Record<string, unknown> {
 
 export interface ICamt003 extends Record<string, unknown> {
     Document: {
-        GetAcct: [{
-            AcctQryDef: [{
-                AcctCrit: [{
-                    NewCrit: [{
-                        SchCrit: [{
-                            AcctId: [{
-                                EQ: [{
-                                    Othr: [{
-                                        Id: [string]
+        GetAcct: [
+            {
+                GrpHdr: [{
+                    MsgId: [string]
+                }]
+            },
+            {
+                AcctQryDef: [{
+                    AcctCrit: [{
+                        NewCrit: [{
+                            SchCrit: [{
+                                AcctId: [{
+                                    EQ: [{
+                                        Othr: [{
+                                            Id: [string]
+                                        }]
                                     }]
                                 }]
                             }]
                         }]
                     }]
                 }]
-            }]
-        }]
+            },
+        ]
     }
 }
 

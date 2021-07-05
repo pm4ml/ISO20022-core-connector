@@ -38,7 +38,7 @@ paths:
                     description: Mojaloop error code
                 required:
                   - statusCode
-
+            
   /inbound/quoterequests:
     post:
       summary: Quotes request
@@ -304,10 +304,24 @@ paths:
         required: true
       responses:
         200:
-          description: OK
+          $ref: '#/components/responses/ISO20022.200'
+        404:
+          $ref: '#/components/responses/ISO20022.404'
+        4XX:
+          description: Schema validation error
+        5XX:
+          description: Unexpected error
+
+
 
 components:
   schemas:
+    UUID:
+      title: ID
+      type: string
+      pattern: >-
+        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+    
     CAMT.003:
       type: object
       description: ISO 20022 CAMT.003 message (Get Parties Request)
@@ -397,9 +411,27 @@ components:
             - $
       required:
         - Document
-
-    UUID:
-      title: ID
+    
+    CAMT.004:
       type: string
-      pattern: >-
-        ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+    
+    CAMT.004.Error.404:
+      type: string
+    
+  responses:
+    ISO20022.200:
+      description: OK
+      content: 
+        application/xml:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/CAMT.004'
+
+    ISO20022.404:
+      description: Not found
+      content: 
+        application/xml:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/CAMT.004.Error.404'
+   

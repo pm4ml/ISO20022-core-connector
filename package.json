@@ -7,7 +7,7 @@
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
     "build": "tsc -p ./tsconfig.json",
-    "copystatic": "cp src/api.yaml build/",
+    "copystatic": "cp -R src/api.yaml src/templates build/",
     "lint": "eslint --ext .js,.ts src --color",
     "lint:fix": "eslint --ext .js,.ts src --color --fix",
     "prettier": "prettier --write 'src/**/*.{ts,js,json}'",

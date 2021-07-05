@@ -1,0 +1,23 @@
+<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="urn:iso:std:iso:20022:tech:xsd:camt.003.001.07">
+    <GetAcct>
+        <GrpHdr>
+            <MsgId>7d04b391-0c90-4ad4-9ba8-46232b04e18a</MsgId>
+        </GrpHdr>
+        <AcctQryDef>
+            <AcctCrit>
+                <NewCrit>
+                    <SchCrit>
+                        <AcctId>
+                            <EQ>
+                                <Othr>
+                                    <Id>1234567</Id>
+                                </Othr>
+                            </EQ>
+                        </AcctId>
+                    </SchCrit>
+                </NewCrit>
+            </AcctCrit>
+        </AcctQryDef>
+    </GetAcct>
+</Document>

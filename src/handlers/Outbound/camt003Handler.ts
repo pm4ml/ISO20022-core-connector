@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ICamt003, IErrorInformation } from '~/interfaces';
+import { ICamt003, IErrorInformation } from '../../interfaces';
 import { getParties } from '../../requests/Outbound';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
@@ -17,12 +17,14 @@ import { ApiContext } from '../../types';
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);
     if((error as IErrorInformation).errorCode) {
-        const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation);
+        const originalMsgId = (ctx.request.body as ICamt003).Document.GetAcct[0].GrpHdr[0].MsgId[0];
+        const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation, originalMsgId);
         ctx.response.type = 'application/xml';
         ctx.response.body = body;
         ctx.response.status = status;
     } else {
-        // handle generic JS error
+        ctx.response.body = '';
+        ctx.response.status = 500;
     }
 };
 
@@ -32,10 +34,12 @@ export default async (ctx: ApiContext): Promise<void> => {
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
         ctx.state.logger.debug(JSON.stringify(res.data));
+
         if(res.data.body.errorInformation) {
             handleError(res.data.body.errorInformation, ctx);
             return;
         }
+
         ctx.state.logger.log(res.data);
         ctx.response.type = 'application/xml';
         ctx.response.body = partiesByIdResponseToCamt004(res.data);

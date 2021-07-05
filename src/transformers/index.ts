@@ -7,12 +7,12 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
-import { v4 as uuidv4 } from 'uuid';
 import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, IPartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error,
 } from '../interfaces';
+import { generateMsgId } from '../lib/iso20022';
 
 
 /**
@@ -25,7 +25,7 @@ export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICa
 : IPartiesByIdParams => {
     const body = camt003 as ICamt003;
     // eslint-disable-next-line max-len
-    const idValue = body.Document.GetAcct[0].AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
+    const idValue = body.Document.GetAcct[1].AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
     const getPartiesParams: IPartiesByIdParams = {
         idType: IPartyIdType.ACCOUNT_ID,
         idValue,
@@ -42,7 +42,7 @@ export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICa
  */
 export const partiesByIdResponseToCamt004 = (
     partiesByIdResponse: Record<string, unknown> | IPartiesByIdResponse,
-) : string => {
+): string => {
     const { body } = partiesByIdResponse as IPartiesByIdResponse;
     const acctOrErr = {
         Acct: {
@@ -80,7 +80,7 @@ export const partiesByIdResponseToCamt004 = (
             },
             RtrAcct: {
                 MsgHdr: {
-                    MsgId: uuidv4(),
+                    MsgId: generateMsgId(),
                     CreDtTm: (new Date()).toISOString(),
                 },
                 RptOrErr: {
@@ -109,11 +109,12 @@ export const partiesByIdResponseToCamt004 = (
  * @param partiesByIdResponse
  * @returns {ICamt004}
  */
-export const fspiopErrorToCamt004Error = (errorInformation: IErrorInformation): { body: string, status: number } => {
+export const fspiopErrorToCamt004Error = (_errorInformation: IErrorInformation, originalMsgId: string)
+: { body: string, status: number } => {
     // TODO: Map FSPIOP Error code/description to ISO 20022 Code/Desc
-    const MsgId = uuidv4();
-    const Cd = errorInformation.errorCode;
-    const Desc = errorInformation.errorDescription;
+    const MsgId = generateMsgId();
+    const Cd = 'X050';
+    const Desc = 'Identifier not found';
 
     const camt004Error: ICamt004Error = {
         Document: {
@@ -123,9 +124,9 @@ export const fspiopErrorToCamt004Error = (errorInformation: IErrorInformation): 
             },
             RtrAcct: {
                 MsgHdr: {
-                    MsgId: uuidv4(),
+                    MsgId,
                     CreDtTm: (new Date()).toISOString(),
-                    OrgnlBizQry: { MsgId },
+                    OrgnlBizQry: { MsgId: originalMsgId },
                 },
                 RptOrErr: {
                     OprlErr: {
@@ -140,6 +141,5 @@ export const fspiopErrorToCamt004Error = (errorInformation: IErrorInformation): 
     let xml = XML.fromJsObject(camt004Error);
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
-    // TODO: Deside appropriate status code based on mapping
-    return { body: xml, status: 400 };
+    return { body: xml, status: 404 };
 };
