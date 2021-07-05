@@ -43,7 +43,7 @@ describe('camt003Handler', () => {
     let xmlStr: string;
 
     beforeAll(async () => {
-        xmlStr = fs.readFileSync(path.join(__dirname, '../../data/camt003.xml')).toString();
+        xmlStr = fs.readFileSync(path.join(__dirname, '../../data/camt.003.xml')).toString();
         ctx.request.body = await new Promise((resolve, reject) => {
             xml2js.parseString(xmlStr, (err, result) => {
                 err ? reject(err) : resolve(result)

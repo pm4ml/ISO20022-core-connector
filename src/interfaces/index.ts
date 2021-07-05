@@ -84,7 +84,7 @@ export interface ICamt003 extends Record<string, unknown> {
     Document: {
         GetAcct: [
             {
-                GrpHdr: [{
+                MsgHdr: [{
                     MsgId: [string]
                 }],
                 AcctQryDef: [{

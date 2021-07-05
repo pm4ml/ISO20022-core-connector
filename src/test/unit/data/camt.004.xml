@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:camt.004.001.08">
+    <RtrAcct>
+        <MsgHdr>
+            <MsgId>{{msgId}}</MsgId>
+            <CreDtTm>{{timestamp}}</CreDtTm>
+        </MsgHdr>
+        <RptOrErr>
+            <AcctRpt>
+                <AcctId>
+                    <Othr>
+                        <Id>{{party.partyIdInfo.partyIdentifier}}</Id>
+                    </Othr>
+                </AcctId>
+                <AcctOrErr>
+                    <Acct>
+                        <Ownr>
+                            <CtctDtls>
+                                <Nm>{{party.name}}<Nm>
+                                <MobNb>{{party.partyIdInfo.extensionList["MSISDN"]}}</MobNb>
+                                <EmailAdr>{{party.partyIdInfo.extensionlist["EMAIL"]}}</EmailAdr>
+                            </CtctDtls>
+                        </Ownr>
+                        <Svcr>
+                            <FinInstnId>
+                                <Othr>
+                                    <Id>{{party.partyIdInfo.fspId}}</Id>
+                                </Othr>
+                            </FinInstnId>
+                        </Svcr>
+                    </Acct>
+                </AcctOrErr>
+            </AcctRpt>
+        </RptOrErr>
+    </RtrAcct>
+</Document>

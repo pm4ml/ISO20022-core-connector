@@ -23,7 +23,7 @@ describe('transformers', () => {
     const xsdPath = 'src/templates/xsd/camt.004.xsd';
     describe('camt003ToGetPartiesParams', () => {
         it('should return parameters for `PartiesById` request given a valid camt.003 message', async () => {
-            const xmlStr = fs.readFileSync(path.join(__dirname, '../data/camt003.xml')).toString();
+            const xmlStr = fs.readFileSync(path.join(__dirname, '../data/camt.003.xml')).toString();
             const camt003 = await new Promise((resolve, reject) => {
                 xml2js.parseString(xmlStr, (err, result) => {
                     err ? reject(err) : resolve(result)
