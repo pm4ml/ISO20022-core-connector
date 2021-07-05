@@ -28,6 +28,7 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
+        // TODO: Run camt.003 XSD validation or apply at OpenAPI validation level
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
         ctx.state.logger.debug(JSON.stringify(res.data));

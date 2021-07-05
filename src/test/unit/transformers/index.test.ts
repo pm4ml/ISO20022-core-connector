@@ -29,6 +29,7 @@ describe('transformers', () => {
                     err ? reject(err) : resolve(result)
                 });
             });
+
             const params = camt003ToGetPartiesParams(camt003 as ICamt003);
             expect(params).toMatchObject({ idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' });
         });

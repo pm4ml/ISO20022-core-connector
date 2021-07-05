@@ -10,12 +10,14 @@
 
 'use strict'
 
+import { AxiosResponse } from 'axios';
 import fs from 'fs';
 import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
 import * as xml2js from 'xml2js';
 import camt003Handler from '../../../../handlers/Outbound/camt003Handler';
-import { IPartyIdType, IPartiesByIdParams  } from '../../../../interfaces';
+import { IPartyIdType, IPartiesByIdParams, IErrorInformation, IPartiesByIdResponse  } from '../../../../interfaces';
+import { XML, XSD } from '../../../../lib/xmlUtils';
 
 import { getParties } from '../../../../requests/Outbound'
 jest.mock('../../../../requests/Outbound');
@@ -29,10 +31,15 @@ describe('camt003Handler', () => {
         },
         state: {
             logger: {
-                error: console.log
+                error: jest.fn(),
+                debug: jest.fn(),
+                log: jest.fn()
             }
-        }
+        },
+        response: {type: null, status: null, body: ''}
     };
+    const partiesByIdParams: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' }
+    const xsdPath = 'src/templates/xsd/camt.004.xsd';
     let xmlStr: string;
 
     beforeAll(async () => {
@@ -46,18 +53,47 @@ describe('camt003Handler', () => {
     })
 
     it('should initiate get parties call given correct params', async () => {
-        const params: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' }
         await camt003Handler(ctx as any);
-        expect(mockedGetParties).toBeCalledWith(params);
+        expect(mockedGetParties).toBeCalledWith(partiesByIdParams);
     });
 
     it('should handle exception when get parties call fails', async () => {
-        const params: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' }
         const error = new Error('Mojaloop Connector unreachable');
         mockedGetParties.mockRejectedValue(error);
-        ctx.state.logger.error = jest.fn();
         await camt003Handler(ctx as any);
-        expect(mockedGetParties).toBeCalledWith(params);
+        expect(mockedGetParties).toBeCalledWith(partiesByIdParams);
         expect(ctx.state.logger.error).toBeCalledWith(error);
+    });
+
+    it('should translate FSPIOP error to camt.004', async () => {
+        const error: IErrorInformation = { errorCode: '3100', errorDescription: 'Party not found' };
+        mockedGetParties.mockResolvedValue({ data: { body:  { errorInformation:  error } } } as AxiosResponse<any>);
+        await camt003Handler(ctx as any);
+        expect(mockedGetParties).toBeCalledWith(partiesByIdParams);
+        expect(ctx.state.logger.error).toBeCalledWith(error);
+        expect(XML.fromXml(ctx.response.body)).toBeTruthy();
+        expect(XSD.validate(ctx.response.body, xsdPath)).toBe(true);
+        expect(ctx.response.type).toEqual('application/xml');
+        expect(ctx.response.status).toEqual(400);
+    });
+
+    it('should translate happy path response to camt.004', async() => {
+        const mockedRes = { data: { body: {
+            party: {
+                name: 'Joe Someone',
+                partyIdInfo: {
+                    partyIdentifier: '12345',
+                    fspId: 'dfsp'
+                }
+            }
+        } } as IPartiesByIdResponse } as AxiosResponse<any>;
+        mockedGetParties.mockResolvedValue(mockedRes);
+        await camt003Handler(ctx as any);
+        expect(mockedGetParties).toBeCalledWith(partiesByIdParams);
+        expect(ctx.state.logger.log).toBeCalledWith(mockedRes.data);
+        expect(XML.fromXml(ctx.response.body)).toBeTruthy();
+        expect(XSD.validate(ctx.response.body, xsdPath)).toBe(true);
+        expect(ctx.response.type).toEqual('application/xml');
+        expect(ctx.response.status).toEqual(200);
     });
 });
