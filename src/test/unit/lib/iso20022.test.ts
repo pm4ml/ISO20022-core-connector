@@ -13,12 +13,12 @@ import { generateMsgId } from '../../../lib/iso20022';
 describe('iso20022', () => {
     describe('generateMsgId', () => {
         it('should generate valid ISO20022 message Id', () => {
-            const mockDate = new Date(1466424490000)
+            const mockDate = new Date('10/10/2010 10:10:10')
             jest
                 .spyOn(global, 'Date')
                 .mockImplementation(() => mockDate as unknown as string)
             const id = generateMsgId();
-            expect(id.slice(0,19)).toBe('RNDS/20160620130810');
+            expect(id.slice(0,19)).toBe('RNDS/20101010101010');
             expect(id.length).toEqual(27);
         })
     })
