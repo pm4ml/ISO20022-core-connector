@@ -17,6 +17,7 @@ const xmlnsToHandlersMap: OutboundHandlerMap = {
 
 const handleError = (err: Error, ctx: ApiContext) => {
     ctx.state.logger.error(err);
+    ctx.response.status = 500;
 };
 
 export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {

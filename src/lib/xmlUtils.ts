@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import * as path from 'path';
-import { j2xParser as J2xParser, parse as ParseXML } from 'fast-xml-parser';
+import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
 import { Config } from '../config';
 
@@ -27,7 +27,7 @@ const fromJsObject = (obj: Record<string, unknown>): string => {
  * @param xml
  * @returns {string}
  */
-const fromXml = (xml: string): Record<string, unknown> => ParseXML(xml, Config.xmlOptions);
+const fromXml = (xml: string): Record<string, unknown> => parseXML(xml, Config.xmlOptions);
 
 /**
  * Validate an XML string against supplied XSD

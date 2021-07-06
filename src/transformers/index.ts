@@ -111,7 +111,6 @@ export const partiesByIdResponseToCamt004 = (
  */
 export const fspiopErrorToCamt004Error = (_errorInformation: IErrorInformation, originalMsgId: string)
 : { body: string, status: number } => {
-    // TODO: Map FSPIOP Error code/description to ISO 20022 Code/Desc
     const MsgId = generateMsgId();
     const Cd = 'X050';
     const Desc = 'Identifier not found';
