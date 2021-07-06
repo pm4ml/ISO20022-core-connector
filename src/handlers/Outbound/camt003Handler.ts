@@ -8,18 +8,43 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
+import { ICamt003, IErrorInformation } from '../../interfaces';
 import { getParties } from '../../requests/Outbound';
-import { camt003ToGetPartiesParams } from '../../transformers';
+import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
+
+
+const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
+    ctx.state.logger.error(error);
+    if((error as IErrorInformation).errorCode) {
+        const originalMsgId = (ctx.request.body as ICamt003).Document.GetAcct[0].MsgHdr[0].MsgId[0];
+        const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation, originalMsgId);
+        ctx.response.type = 'application/xml';
+        ctx.response.body = body;
+        ctx.response.status = status;
+    } else {
+        ctx.response.body = '';
+        ctx.response.status = 500;
+    }
+};
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        const params = camt003ToGetPartiesParams(ctx.request.body);
+        // TODO: Run camt.003 XSD validation or apply at OpenAPI validation level
+        const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
-        // TODO: translate response to ISO and respond properly back to ISO system
         ctx.state.logger.debug(JSON.stringify(res.data));
+
+        if(res.data.body.errorInformation) {
+            handleError(res.data.body.errorInformation, ctx);
+            return;
+        }
+
+        ctx.state.logger.log(res.data);
+        ctx.response.type = 'application/xml';
+        ctx.response.body = partiesByIdResponseToCamt004(res.data);
+        ctx.response.status = 200;
     } catch (e) {
-        // TODO: translate error to ISO and respond properly to ISO system
-        ctx.state.logger.error(e);
+        handleError(e, ctx);
     }
 };

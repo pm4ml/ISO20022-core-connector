@@ -18,6 +18,7 @@ jest.mock('../../lib/randomphrase');
 const mockedRandomPhrase = mocked(randomPhrase, true);
 
 import middleware from '../../middlewares';
+import { HTTPResponseError } from '../../requests';
 import { ApiContext } from '../../types';
 
 describe('middleware', () => {
@@ -32,10 +33,17 @@ describe('middleware', () => {
         } as ApiContext;
     })
     describe('createErrorHandler', () => {
-        it('should return error handler middleware that catches and logs unhadled errors', async () => {
+        it('should return error handler middleware that catches and logs unhandled errors', async () => {
             const errorHandler = middleware.createErrorHandler();
             const spy = jest.spyOn(ctx.state.logger, 'error');
             await errorHandler(ctx, () => { throw new Error() });
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
+
+        it('should return error handler middleware that catches and logs HTTPResponseError type', async () => {
+            const errorHandler = middleware.createErrorHandler();
+            const spy = jest.spyOn(ctx.state.logger, 'error');
+            await errorHandler(ctx, () => { throw new HTTPResponseError({ msg: 'message', res: { data: {}, statusCode: 200 } }) });
             expect(spy).toHaveBeenCalledTimes(1);
         });
     });
@@ -76,6 +84,22 @@ describe('middleware', () => {
             };
             const routes = middleware.createRouter(handlerMap);
             expect(routes).toBeTruthy();
+        });
+
+        it('should throw on unsupported router method', async () => {
+            const handlerMap = {
+                '/parties': {
+                    get: jest.fn(),
+                    post: jest.fn(),
+                    put: jest.fn(),
+                    del: jest.fn(),
+                    patch: jest.fn(),
+                    unsupported: jest.fn()
+                }
+            };
+            let err;
+            try { middleware.createRouter(handlerMap) } catch (e) { err = e }
+            expect(err).toBeTruthy();
         });
     })
 });

@@ -20,8 +20,26 @@ export interface ServiceConfig {
     autoAcceptParty: boolean,
     autoAcceptQuotes: boolean,
     requestTimeout?: number,
-    logger?: Logger.Logger
+    logger?: Logger.Logger,
+    xmlOptions?: any
+
 }
+
+const xmlOptions = {
+    attributeNamePrefix: '',
+    attrNodeName: 'attr',
+    textNodeName: '#text',
+    ignoreAttributes: false,
+    ignoreNameSpace: false,
+    allowBooleanAttributes: false,
+    parseNodeValue: true,
+    parseAttributeValue: false,
+    trimValues: true,
+    cdataTagName: '__cdata',
+    cdataPositionChar: '\\c',
+    parseTrueNumberOnly: false,
+    arrayMode: false,
+};
 
 export const Config: ServiceConfig = {
     port: env.get('LISTEN_PORT').default('3000').asPortNumber(),
@@ -29,4 +47,5 @@ export const Config: ServiceConfig = {
     autoAcceptParty: env.get('AUTO_ACCEPT_PARTY').required().asBool(),
     autoAcceptQuotes: env.get('AUTO_ACCEPT_QUOTES').required().asBool(),
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
+    xmlOptions,
 };

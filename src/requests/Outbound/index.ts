@@ -10,7 +10,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { Config } from '../../config';
-import { IGetPartiesParams } from '../../interfaces';
+import { IPartiesByIdParams } from '../../interfaces';
 
 const request = axios.create({
     baseURL: Config.outboundEndpoint,
@@ -32,4 +32,4 @@ export const buildHeaders = (): Record<string, any> => {
     return headers;
 };
 
-export const getParties = (params: IGetPartiesParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });
+export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });

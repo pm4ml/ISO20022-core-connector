@@ -9,7 +9,7 @@ RUN npm run build
 
 
 FROM node:lts-alpine
-RUN apk add --no-cache git
+RUN apk add --no-cache git python g++ make
 WORKDIR /opt/app
 
 COPY package.json package-lock.json* /opt/app/

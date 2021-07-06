@@ -75,7 +75,13 @@ export default class Server {
         if(this._logger) {
             this._api.use(middlewares.createLogger(this._logger));
         }
-        this._api.use(xmlBodyParser());
+        this._api.use(xmlBodyParser({
+            onerror: (err: any, ctx: ApiContext) => {
+                ctx.response.status = 400;
+                ctx.response.body = '';
+                ctx.state.logger.log(err);
+            },
+        }));
         this._api.use(bodyParser());
         this._api.use(validator);
         this._api.use(middlewares.createRouter(handlers));

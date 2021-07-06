@@ -1,6 +1,9 @@
 <Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="urn:iso:std:iso:20022:tech:xsd:camt.003.001.07">
     <GetAcct>
+        <MsgHdr>
+            <MsgId>RNDS/2016062013081046232b04</MsgId>
+        </MsgHdr>
         <AcctQryDef>
             <AcctCrit>
                 <NewCrit>
