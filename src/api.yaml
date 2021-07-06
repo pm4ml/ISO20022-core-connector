@@ -335,6 +335,19 @@ components:
               items:
                 type: object
                 properties:
+                  MsgHdr:
+                    type: array
+                    maxItems: 1
+                    items:
+                      type: object
+                      properties:
+                        MsgId:
+                          type: array
+                          maxItems: 1
+                          items:
+                            type: string
+                      required:
+                        - MsgId
                   AcctQryDef:
                     type: array
                     maxItems: 1
@@ -398,6 +411,7 @@ components:
                         - AcctCrit
                 required:
                   - AcctQryDef
+                  - MsgHdr
             $:
               type: object
               properties:
