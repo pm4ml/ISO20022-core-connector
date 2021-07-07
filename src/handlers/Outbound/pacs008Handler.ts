@@ -16,7 +16,7 @@ import { ApiContext } from '../../types';
 
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);
-    if ((error as IErrorInformation).errorCode) {
+    if((error as IErrorInformation).errorCode) {
         const originalMsgId = (ctx.request.body as ICamt003).Document.GetAcct.MsgHdr.MsgId;
         const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation, originalMsgId);
         ctx.response.type = 'application/xml';
