@@ -12,7 +12,7 @@
 
 import { mocked } from 'ts-jest/utils';
 import { Logger } from '@mojaloop/sdk-standard-components';
-import { ServiceConfig } from '../../config';
+import { Config, IServiceConfig } from '../../config';
 import Server from '../../server';
 import middlewares from '../../middlewares';
 
@@ -22,7 +22,7 @@ const mockedOas = mocked(oas, true);
 
 
 describe('Server', () => {
-    let server: Server, config: ServiceConfig, logger: Logger.Logger;
+    let server: Server, config: IServiceConfig, logger: Logger.Logger;
 
     beforeEach(async () => {
         logger = new Logger.Logger({
@@ -35,6 +35,7 @@ describe('Server', () => {
             autoAcceptParty: false,
             autoAcceptQuotes: false,
             logger,
+            xmlOptions: Config.xmlOptions
         }
         server = new Server(config);
         mockedOas.mockResolvedValue(() => { });

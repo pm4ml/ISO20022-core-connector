@@ -10,7 +10,6 @@
 
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
-import xmlBodyParser from 'koa-xml-body';
 import { oas } from 'koa-oas3';
 import cors from '@koa/cors';
 
@@ -23,10 +22,11 @@ import handlers from './handlers';
 import middlewares from './middlewares';
 
 import { ApiContext } from './types';
-import { ServiceConfig } from './config';
+import { Config, IServiceConfig } from './config';
+import { bodyParser as xmlBodyParser } from './lib/koaXmlBody';
 
 export default class Server {
-    _conf: ServiceConfig;
+    _conf: IServiceConfig;
 
     _api: any;
 
@@ -34,7 +34,7 @@ export default class Server {
 
     _logger: Logger.Logger | undefined;
 
-    constructor(conf: ServiceConfig) {
+    constructor(conf: IServiceConfig) {
         this._conf = conf;
         this._api = null;
         this._server = null;
@@ -75,8 +75,18 @@ export default class Server {
         if(this._logger) {
             this._api.use(middlewares.createLogger(this._logger));
         }
+        // this._api.use(xmlBodyParser({
+        //     onerror: (err: any, ctx: ApiContext) => {
+        //         ctx.response.type = 'text/html';
+        //         ctx.response.status = 400;
+        //         ctx.response.body = '';
+        //         ctx.state.logger.log(err);
+        //     },
+        // }));
         this._api.use(xmlBodyParser({
+            xmlOptions: Config.xmlOptions,
             onerror: (err: any, ctx: ApiContext) => {
+                ctx.response.type = 'text/html';
                 ctx.response.status = 400;
                 ctx.response.body = '';
                 ctx.state.logger.log(err);

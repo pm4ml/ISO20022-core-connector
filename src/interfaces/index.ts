@@ -74,36 +74,38 @@ export enum PartiesCurrentState {
 
 export interface INamespacedXMLDoc extends Record<string, unknown> {
     Document: {
-        $: {
-            xmlns: string
+        attr: {
+            xmlns: string,
         }
     }
 }
 
 export interface ICamt003 extends Record<string, unknown> {
     Document: {
-        GetAcct: [
-            {
-                MsgHdr: [{
-                    MsgId: [string]
-                }],
-                AcctQryDef: [{
-                    AcctCrit: [{
-                        NewCrit: [{
-                            SchCrit: [{
-                                AcctId: [{
-                                    EQ: [{
-                                        Othr: [{
-                                            Id: [string]
-                                        }]
-                                    }]
-                                }]
-                            }]
-                        }]
-                    }]
-                }]
+        attr: {
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07',
+            'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
+        },
+        GetAcct: {
+            MsgHdr: {
+                MsgId: string
             },
-        ]
+            AcctQryDef: {
+                AcctCrit: {
+                    NewCrit: {
+                        SchCrit: {
+                            AcctId: {
+                                EQ: {
+                                    Othr: {
+                                        Id: string
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -10,9 +10,11 @@
 import { INamespacedXMLDoc } from '../../interfaces';
 import { ApiContext, OutboundHandlerMap } from '../../types';
 import camt003Handler from '../Outbound/camt003Handler';
+import pacs008Handler from './pacs008Handler';
 
 const xmlnsToHandlersMap: OutboundHandlerMap = {
     'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07': camt003Handler,
+    'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09': pacs008Handler,
 };
 
 const handleError = (err: Error, ctx: ApiContext) => {
@@ -22,7 +24,7 @@ const handleError = (err: Error, ctx: ApiContext) => {
 
 export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     const body = ctx.request.body as INamespacedXMLDoc;
-    const namespace = body.Document.$.xmlns;
+    const namespace = body.Document.attr.xmlns;
     const handler = xmlnsToHandlersMap[namespace];
     try {
         await handler(ctx);

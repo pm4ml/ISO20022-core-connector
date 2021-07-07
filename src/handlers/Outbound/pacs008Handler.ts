@@ -16,7 +16,7 @@ import { ApiContext } from '../../types';
 
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);
-    if((error as IErrorInformation).errorCode) {
+    if ((error as IErrorInformation).errorCode) {
         const originalMsgId = (ctx.request.body as ICamt003).Document.GetAcct.MsgHdr.MsgId;
         const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation, originalMsgId);
         ctx.response.type = 'application/xml';
@@ -31,17 +31,22 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        // TODO: Run camt.003 XSD validation or apply at OpenAPI validation level
+        // TODO: Run pacs.008 XSD validation or apply at OpenAPI validation level
+        // convert pacs.008 to POST /quotes and send
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
         ctx.state.logger.debug(JSON.stringify(res.data));
-
         if(res.data.body.errorInformation) {
             handleError(res.data.body.errorInformation, ctx);
             return;
         }
 
+        // convert POST /quotes response to POST /tranfers request and send
+
+
         ctx.state.logger.log(res.data);
+
+        // convert response to pacs.002 and respond
         ctx.response.type = 'application/xml';
         ctx.response.body = partiesByIdResponseToCamt004(res.data);
         ctx.response.status = 200;
