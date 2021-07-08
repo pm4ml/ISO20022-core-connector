@@ -24,7 +24,7 @@ describe('OutboundHandler', () => {
         request: {
             body: {
                 Document: {
-                    $: {
+                    attr: {
                         xmlns: 'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07'
                     }
                 }

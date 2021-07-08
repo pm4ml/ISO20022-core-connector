@@ -22,7 +22,7 @@ const handleError = (err: Error, ctx: ApiContext) => {
 
 export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     const body = ctx.request.body as INamespacedXMLDoc;
-    const namespace = body.Document.$.xmlns;
+    const namespace = body.Document.attr.xmlns;
     const handler = xmlnsToHandlersMap[namespace];
     try {
         await handler(ctx);

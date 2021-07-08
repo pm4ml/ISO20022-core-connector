@@ -10,15 +10,15 @@
 import * as path from 'path';
 import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
-import { Config } from '../config';
+import { Config, IXMLOptions } from '../config';
 
 /**
  * Parse JS object to XML
  * @param obj
  * @returns {string}
  */
-const fromJsObject = (obj: Record<string, unknown>): string => {
-    const parser = new J2xParser(Config.xmlOptions);
+const fromJsObject = (obj: Record<string, unknown>, xmlOptions?: IXMLOptions): string => {
+    const parser = new J2xParser(xmlOptions || Config.xmlOptions);
     return parser.parse(obj);
 };
 
@@ -27,7 +27,9 @@ const fromJsObject = (obj: Record<string, unknown>): string => {
  * @param xml
  * @returns {string}
  */
-const fromXml = (xml: string): Record<string, unknown> => parseXML(xml, Config.xmlOptions);
+// eslint-disable-next-line max-len
+const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown> => parseXML(xml, xmlOptions || Config.xmlOptions);
+
 
 /**
  * Validate an XML string against supplied XSD

@@ -14,7 +14,6 @@ import { AxiosResponse } from 'axios';
 import fs from 'fs';
 import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
-import * as xml2js from 'xml2js';
 import camt003Handler from '../../../../handlers/Outbound/camt003Handler';
 import { IPartyIdType, IPartiesByIdParams, IErrorInformation, IPartiesByIdResponse  } from '../../../../interfaces';
 import { XML, XSD } from '../../../../lib/xmlUtils';
@@ -44,15 +43,13 @@ describe('camt003Handler', () => {
 
     beforeAll(async () => {
         xmlStr = fs.readFileSync(path.join(__dirname, '../../data/camt.003.xml')).toString();
-        ctx.request.body = await new Promise((resolve, reject) => {
-            xml2js.parseString(xmlStr, (err, result) => {
-                err ? reject(err) : resolve(result)
-            });
-        });
+        ctx.request.body = XML.fromXml(xmlStr) as any;
         mockedGetParties.mockResolvedValue({} as any);
     })
 
     it('should initiate get parties call given correct params', async () => {
+        const response = ctx.response;
+        mockedGetParties.mockResolvedValue(response as any);
         await camt003Handler(ctx as any);
         expect(mockedGetParties).toBeCalledWith(partiesByIdParams);
     });

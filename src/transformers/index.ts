@@ -24,8 +24,7 @@ import { generateMsgId } from '../lib/iso20022';
 export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICamt003)
 : IPartiesByIdParams => {
     const body = camt003 as ICamt003;
-    // eslint-disable-next-line max-len
-    const idValue = body.Document.GetAcct[0].AcctQryDef[0].AcctCrit[0].NewCrit[0].SchCrit[0].AcctId[0].EQ[0].Othr[0].Id[0];
+    const idValue = body.Document.GetAcct.AcctQryDef.AcctCrit.NewCrit.SchCrit.AcctId.EQ.Othr.Id as string;
     const getPartiesParams: IPartiesByIdParams = {
         idType: IPartyIdType.ACCOUNT_ID,
         idValue,

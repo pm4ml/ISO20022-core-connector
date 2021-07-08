@@ -16,7 +16,7 @@ paths:
       responses:
         200:
           description: Returns a success response code if the service is healthy.
-  
+
   /inbound/parties/:idType/:idValue:
     get:
       summary: GET parties
@@ -34,11 +34,11 @@ paths:
                 title: NotFoundError
                 type: object
                 properties:
-                  statusCode: 
+                  statusCode:
                     description: Mojaloop error code
                 required:
                   - statusCode
-            
+
   /inbound/quoterequests:
     post:
       summary: Quotes request
@@ -104,7 +104,7 @@ paths:
                       description: Payee's last name
                 quoteId:
                   description: Quote ID
-                transactionId: 
+                transactionId:
                   description: Common ID (decided by the Payer FSP) between the FSPs for the future transaction object.
                 amountType:
                   description: Amount type - SEND or RECEIVE
@@ -160,11 +160,11 @@ paths:
                 title: Quote error
                 type: object
                 properties:
-                  statusCode: 
+                  statusCode:
                     description: Mojaloop error code
                 required:
-                  - statusCode 
-  
+                  - statusCode
+
   /inbound/transfers:
     post:
       summary: Transfer request
@@ -284,10 +284,10 @@ paths:
                 title: Tranfer error
                 type: object
                 properties:
-                  statusCode: 
+                  statusCode:
                     description: Mojaloop error code
                 required:
-                  - statusCode 
+                  - statusCode
 
   /outbound/iso20022:
     post:
@@ -312,8 +312,6 @@ paths:
         5XX:
           description: Unexpected error
 
-
-
 components:
   schemas:
     UUID:
@@ -321,7 +319,7 @@ components:
       type: string
       pattern: >-
         ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
-    
+
     CAMT.003:
       type: object
       description: ISO 20022 CAMT.003 message (Get Parties Request)
@@ -329,113 +327,83 @@ components:
         Document:
           type: object
           properties:
-            GetAcct:
-              type: array
-              maxItems: 1
-              items:
-                type: object
-                properties:
-                  MsgHdr:
-                    type: array
-                    maxItems: 1
-                    items:
-                      type: object
-                      properties:
-                        MsgId:
-                          type: array
-                          maxItems: 1
-                          items:
-                            type: string
-                      required:
-                        - MsgId
-                  AcctQryDef:
-                    type: array
-                    maxItems: 1
-                    items:
-                      type: object
-                      properties:
-                        AcctCrit:
-                          type: array
-                          maxItems: 1
-                          items: 
-                            type: object
-                            properties: 
-                              NewCrit:
-                                type: array
-                                maxItems: 1
-                                items:
-                                  type: object
-                                  properties:
-                                    SchCrit:
-                                      type: array
-                                      maxItems: 1
-                                      items:
-                                        type: object
-                                        properties:
-                                          AcctId:
-                                            type: array
-                                            maxItems: 1
-                                            items:
-                                              type: object
-                                              properties:
-                                                EQ:
-                                                  type: array
-                                                  maxItems: 1
-                                                  items:
-                                                    type: object
-                                                    properties:
-                                                      Othr:
-                                                        type: array
-                                                        maxItems: 1
-                                                        items:
-                                                          type: object
-                                                          properties:
-                                                            Id:
-                                                              type: array
-                                                              maxItems: 1
-                                                              items:
-                                                                type: string
-                                                          required:
-                                                            - Id
-                                                    required:
-                                                      - Othr
-                                              required:
-                                                - EQ
-                                        required:
-                                          - AcctId
-                                  required:
-                                    - SchCrit
-                            required:
-                              - NewCrit
-                      required:
-                        - AcctCrit
-                required:
-                  - AcctQryDef
-                  - MsgHdr
-            $:
+            attr: 
               type: object
               properties:
+                'xmlns:xsi': 
+                  type: string
+                  pattern: 'http://www.w3.org/2001/XMLSchema-instance'
                 xmlns:
                   type: string
                   pattern: 'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07'
               required:
                 - xmlns
+            GetAcct:
+              type: object
+              properties:
+                MsgHdr:
+                  type: object
+                  properties:
+                    MsgId:
+                      type: string
+                  required:
+                    - MsgId
+                AcctQryDef:
+                  type: object
+                  properties:
+                    AcctCrit:
+                      type: object
+                      properties:
+                        NewCrit:
+                          type: object
+                          properties:
+                            SchCrit:
+                              type: object
+                              properties:
+                                AcctId:
+                                  type: object
+                                  properties:
+                                    EQ:
+                                      type: object
+                                      properties:
+                                        Othr:
+                                          type: object
+                                          properties:
+                                            Id:
+                                              type: string
+                                          required:
+                                            - Id
+                                      required:
+                                        - Othr
+                                  required:
+                                    - EQ
+                              required:
+                                - AcctId
+                          required:
+                            - SchCrit
+                      required:
+                        - NewCrit
+                  required:
+                    - AcctCrit
+              required:
+                - MsgHdr
+                - AcctQryDef
           required:
+            - attr
             - GetAcct
-            - $
       required:
         - Document
-    
+
     CAMT.004:
       type: string
-    
+
     CAMT.004.Error.404:
       type: string
-    
+
   responses:
     ISO20022.200:
       description: OK
-      content: 
+      content:
         application/xml:
           schema:
             oneOf:
@@ -443,9 +411,8 @@ components:
 
     ISO20022.404:
       description: Not found
-      content: 
+      content:
         application/xml:
           schema:
             oneOf:
               - $ref: '#/components/schemas/CAMT.004.Error.404'
-   

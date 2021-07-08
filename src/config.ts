@@ -14,25 +14,41 @@ import { Logger } from '@mojaloop/sdk-standard-components';
 
 dotenv.config();
 
-export interface ServiceConfig {
+export interface IServiceConfig {
     port?: number,
     outboundEndpoint: string,
     autoAcceptParty: boolean,
     autoAcceptQuotes: boolean,
     requestTimeout?: number,
     logger?: Logger.Logger,
-    xmlOptions?: any
+    xmlOptions: IXMLOptions
 
 }
 
-const xmlOptions = {
+export interface IXMLOptions {
+    attributeNamePrefix: string,
+    attrNodeName: string,
+    textNodeName: string,
+    ignoreAttributes: boolean,
+    ignoreNameSpace: boolean,
+    allowBooleanAttributes: boolean,
+    parseNodeValue: boolean,
+    parseAttributeValue: boolean,
+    trimValues: boolean,
+    cdataTagName: string,
+    cdataPositionChar: string,
+    parseTrueNumberOnly: boolean,
+    arrayMode: boolean,
+}
+
+const xmlOptions: IXMLOptions = {
     attributeNamePrefix: '',
     attrNodeName: 'attr',
     textNodeName: '#text',
     ignoreAttributes: false,
     ignoreNameSpace: false,
     allowBooleanAttributes: false,
-    parseNodeValue: true,
+    parseNodeValue: false,
     parseAttributeValue: false,
     trimValues: true,
     cdataTagName: '__cdata',
@@ -41,7 +57,7 @@ const xmlOptions = {
     arrayMode: false,
 };
 
-export const Config: ServiceConfig = {
+export const Config: IServiceConfig = {
     port: env.get('LISTEN_PORT').default('3000').asPortNumber(),
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
     autoAcceptParty: env.get('AUTO_ACCEPT_PARTY').required().asBool(),

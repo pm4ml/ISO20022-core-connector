@@ -9,10 +9,10 @@
  **************************************************************************/
 
 import Koa from 'koa';
-import { ServiceConfig } from './config';
+import { IServiceConfig } from './config';
 
 export interface ApiState {
-    conf: ServiceConfig;
+    conf: IServiceConfig;
     logger: any;
 }
 
