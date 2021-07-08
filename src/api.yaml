@@ -305,9 +305,9 @@ paths:
         required: true
       responses:
         200:
-          $ref: "#/components/responses/ISO20022.200"
+          $ref: '#/components/responses/ISO20022.200'
         404:
-          $ref: "#/components/responses/ISO20022.404"
+          $ref: '#/components/responses/ISO20022.404'
         4XX:
           description: Schema validation error
         5XX:
@@ -494,7 +494,7 @@ components:
         application/xml:
           schema:
             oneOf:
-              - $ref: "#/components/schemas/CAMT.004"
+              - $ref: '#/components/schemas/CAMT.004'
 
     ISO20022.404:
       description: Not found
@@ -502,4 +502,4 @@ components:
         application/xml:
           schema:
             oneOf:
-              - $ref: "#/components/schemas/CAMT.004.Error.404"
+              - $ref: '#/components/schemas/CAMT.004.Error.404'

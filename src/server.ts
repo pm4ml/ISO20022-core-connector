@@ -75,14 +75,7 @@ export default class Server {
         if(this._logger) {
             this._api.use(middlewares.createLogger(this._logger));
         }
-        // this._api.use(xmlBodyParser({
-        //     onerror: (err: any, ctx: ApiContext) => {
-        //         ctx.response.type = 'text/html';
-        //         ctx.response.status = 400;
-        //         ctx.response.body = '';
-        //         ctx.state.logger.log(err);
-        //     },
-        // }));
+
         this._api.use(xmlBodyParser({
             xmlOptions: Config.xmlOptions,
             onerror: (err: any, ctx: ApiContext) => {

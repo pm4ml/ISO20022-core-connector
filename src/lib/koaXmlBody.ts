@@ -48,10 +48,10 @@ const parse = (request: any, options: IOptions) => {
 
 export const bodyParser = (options: IOptions): any => (ctx: ApiContext, next: Next) => {
     /**
-     * only parse and set ctx.request[bodyKey] when
+     * only parse and set ctx.request[option.key] when
      * 1. type is xml (text/xml and application/xml)
      * 2. method is post/put/patch
-     * 3. ctx.request[bodyKey] is undefined
+     * 3. ctx.request[option.key] is undefined
      */
     const opt = { key: 'body', ...options };
 
