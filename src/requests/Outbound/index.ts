@@ -33,3 +33,4 @@ export const buildHeaders = (): Record<string, any> => {
 };
 
 export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });
+export const postQuotes = () => {};

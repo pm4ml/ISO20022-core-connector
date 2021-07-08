@@ -10,7 +10,7 @@
 import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, IPartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
-    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error,
+    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -140,4 +140,22 @@ export const fspiopErrorToCamt004Error = (_errorInformation: IErrorInformation, 
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
     return { body: xml, status: 404 };
+};
+
+/**
+ * Translates ISO 20022 pacs.008 to POST /quotes request body
+ *
+ * @param IPACS008
+ * @returns {IPostQuotesBody}
+ */
+export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs008)
+: IPostQuotesBody => {
+    const body = pacs008 as IPacs008;
+    const idValue = body.Document.GetAcct.AcctQryDef.AcctCrit.NewCrit.SchCrit.AcctId.EQ.Othr.Id as string;
+    const postQuotesBody: IPostQuotesBody = {
+        idType: IPartyIdType.ACCOUNT_ID,
+        idValue,
+    };
+
+    return postQuotesBody;
 };

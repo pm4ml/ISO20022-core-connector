@@ -7,6 +7,20 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
+
+export enum PartiesCurrentState {
+    WAITING_FOR_REQUEST_PARTY_INFORMATION = 'WAITING_FOR_REQUEST_PARTY_INFORMATION',
+    COMPLETED = 'COMPLETED',
+    ERROR_OCCURRED = 'ERROR_OCCURED',
+}
+
+export interface INamespacedXMLDoc extends Record<string, unknown> {
+    Document: {
+        attr: {
+            xmlns: string,
+        }
+    }
+}
 export interface IExtensionItem {
     key: string,
     value: string,
@@ -66,18 +80,22 @@ export interface IPartyComplexName {
     lastName: string,
 }
 
-export enum PartiesCurrentState {
-    WAITING_FOR_REQUEST_PARTY_INFORMATION = 'WAITING_FOR_REQUEST_PARTY_INFORMATION',
-    COMPLETED = 'COMPLETED',
-    ERROR_OCCURRED = 'ERROR_OCCURED',
-}
-
-export interface INamespacedXMLDoc extends Record<string, unknown> {
-    Document: {
-        attr: {
-            xmlns: string,
-        }
-    }
+export interface IPostQuotesBody {
+    currentState: 'payeeResolved',
+    amountType: '',
+    amount: {
+        currency: '',
+        amount: ''
+    },
+    from: {
+        type: ''
+    },
+    to: {
+        fspId: '',
+    },
+    transactionType: '',
+    note?: '',
+    quoteRequestExtensions?: [],
 }
 
 export interface ICamt003 extends Record<string, unknown> {
@@ -176,5 +194,42 @@ export interface ICamt004Error extends Record<string, unknown> {
                 }
             }
         },
+    }
+}
+
+
+export interface IPacs008 extends Record<string, unknown> {
+    Document: {
+        attr: {
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09',
+            'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
+        },
+        FIToFICstmrCdtTrf: {
+            GrpHdr: {
+                MsgId: string,
+                NbOfTxs: string,
+            },
+            CdtTrfTxInf: {
+                PmtId: {
+                    EndToEndId: string
+                },
+                IntrBkSttmAmt: {
+                    attr: {
+                        Ccy: string
+                    },
+                    '#text': string
+                },
+                Dbtr: {
+                    CtctDtls: {
+                        MobNb: string
+                    }
+                },
+                Cdtr: {
+                    CtctDtls: {
+                        MobNb: string
+                    }
+                }
+            }
+        }
     }
 }

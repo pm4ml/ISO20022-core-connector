@@ -301,6 +301,7 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/CAMT.003"
+                - $ref: "#/components/schemas/PACS.008"
         required: true
       responses:
         200:
@@ -391,6 +392,92 @@ components:
           required:
             - attr
             - GetAcct
+      required:
+        - Document
+
+    PACS.008:
+      type: object
+      description: ISO 20022 PACS.008 message (Quoting/Transfers)
+      properties:
+        Document:
+          type: object
+          properties:
+            FIToFICstmrCdtTrf:
+              type: object
+              properties:
+                GrpHdr:
+                  type: object
+                  properties:
+                    MsgId:
+                      type: string
+                    NbOfTxs:
+                      type: number
+                  required:
+                    - MsgId
+                    - NbOfTxs
+                CdtTrfTxInf:
+                  type: object
+                  properties:
+                    PmtId:
+                      type: object
+                      properties:
+                        EndToEndId:
+                          type: string
+                      required:
+                        - EndToEndId
+                    IntrBkSttmAmt:
+                      type: object
+                      properties:
+                        attr:
+                          type: object
+                          properties:
+                            Ccy:
+                              type: string
+                        '#text':
+                              type: number
+                      required:
+                        - attr
+                        - '#text'
+                    Dbtr:
+                      type: object
+                      properties:
+                        CtctDtls:
+                          type: object
+                          properties:
+                            MobNb:
+                              type: string
+                          required:
+                            - MobNb
+                      required:
+                        - CtctDtls
+                    Cdtr:
+                      type: object
+                      properties:
+                        CtctDtls:
+                          type: object
+                          properties:
+                            MobNb:
+                              type: string
+                          required:
+                            - MobNb
+                      required:
+                        - CtctDtls
+                  required:
+                    - PmId
+                    - IntrBkSttmAmt
+                    - Dbtr
+                    - Cdtr      
+            attr:
+              type: object
+              properties:
+                xmlns:
+                  type: string
+                  pattern: "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09"
+              required:
+                - xmlns
+          required:
+            - FIToFICstmrCdtTrf
+            - attr
       required:
         - Document
 
