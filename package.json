@@ -43,6 +43,7 @@
     "arrowParens": "avoid"
   },
   "devDependencies": {
+    "@shopify/jest-koa-mocks": "^3.0.1",
     "@types/jest": "26.0.23",
     "@types/koa": "2.13.3",
     "@types/koa-bodyparser": "4.3.1",
@@ -83,7 +84,7 @@
     "koa-oas3": "2.3.1",
     "koa-router": "10.0.0",
     "libxmljs2-xsd": "0.26.5",
-    "raw-body": "^2.4.1",
+    "raw-body": "2.4.1",
     "tslib": "2.3.0",
     "uuid": "8.3.2"
   }
