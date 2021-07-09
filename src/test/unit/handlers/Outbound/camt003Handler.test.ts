@@ -15,7 +15,7 @@ import fs from 'fs';
 import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
 import camt003Handler from '../../../../handlers/Outbound/camt003Handler';
-import { IPartyIdType, IPartiesByIdParams, IErrorInformation, IPartiesByIdResponse  } from '../../../../interfaces';
+import { PartyIdType, IPartiesByIdParams, IErrorInformation, IPartiesByIdResponse  } from '../../../../interfaces';
 import { XML, XSD } from '../../../../lib/xmlUtils';
 
 import { getParties } from '../../../../requests/Outbound'
@@ -37,7 +37,7 @@ describe('camt003Handler', () => {
         },
         response: {type: null, status: null, body: ''}
     };
-    const partiesByIdParams: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' }
+    const partiesByIdParams: IPartiesByIdParams = { idType: PartyIdType.ACCOUNT_ID, idValue: '1234567' }
     const xsdPath = 'src/templates/xsd/camt.004.xsd';
     let xmlStr: string;
 

@@ -411,7 +411,7 @@ components:
                     MsgId:
                       type: string
                     NbOfTxs:
-                      type: number
+                      type: string
                   required:
                     - MsgId
                     - NbOfTxs
@@ -425,7 +425,7 @@ components:
                           type: string
                       required:
                         - EndToEndId
-                    IntrBkSttmAmt:
+                    IntrBkSttlmAmt:
                       type: object
                       properties:
                         attr:
@@ -434,7 +434,7 @@ components:
                             Ccy:
                               type: string
                         '#text':
-                              type: number
+                              type: string
                       required:
                         - attr
                         - '#text'
@@ -450,6 +450,18 @@ components:
                             - MobNb
                       required:
                         - CtctDtls
+                    DbtrAgt:
+                      type: object
+                      properties:
+                        FinInstnId:
+                          type: object
+                          properties:
+                            BICFI: 
+                              type: string
+                          required:
+                            - BICFI
+                      required:
+                        - FinInstnId
                     Cdtr:
                       type: object
                       properties:
@@ -462,17 +474,34 @@ components:
                             - MobNb
                       required:
                         - CtctDtls
+                    CdtrAgt:
+                      type: object
+                      properties:
+                        FinInstnId:
+                          type: object
+                          properties:
+                            BICFI:
+                              type: string
+                          required:
+                            - BICFI
+                      required:
+                        - FinInstnId
                   required:
-                    - PmId
-                    - IntrBkSttmAmt
+                    - PmtId
+                    - IntrBkSttlmAmt
                     - Dbtr
-                    - Cdtr      
+                    - DbtrAgt
+                    - Cdtr  
+                    - CdtrAgt    
             attr:
               type: object
               properties:
+                'xmlns:xsi': 
+                  type: string
+                  pattern: 'http://www.w3.org/2001/XMLSchema-instance'
                 xmlns:
                   type: string
-                  pattern: "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09"
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09'
               required:
                 - xmlns
           required:

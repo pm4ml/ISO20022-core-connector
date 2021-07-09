@@ -11,7 +11,7 @@
 'use strict'
 
 import { mocked } from 'ts-jest/utils';
-import { IPartyIdType, IPartiesByIdParams } from '../../../../interfaces';
+import { PartyIdType, IPartiesByIdParams } from '../../../../interfaces';
 
 import axios from 'axios';
 jest.mock('axios');
@@ -23,7 +23,7 @@ import  { getParties, buildHeaders } from '../../../../requests/Outbound';
 
 describe('Outbound requests', () => {
     describe('getParties', () => {
-        const params: IPartiesByIdParams = { idType: IPartyIdType.ACCOUNT_ID, idValue: '123456' };
+        const params: IPartiesByIdParams = { idType: PartyIdType.ACCOUNT_ID, idValue: '123456' };
         it('should execute correct handler given a valid ISO 20022 message', async () => {
             await getParties(params);
             const url = `/parties/${params.idType}/${params.idValue}`;

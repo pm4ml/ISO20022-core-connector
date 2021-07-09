@@ -8,9 +8,9 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ICamt003, IErrorInformation } from '../../interfaces';
-import { getParties, postQuotes } from '../../requests/Outbound';
-import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
+import { ICamt003, IErrorInformation, IPacs008 } from '../../interfaces';
+import { postQuotes } from '../../requests/Outbound';
+import { fspiopErrorToCamt004Error, pacs008ToPostQuotesBody, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
 
 
@@ -33,17 +33,22 @@ export default async (ctx: ApiContext): Promise<void> => {
     try {
         // TODO: Run pacs.008 XSD validation or apply at OpenAPI validation level
         // convert pacs.008 to POST /quotes and send
-        const params = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
-        const res = await postQuotes(params);
-        ctx.state.logger.debug(JSON.stringify(res.data));
+        const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
+        let res = await postQuotes(postQuotesBody);
+        ctx.state.logger.log(JSON.stringify(res.data));
         if(res.data.body.errorInformation) {
             handleError(res.data.body.errorInformation, ctx);
             return;
         }
 
         // convert POST /quotes response to POST /tranfers request and send
-        
-        ctx.state.logger.log(res.data);
+        // if no error is received, we send PUT /transfers/transferId to accept quote and execute transfer
+        res = {} as any;
+        if(res.data.body.errorInformation) {
+            handleError(res.data.body.errorInformation, ctx);
+            return;
+        }
+
 
         // convert response to pacs.002 and respond
         ctx.response.type = 'application/xml';

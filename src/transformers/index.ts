@@ -9,8 +9,8 @@
  **************************************************************************/
 import { XML } from '../lib/xmlUtils';
 import {
-    ICamt003, IPartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
-    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
+    ICamt003, PartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
+    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008, IPostQuotesBody, AmountType, TransactionType,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -26,7 +26,7 @@ export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICa
     const body = camt003 as ICamt003;
     const idValue = body.Document.GetAcct.AcctQryDef.AcctCrit.NewCrit.SchCrit.AcctId.EQ.Othr.Id as string;
     const getPartiesParams: IPartiesByIdParams = {
-        idType: IPartyIdType.ACCOUNT_ID,
+        idType: PartyIdType.ACCOUNT_ID,
         idValue,
     };
 
@@ -145,16 +145,32 @@ export const fspiopErrorToCamt004Error = (_errorInformation: IErrorInformation, 
 /**
  * Translates ISO 20022 pacs.008 to POST /quotes request body
  *
- * @param IPACS008
+ * @param {Record<string, unknown> | IPacs008} pacs008
  * @returns {IPostQuotesBody}
  */
 export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs008)
 : IPostQuotesBody => {
     const body = pacs008 as IPacs008;
-    const idValue = body.Document.GetAcct.AcctQryDef.AcctCrit.NewCrit.SchCrit.AcctId.EQ.Othr.Id as string;
     const postQuotesBody: IPostQuotesBody = {
-        idType: IPartyIdType.ACCOUNT_ID,
-        idValue,
+        currentState: 'payeeResolved',
+        homeTransactionId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
+        amountType: AmountType.SEND,
+        amount: {
+            currency: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt.attr.Ccy,
+            amount: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt['#text'],
+        },
+        from: {
+            idType: PartyIdType.ACCOUNT_ID,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.CtctDtls.MobNb,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.BICFI,
+        },
+        to: {
+            idType: PartyIdType.ACCOUNT_ID,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.CtctDtls.MobNb,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.BICFI,
+        },
+        transactionType: TransactionType.TRANSFER,
+        skipPartyLookup: true,
     };
 
     return postQuotesBody;

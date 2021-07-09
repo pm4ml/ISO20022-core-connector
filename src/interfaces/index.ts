@@ -14,6 +14,15 @@ export enum PartiesCurrentState {
     ERROR_OCCURRED = 'ERROR_OCCURED',
 }
 
+export enum AmountType {
+    SEND = 'SEND',
+    RECEIVE = 'RECEIVE',
+}
+
+export enum TransactionType {
+    TRANSFER = 'TRANSFER',
+}
+
 export interface INamespacedXMLDoc extends Record<string, unknown> {
     Document: {
         attr: {
@@ -31,12 +40,24 @@ export interface IErrorInformation {
     extensionList?: Array<IExtensionItem>
 }
 
-export enum IPartyIdType {
+export interface IMoney {
+    currency: string,
+    amount: string
+}
+
+export enum PartyIdType {
+    MSISDN = 'MSISDN',
     ACCOUNT_ID = 'ACCOUNT_ID',
+    EMAIL = 'EMAIL',
+    PERSONAL_ID = 'PERSONAL_ID',
+    BUSINESS = ' BUSINESS',
+    DEVICE = 'DEVICE',
+    IBAN = 'IBAN',
+    ALIAS = 'ALIAS',
 }
 
 export interface IPartiesByIdParams {
-    idType: IPartyIdType.ACCOUNT_ID,
+    idType: PartyIdType.ACCOUNT_ID,
     idValue: string
 }
 
@@ -62,7 +83,7 @@ export interface IAccount {
 }
 
 export interface IPartyIdInfo {
-    partyIdType: IPartyIdType,
+    partyIdType: PartyIdType,
     partyIdentifier: string,
     partySubIdOrType?: string,
     fspId: string,
@@ -80,23 +101,133 @@ export interface IPartyComplexName {
     lastName: string,
 }
 
+export enum PayerType {
+    CONSUMER = 'CONSUMER',
+    AGENT = 'AGENT',
+    BUSINESS = 'BUSINESS',
+    DEVICE = 'DEVICE',
+}
+
+export interface ITransferParty {
+    type?: PayerType,
+    idType: PartyIdType,
+    idValue: string,
+    idSubValue?: string,
+    displayName?: string,
+    firstName?: string,
+    middleName?: string,
+    lastName?: string,
+    dateOfBirth?: string,
+    merchantClassificationCode?: string,
+    fspId?: string,
+    extensionList?: Array<IExtensionItem>
+}
+
 export interface IPostQuotesBody {
     currentState: 'payeeResolved',
-    amountType: '',
-    amount: {
-        currency: '',
-        amount: ''
-    },
-    from: {
-        type: ''
-    },
-    to: {
-        fspId: '',
-    },
-    transactionType: '',
-    note?: '',
-    quoteRequestExtensions?: [],
+    homeTransactionId: string,
+    amountType: AmountType,
+    amount: IMoney,
+    from: ITransferParty,
+    to: ITransferParty,
+    transactionType: TransactionType,
+    note?: string,
+    quoteRequestExtensions?: Array<IExtensionItem>,
+    transferRequestExtension?: Array<IExtensionItem>,
+    skipPartyLookup: boolean
 }
+
+export interface IPostQuotesResponseBody {
+    transferAmount: IMoney,
+    payeeReceiveAmount?: IMoney,
+    payeeFspFee?: IMoney,
+    payeeFspCommission?: IMoney,
+    expiration: Date,
+    geoCode?: {
+        longitude: string,
+        latitude: string
+    },
+    ilpPacket: string,
+    condition: string,
+    extensionList?: Array<IExtensionItem>,
+}
+
+export interface ITransferSuccess {
+    transferId?: string,
+    homeTransactionId?: string,
+    from: ITransferParty,
+    to: ITransferParty | Array<ITransferParty>,
+    amountType: AmountType,
+    currency: string,
+    amount: string,
+    transactionType: TransactionType,
+    note?: string,
+    currentState?: string,
+    quoteId?: string,
+    getPartiesResponse?: {
+        body: Record<string, unknown>
+        headers?: Record<string, unknown>
+    },
+    quoteResponse?: {
+        body: IPostQuotesResponseBody,
+        headers?: Record<string, unknown>
+    },
+    quoteResponseSource?: string,
+    fulfil?: {
+        body: Record<string, unknown>,
+        headers?: Record<string, unknown>
+    },
+    lastError?: Record<string, unknown>,
+    skipPartyLookup?: boolean
+}
+
+export interface ITransferState {
+    from: ITransferParty,
+    to: ITransferParty | Array<ITransferParty>,
+    amountType: AmountType,
+    currency: string,
+    amount: string,
+    transactionType: TransactionType,
+    transferId?: string,
+    homeTransactionId?: string,
+    note?: string,
+    currentState?: string,
+    quoteId?: string,
+    getPartiesResponse?: {
+        body: Record<string, unknown>
+        headers?: Record<string, unknown>
+    },
+    quoteResponse?: {
+        body: IPostQuotesResponseBody,
+        headers?: Record<string, unknown>
+    },
+    quoteResponseSource?: string,
+    fulfil?: {
+        body: Record<string, unknown>,
+        headers?: Record<string, unknown>
+    },
+    lastError?: Record<string, unknown>,
+    skipPartyLookup?: boolean
+}
+
+export interface ITransferContinuationQuote {
+    acceptQuote: boolean,
+    additionalProperties?: string
+}
+
+export interface ITransferBadRequest {
+    statusCode?: string,
+    message?: string,
+    transferState: ITransferState
+}
+
+export type ITransferServerError = ITransferBadRequest;
+
+export type ITransferTimeoutError = ITransferBadRequest;
+
+export type ITransferResponse = ITransferSuccess;
+
+export type ITransferResponseError = ITransferBadRequest | ITransferServerError | ITransferTimeoutError;
 
 export interface ICamt003 extends Record<string, unknown> {
     Document: {
@@ -213,7 +344,7 @@ export interface IPacs008 extends Record<string, unknown> {
                 PmtId: {
                     EndToEndId: string
                 },
-                IntrBkSttmAmt: {
+                IntrBkSttlmAmt: {
                     attr: {
                         Ccy: string
                     },
@@ -224,11 +355,21 @@ export interface IPacs008 extends Record<string, unknown> {
                         MobNb: string
                     }
                 },
+                DbtrAgt: {
+                    FinInstnId: {
+                        BICFI: string
+                    }
+                },
                 Cdtr: {
                     CtctDtls: {
                         MobNb: string
                     }
-                }
+                },
+                CdtrAgt: {
+                    FinInstnId: {
+                        BICFI: string
+                    }
+                },
             }
         }
     }
