@@ -8,20 +8,20 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { ICamt003, IErrorInformation, IPacs008 } from '../../interfaces';
-import { postQuotes } from '../../requests/Outbound';
-import { fspiopErrorToCamt004Error, pacs008ToPostQuotesBody, partiesByIdResponseToCamt004 } from '../../transformers';
+import {
+    IPacs008, ITransferError, TransferStatus,
+} from '../../interfaces';
+import { putTransfersAcceptQuotes, postTransfersQuotesStage } from '../../requests/Outbound';
+import { pacs008ToPostQuotesBody, transferResponseToPacs002 } from '../../transformers';
 import { ApiContext } from '../../types';
 
 
-const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
+const handleError = (error: Error | ITransferError, ctx: ApiContext) => {
     ctx.state.logger.error(error);
-    if((error as IErrorInformation).errorCode) {
-        const originalMsgId = (ctx.request.body as ICamt003).Document.GetAcct.MsgHdr.MsgId;
-        const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation, originalMsgId);
+    if((error as ITransferError).transferState) {
         ctx.response.type = 'application/xml';
-        ctx.response.body = body;
-        ctx.response.status = status;
+        ctx.response.body = null;
+        ctx.response.status = 400;
     } else {
         ctx.response.body = '';
         ctx.response.type = 'text/html';
@@ -32,27 +32,26 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
 export default async (ctx: ApiContext): Promise<void> => {
     try {
         // TODO: Run pacs.008 XSD validation or apply at OpenAPI validation level
-        // convert pacs.008 to POST /quotes and send
+        // convert pacs.008 to POST /transfers quotes stage and send
         const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
-        let res = await postQuotes(postQuotesBody);
+        let res = await postTransfersQuotesStage(postQuotesBody);
         ctx.state.logger.log(JSON.stringify(res.data));
-        if(res.data.body.errorInformation) {
-            handleError(res.data.body.errorInformation, ctx);
+        if(res.data.currentState === TransferStatus.ERROR_OCCURRED) {
+            handleError(res.data, ctx);
             return;
         }
 
-        // convert POST /quotes response to POST /tranfers request and send
+        // convert POST /transfers response to PUT /tranfers/transferId (quote acceptance) request and send
         // if no error is received, we send PUT /transfers/transferId to accept quote and execute transfer
-        res = {} as any;
-        if(res.data.body.errorInformation) {
-            handleError(res.data.body.errorInformation, ctx);
+        res = await putTransfersAcceptQuotes(res.data.transferId, { acceptQuote: true });
+        if(res.data.currentState === TransferStatus.ERROR_OCCURRED) {
+            handleError(res.data.errorInformation, ctx);
             return;
         }
-
 
         // convert response to pacs.002 and respond
         ctx.response.type = 'application/xml';
-        ctx.response.body = partiesByIdResponseToCamt004(res.data);
+        ctx.response.body = transferResponseToPacs002(res.data);
         ctx.response.status = 200;
     } catch (e) {
         handleError(e, ctx);

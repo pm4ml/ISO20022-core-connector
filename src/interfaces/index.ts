@@ -14,6 +14,13 @@ export enum PartiesCurrentState {
     ERROR_OCCURRED = 'ERROR_OCCURED',
 }
 
+export enum TransferStatus {
+    WAITING_FOR_PARTY_ACCEPTANCE = 'WAITING_FOR_PARTY_ACCEPTANCE',
+    WAITING_FOR_QUOTE_ACCEPTANCE = 'WAITING_FOR_QUOTE_ACCEPTANCE',
+    COMPLETED = 'COMPLETED',
+    ERROR_OCCURRED = 'ERROR_OCCURED',
+}
+
 export enum AmountType {
     SEND = 'SEND',
     RECEIVE = 'RECEIVE',
@@ -21,6 +28,13 @@ export enum AmountType {
 
 export enum TransactionType {
     TRANSFER = 'TRANSFER',
+}
+
+export enum MojaloopTransferState {
+    RECEIVED = 'RECEIVED',
+    RESERVED = 'RESERVED',
+    COMMITTED = 'COMMITTED',
+    ABORTED = 'ABORTED',
 }
 
 export interface INamespacedXMLDoc extends Record<string, unknown> {
@@ -124,12 +138,12 @@ export interface ITransferParty {
 }
 
 export interface IPostQuotesBody {
-    currentState: 'payeeResolved',
     homeTransactionId: string,
-    amountType: AmountType,
-    amount: IMoney,
     from: ITransferParty,
     to: ITransferParty,
+    amountType: AmountType,
+    currency: string,
+    amount: string,
     transactionType: TransactionType,
     note?: string,
     quoteRequestExtensions?: Array<IExtensionItem>,
@@ -152,7 +166,13 @@ export interface IPostQuotesResponseBody {
     extensionList?: Array<IExtensionItem>,
 }
 
-export interface ITransferSuccess {
+export interface ITransferFulfilment {
+    transferState: MojaloopTransferState,
+    fulfilment?: string,
+    completedTimestamp?: string,
+    extensionList?: Array<IExtensionItem>
+}
+export interface ITransferState {
     transferId?: string,
     homeTransactionId?: string,
     from: ITransferParty,
@@ -162,7 +182,7 @@ export interface ITransferSuccess {
     amount: string,
     transactionType: TransactionType,
     note?: string,
-    currentState?: string,
+    currentState?: TransferStatus,
     quoteId?: string,
     getPartiesResponse?: {
         body: Record<string, unknown>
@@ -174,41 +194,15 @@ export interface ITransferSuccess {
     },
     quoteResponseSource?: string,
     fulfil?: {
-        body: Record<string, unknown>,
+        body: ITransferFulfilment,
         headers?: Record<string, unknown>
     },
     lastError?: Record<string, unknown>,
-    skipPartyLookup?: boolean
+    skipPartyLookup?: boolean,
+    extensionList: Array<IExtensionItem>
 }
 
-export interface ITransferState {
-    from: ITransferParty,
-    to: ITransferParty | Array<ITransferParty>,
-    amountType: AmountType,
-    currency: string,
-    amount: string,
-    transactionType: TransactionType,
-    transferId?: string,
-    homeTransactionId?: string,
-    note?: string,
-    currentState?: string,
-    quoteId?: string,
-    getPartiesResponse?: {
-        body: Record<string, unknown>
-        headers?: Record<string, unknown>
-    },
-    quoteResponse?: {
-        body: IPostQuotesResponseBody,
-        headers?: Record<string, unknown>
-    },
-    quoteResponseSource?: string,
-    fulfil?: {
-        body: Record<string, unknown>,
-        headers?: Record<string, unknown>
-    },
-    lastError?: Record<string, unknown>,
-    skipPartyLookup?: boolean
-}
+export type ITransferSuccess = ITransferState;
 
 export interface ITransferContinuationQuote {
     acceptQuote: boolean,
@@ -225,10 +219,9 @@ export type ITransferServerError = ITransferBadRequest;
 
 export type ITransferTimeoutError = ITransferBadRequest;
 
-export type ITransferResponse = ITransferSuccess;
+export type ITransferError = ITransferBadRequest | ITransferServerError | ITransferTimeoutError;
 
-export type ITransferResponseError = ITransferBadRequest | ITransferServerError | ITransferTimeoutError;
-
+export type ITransferResponse = ITransferSuccess | ITransferError;
 export interface ICamt003 extends Record<string, unknown> {
     Document: {
         attr: {
@@ -372,5 +365,46 @@ export interface IPacs008 extends Record<string, unknown> {
                 },
             }
         }
+    }
+}
+
+export interface IPacs002 extends Record<string, unknown> {
+    Document: {
+        attr: {
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.11',
+            'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
+        },
+        FIToFIPmtStsRpt: {
+            GrpHdr: {
+                MsgId: string,
+                CreDtTm: string,
+                Flflmnt?: {
+                    Fulfilment: string
+                },
+                InstgAgt?: {
+                    FinInstnId: {
+                        BICFI: string,
+                        Nm: string
+                    }
+                },
+                InstdAgt?: {
+                    FinInstnId: {
+                        BICFI: string,
+                        Nm: string
+                    }
+                }
+            },
+            OrgnlGrpInfAndSts?: {
+                OrgnlMsgId: string,
+                OrgnlMsgNmId: string,
+                GrpSts: string
+            },
+            TxInfAndSts?: {
+                OrgnlInstrId: string,
+                OrgnlEndToEndId: string,
+                OrgnlTxId: string,
+                OrgnlUETR: 'ACCC' | 'RJCT'
+            }
+        },
     }
 }

@@ -10,7 +10,7 @@
 import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, PartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
-    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008, IPostQuotesBody, AmountType, TransactionType,
+    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008, IPostQuotesBody, AmountType, TransactionType, ITransferSuccess, IPacs002,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -152,13 +152,10 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
 : IPostQuotesBody => {
     const body = pacs008 as IPacs008;
     const postQuotesBody: IPostQuotesBody = {
-        currentState: 'payeeResolved',
         homeTransactionId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
         amountType: AmountType.SEND,
-        amount: {
-            currency: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt.attr.Ccy,
-            amount: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt['#text'],
-        },
+        amount: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt['#text'],
+        currency: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt.attr.Ccy,
         from: {
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.CtctDtls.MobNb,
@@ -174,4 +171,58 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
     };
 
     return postQuotesBody;
+};
+
+
+/**
+ * Translates ML's transfer success response to ISO 20022 pacs.002 response.
+ *
+ * @param transferResponse
+ * @returns {IPacs002}
+ */
+export const transferResponseToPacs002 = (
+    transferResponse: Record<string, unknown> | ITransferSuccess,
+): string => {
+    const body = transferResponse as ITransferSuccess;
+    let msgId = '';
+    let instrId = '';
+    let endToEndId = '';
+    let txId = '';
+
+    Object.values(body.extensionList).forEach(extItem => {
+        if(extItem.key === 'MSGID') {
+            msgId = extItem.value;
+        } else if(extItem.key === 'INSTRID') {
+            instrId = extItem.value;
+        } else if(extItem.key === 'TXID') {
+            txId = extItem.value;
+        } else if(extItem.key === 'ENDTOENDID') {
+            endToEndId = extItem.value;
+        }
+    });
+    const pacs002: IPacs002 = {
+        Document: {
+            attr: {
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.11',
+            },
+            FIToFIPmtStsRpt: {
+                GrpHdr: {
+                    MsgId: msgId,
+                    CreDtTm: (new Date()).toISOString(),
+                },
+                TxInfAndSts: {
+                    OrgnlInstrId: instrId,
+                    OrgnlEndToEndId: endToEndId,
+                    OrgnlTxId: txId,
+                    OrgnlUETR: 'ACCC',
+                },
+            },
+        },
+    };
+
+    let xml = XML.fromJsObject(pacs002);
+    xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
+
+    return xml;
 };
