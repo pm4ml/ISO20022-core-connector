@@ -231,7 +231,7 @@ export const transferResponseToPacs002 = (
     let endToEndId = '';
     let txId = '';
 
-    Object.values(body.extensionList).forEach(extItem => {
+    Object.values(body.quoteRequestExtensions).forEach(extItem => {
         if(extItem.key === 'MSGID') {
             msgId = extItem.value;
         } else if(extItem.key === 'INSTRID') {

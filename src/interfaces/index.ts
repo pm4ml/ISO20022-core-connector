@@ -199,7 +199,7 @@ export interface ITransferState {
     },
     lastError?: Record<string, unknown>,
     skipPartyLookup?: boolean,
-    extensionList: Array<IExtensionItem>
+    quoteRequestExtensions: Array<IExtensionItem>
 }
 
 export type ITransferSuccess = ITransferState;
