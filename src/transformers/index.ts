@@ -11,7 +11,8 @@ import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, PartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
-    IPostQuotesBody, AmountType, TransactionType, ITransferSuccess, IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
+    IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
+    IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
