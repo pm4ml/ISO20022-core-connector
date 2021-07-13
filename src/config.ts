@@ -21,7 +21,8 @@ export interface IServiceConfig {
     autoAcceptQuotes: boolean,
     requestTimeout?: number,
     logger?: Logger.Logger,
-    xmlOptions: IXMLOptions
+    xmlOptions: IXMLOptions,
+    templatesPath: string
 
 }
 
@@ -63,5 +64,6 @@ export const Config: IServiceConfig = {
     autoAcceptParty: env.get('AUTO_ACCEPT_PARTY').required().asBool(),
     autoAcceptQuotes: env.get('AUTO_ACCEPT_QUOTES').required().asBool(),
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
+    templatesPath: env.get('TEMPLATES_PATH').required().asString(),
     xmlOptions,
 };

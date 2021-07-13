@@ -412,19 +412,66 @@ components:
                       type: string
                     NbOfTxs:
                       type: string
+                    CreDtTm:
+                      type: string
+                    SttlmInf:
+                      type: object
+                      properties:
+                        SttlmMtd:
+                          type: string
+                      required:
+                        - SttlmMtd
+                    PmtTpInf:
+                      type: object
+                      properties:
+                        CtgyPurp:
+                          type: object
+                          properties:
+                            Cd:
+                              type: string
+                          required:
+                            - Cd
+                      required:
+                        - CtgyPurp
+                    InstgAgt:
+                      type: object
+                      properties:
+                        FinInstnId:
+                          type: object
+                          properties:
+                            Othr:
+                              type: object
+                              properties:
+                                Id:
+                                  type: string
+                              required:
+                                - Id
+                          required:
+                            - Othr
+                      required:
+                        - FinInstnId
                   required:
                     - MsgId
                     - NbOfTxs
+                    - CreDtTm
+                    - SttlmInf
+                    - PmtTpInf
                 CdtTrfTxInf:
                   type: object
                   properties:
                     PmtId:
                       type: object
                       properties:
+                        InstrId:
+                          type: string
                         EndToEndId:
+                          type: string
+                        TxId:
                           type: string
                       required:
                         - EndToEndId
+                        - InstrId
+                        - TxId
                     IntrBkSttlmAmt:
                       type: object
                       properties:
@@ -438,6 +485,8 @@ components:
                       required:
                         - attr
                         - '#text'
+                    IntrBkSttlmDt:
+                      type: string
                     Dbtr:
                       type: object
                       properties:
@@ -486,9 +535,15 @@ components:
                             - BICFI
                       required:
                         - FinInstnId
+                    RmtInf:
+                      type: object
+                      properties:
+                        Ustrd:
+                          type: string
                   required:
                     - PmtId
                     - IntrBkSttlmAmt
+                    - IntrBkSttlmDt
                     - Dbtr
                     - DbtrAgt
                     - Cdtr  

@@ -38,7 +38,7 @@ describe('camt003Handler', () => {
         response: {type: null, status: null, body: ''}
     };
     const partiesByIdParams: IPartiesByIdParams = { idType: PartyIdType.ACCOUNT_ID, idValue: '1234567' }
-    const xsdPath = 'src/templates/xsd/camt.004.xsd';
+    const xsdPath = 'src/templates/xsd/camt.004.001.08.xsd';
     let xmlStr: string;
 
     beforeAll(async () => {

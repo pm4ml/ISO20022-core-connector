@@ -7,7 +7,7 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
-import * as path from 'path';
+import * as fs from 'fs';
 import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
 import { Config, IXMLOptions } from '../config';
@@ -37,7 +37,10 @@ const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown>
  * @returns {boolean | Array<Record<string, unknown>>}
  */
 const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, unknown>> => {
-    const schema = xsd.parseFile(path.resolve(process.cwd(), xsdPath));
+    if(!fs.existsSync(xsdPath)) {
+        throw new Error(`XSD file not found: ${xsdPath}`);
+    }
+    const schema = xsd.parseFile(xsdPath);
     const result = schema.validate(xml);
     return result != null ? result : true;
 };

@@ -33,5 +33,5 @@ export const buildHeaders = (): Record<string, any> => {
 };
 
 export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });
-export const postTransfersQuotesStage = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildHeaders() });
-export const putTransfersAcceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildHeaders() });
+export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildHeaders() });
+export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildHeaders() });

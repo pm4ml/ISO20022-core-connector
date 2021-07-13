@@ -10,7 +10,8 @@
 import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, PartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
-    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008, IPostQuotesBody, AmountType, TransactionType, ITransferSuccess, IPacs002,
+    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
+    IPostQuotesBody, AmountType, TransactionType, ITransferSuccess, IPacs002,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -170,6 +171,47 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
         skipPartyLookup: true,
     };
 
+    // TODO: Add extension list @see `transferResponseToPacs002` in transformers/index.ts
+    postQuotesBody.quoteRequestExtensions = [
+        {
+            key: 'MSGID',
+            value: body.Document.FIToFICstmrCdtTrf.GrpHdr.MsgId,
+        },
+        {
+            key: 'CREDT',
+            value: body.Document.FIToFICstmrCdtTrf.GrpHdr.CreDtTm,
+        },
+        {
+            key: 'INSTRID',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
+        },
+        {
+            key: 'ENDTOENDID',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
+        },
+        {
+            key: 'TXID',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
+        },
+        {
+            key: 'SETTLEDATE',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmDt,
+        },
+        {
+            key: 'USTRD',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Ustrd,
+        },
+        {
+            key: 'REFDOC',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Strd.RfrdDocInf.Nb,
+        },
+        {
+            key: 'DOCDATE',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Strd.RfrdDocInf.RltdDt,
+        },
+
+    ];
+
     return postQuotesBody;
 };
 
@@ -200,6 +242,7 @@ export const transferResponseToPacs002 = (
             endToEndId = extItem.value;
         }
     });
+
     const pacs002: IPacs002 = {
         Document: {
             attr: {

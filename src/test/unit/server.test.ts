@@ -35,7 +35,8 @@ describe('Server', () => {
             autoAcceptParty: false,
             autoAcceptQuotes: false,
             logger,
-            xmlOptions: Config.xmlOptions
+            xmlOptions: Config.xmlOptions,
+            templatesPath: Config.templatesPath
         }
         server = new Server(config);
         mockedOas.mockResolvedValue(() => { });

@@ -332,16 +332,40 @@ export interface IPacs008 extends Record<string, unknown> {
             GrpHdr: {
                 MsgId: string,
                 NbOfTxs: string,
+                CreDtTm: string,
+                SttlmInf: {
+                    SttlmMtd: string
+                },
+                PmtTpInf: {
+                    CtgyPurp: {
+                        Cd: string
+                    }
+                },
+                InstgAgt: {
+                    FinInstnId: {
+                        Othr: {
+                            Id: string
+                        }
+                    }
+                }
             },
             CdtTrfTxInf: {
                 PmtId: {
-                    EndToEndId: string
+                    EndToEndId: string,
+                    InstrId: string,
+                    TxId: string
                 },
                 IntrBkSttlmAmt: {
                     attr: {
                         Ccy: string
                     },
                     '#text': string
+                },
+                IntrBkSttlmDt: string,
+                PmtTpInf: {
+                    CtgyPurp: {
+                        Cd: string
+                    }
                 },
                 Dbtr: {
                     CtctDtls: {
@@ -363,6 +387,15 @@ export interface IPacs008 extends Record<string, unknown> {
                         BICFI: string
                     }
                 },
+                RmtInf: {
+                    Ustrd: string,
+                    Strd: {
+                        RfrdDocInf: {
+                            Nb: string,
+                            RltdDt: string
+                        }
+                    }
+                }
             }
         }
     }
