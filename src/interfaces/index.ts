@@ -404,7 +404,7 @@ export interface IPacs008 extends Record<string, unknown> {
 export interface IPacs002 extends Record<string, unknown> {
     Document: {
         attr: {
-            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.11',
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
             'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
         },
         FIToFIPmtStsRpt: {
@@ -436,7 +436,7 @@ export interface IPacs002 extends Record<string, unknown> {
                 OrgnlInstrId: string,
                 OrgnlEndToEndId: string,
                 OrgnlTxId: string,
-                OrgnlUETR: 'ACCC' | 'RJCT'
+                TxSts: 'ACCC' | 'RJCT'
             }
         },
     }

@@ -10,9 +10,9 @@
 
 'use strict'
 
-import { AxiosResponse } from 'axios';
 import fs from 'fs';
 import * as path from 'path';
+import { AxiosResponse } from 'axios';
 import { mocked } from 'ts-jest/utils';
 import camt003Handler from '../../../../handlers/Outbound/camt003Handler';
 import { PartyIdType, IPartiesByIdParams, IErrorInformation, IPartiesByIdResponse  } from '../../../../interfaces';

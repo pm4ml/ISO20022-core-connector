@@ -11,7 +11,7 @@ import { XML } from '../lib/xmlUtils';
 import {
     ICamt003, PartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
-    IPostQuotesBody, AmountType, TransactionType, ITransferSuccess, IPacs002,
+    IPostQuotesBody, AmountType, TransactionType, ITransferSuccess, IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -223,15 +223,25 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
  * @returns {IPacs002}
  */
 export const transferResponseToPacs002 = (
-    transferResponse: Record<string, unknown> | ITransferSuccess,
+    transferResponse: ITransferSuccess | ITransferError,
 ): string => {
-    const body = transferResponse as ITransferSuccess;
-    let msgId = '';
-    let instrId = '';
-    let endToEndId = '';
-    let txId = '';
+    let body: ITransferResponse;
+    let extensionList: Array<IExtensionItem>;
+    let [msgId, instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
 
-    Object.values(body.quoteRequestExtensions).forEach(extItem => {
+    if((transferResponse as ITransferSuccess).currentState === TransferStatus.COMPLETED) {
+        body = transferResponse as ITransferSuccess;
+        currentState = body.currentState || TransferStatus.COMPLETED;
+        completedTimestamp = body.fulfil?.body.completedTimestamp || (new Date()).toISOString();
+        extensionList = body.quoteRequestExtensions;
+    } else {
+        body = transferResponse as ITransferError;
+        currentState = body.transferState.currentState || TransferStatus.ERROR_OCCURRED;
+        completedTimestamp = body.transferState.fulfil?.body.completedTimestamp || (new Date()).toISOString();
+        extensionList = body.transferState.quoteRequestExtensions;
+    }
+
+    Object.values(extensionList).forEach(extItem => {
         if(extItem.key === 'MSGID') {
             msgId = extItem.value;
         } else if(extItem.key === 'INSTRID') {
@@ -247,18 +257,18 @@ export const transferResponseToPacs002 = (
         Document: {
             attr: {
                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.11',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
             },
             FIToFIPmtStsRpt: {
                 GrpHdr: {
                     MsgId: msgId,
-                    CreDtTm: (new Date()).toISOString(),
+                    CreDtTm: completedTimestamp || (new Date()).toISOString(),
                 },
                 TxInfAndSts: {
                     OrgnlInstrId: instrId,
                     OrgnlEndToEndId: endToEndId,
                     OrgnlTxId: txId,
-                    OrgnlUETR: 'ACCC',
+                    TxSts: currentState === TransferStatus.COMPLETED ? 'ACCC' : 'RJCT',
                 },
             },
         },
