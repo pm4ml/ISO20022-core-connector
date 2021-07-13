@@ -8,6 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
+import { XSD } from '../../lib/xmlUtils';
 import { ICamt003, IErrorInformation } from '../../interfaces';
 import { getParties } from '../../requests/Outbound';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
@@ -31,7 +32,7 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        // TODO: Run camt.003 XSD validation or apply at OpenAPI validation level
+        if(XSD.validateRequest(ctx, XSD.paths.camt_003) !== true) return;
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
         ctx.state.logger.debug(JSON.stringify(res.data));

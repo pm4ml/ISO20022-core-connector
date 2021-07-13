@@ -11,6 +11,7 @@ import * as fs from 'fs';
 import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
 import { Config, IXMLOptions } from '../config';
+import { ApiContext } from '~/types';
 
 /**
  * Parse JS object to XML
@@ -34,16 +35,49 @@ const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown>
 /**
  * Validate an XML string against supplied XSD
  * @param {string} xmlString
+ * * @param {string} xsdPath
  * @returns {boolean | Array<Record<string, unknown>>}
  */
 const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, unknown>> => {
     if(!fs.existsSync(xsdPath)) {
         throw new Error(`XSD file not found: ${xsdPath}`);
     }
+    if(!xml.length) {
+        throw new Error('XML content cannot be blank.');
+    }
     const schema = xsd.parseFile(xsdPath);
     const result = schema.validate(xml);
     return result != null ? result : true;
 };
 
+/**
+ * Validate an XML request against supplied XSD
+* @param {string} xsdPath
+* @param {ApiContext} ctx
+ * @returns {boolean | Array<Record<string, unknown>>}
+ */
+const validateRequest = (ctx: ApiContext, xsdPath: string): boolean | Array<Record<string, unknown>> => {
+    const validationResult = validate(ctx.request.rawBody, xsdPath);
+    if(validationResult !== true) {
+        ctx.state.logger.push({ validationResult }).error(new Error('Schema valdiation error'));
+        ctx.response.type = 'text/html';
+        ctx.response.body = null;
+        ctx.response.status = 400;
+    }
+    return validationResult;
+};
+
+/**
+ * Paths to XSDs
+ */
+const paths = {
+    camt_003: `${Config.templatesPath}/xsd/camt.003.001.07.xsd`,
+    camt_004: `${Config.templatesPath}/xsd/camt.004.001.08.xsd`,
+    pacs_008: `${Config.templatesPath}/xsd/pacs.008.001.09.xsd`,
+    pain_001: `${Config.templatesPath}/xsd/pain.001.001.10_1.xsd`,
+    pain_002: `${Config.templatesPath}/xsd/pain.002.001.11.xsd`,
+    pain_013: `${Config.templatesPath}/xsd/pain.013.001.08.xsd`,
+};
+
 export const XML = { fromJsObject, fromXml };
-export const XSD = { validate };
+export const XSD = { validate, validateRequest, paths };

@@ -19,7 +19,7 @@ import { XML, XSD } from '../../../lib/xmlUtils';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../../transformers';
 
 describe('transformers', () => {
-    const xsdPath = 'src/templates/xsd/camt.004.001.08.xsd';
+    const xsdPath = XSD.paths.camt_004;
     describe('camt003ToGetPartiesParams', () => {
         it('should return parameters for `PartiesById` request given a valid camt.003 message', async () => {
             const xmlStr = fs.readFileSync(path.join(__dirname, '../data/camt.003.xml')).toString();
