@@ -53,8 +53,8 @@ const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, 
 
 /**
  * Handle XML/XSD validation error
- * @param {string} xmlString
- * @param {string} xsdPath
+ * @param {object} validationResult
+ * @param {ApiContext} ctx
  * @returns {boolean | Array<Record<string, unknown>>}
  */
 const handleValidationError = (validationResult: unknown, ctx: ApiContext): void => {
