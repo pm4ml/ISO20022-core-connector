@@ -10,7 +10,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { Config } from '../../config';
-import { IPartiesByIdParams } from '../../interfaces';
+import { IPartiesByIdParams, IPostQuotesBody, ITransferContinuationQuote } from '../../interfaces';
 
 const request = axios.create({
     baseURL: Config.outboundEndpoint,
@@ -33,3 +33,5 @@ export const buildHeaders = (): Record<string, any> => {
 };
 
 export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });
+export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildHeaders() });
+export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildHeaders() });

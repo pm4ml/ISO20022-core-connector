@@ -300,7 +300,8 @@ paths:
           application/xml:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/CAMT.003'
+                - $ref: "#/components/schemas/CAMT.003"
+                - $ref: "#/components/schemas/PACS.008"
         required: true
       responses:
         200:
@@ -391,6 +392,176 @@ components:
           required:
             - attr
             - GetAcct
+      required:
+        - Document
+
+    PACS.008:
+      type: object
+      description: ISO 20022 PACS.008 message (Quoting/Transfers)
+      properties:
+        Document:
+          type: object
+          properties:
+            FIToFICstmrCdtTrf:
+              type: object
+              properties:
+                GrpHdr:
+                  type: object
+                  properties:
+                    MsgId:
+                      type: string
+                    NbOfTxs:
+                      type: string
+                    CreDtTm:
+                      type: string
+                    SttlmInf:
+                      type: object
+                      properties:
+                        SttlmMtd:
+                          type: string
+                      required:
+                        - SttlmMtd
+                    PmtTpInf:
+                      type: object
+                      properties:
+                        CtgyPurp:
+                          type: object
+                          properties:
+                            Cd:
+                              type: string
+                          required:
+                            - Cd
+                      required:
+                        - CtgyPurp
+                    InstgAgt:
+                      type: object
+                      properties:
+                        FinInstnId:
+                          type: object
+                          properties:
+                            Othr:
+                              type: object
+                              properties:
+                                Id:
+                                  type: string
+                              required:
+                                - Id
+                          required:
+                            - Othr
+                      required:
+                        - FinInstnId
+                  required:
+                    - MsgId
+                    - NbOfTxs
+                    - CreDtTm
+                    - SttlmInf
+                    - PmtTpInf
+                CdtTrfTxInf:
+                  type: object
+                  properties:
+                    PmtId:
+                      type: object
+                      properties:
+                        InstrId:
+                          type: string
+                        EndToEndId:
+                          type: string
+                        TxId:
+                          type: string
+                      required:
+                        - EndToEndId
+                        - InstrId
+                        - TxId
+                    IntrBkSttlmAmt:
+                      type: object
+                      properties:
+                        attr:
+                          type: object
+                          properties:
+                            Ccy:
+                              type: string
+                        '#text':
+                              type: string
+                      required:
+                        - attr
+                        - '#text'
+                    IntrBkSttlmDt:
+                      type: string
+                    Dbtr:
+                      type: object
+                      properties:
+                        CtctDtls:
+                          type: object
+                          properties:
+                            MobNb:
+                              type: string
+                          required:
+                            - MobNb
+                      required:
+                        - CtctDtls
+                    DbtrAgt:
+                      type: object
+                      properties:
+                        FinInstnId:
+                          type: object
+                          properties:
+                            BICFI: 
+                              type: string
+                          required:
+                            - BICFI
+                      required:
+                        - FinInstnId
+                    Cdtr:
+                      type: object
+                      properties:
+                        CtctDtls:
+                          type: object
+                          properties:
+                            MobNb:
+                              type: string
+                          required:
+                            - MobNb
+                      required:
+                        - CtctDtls
+                    CdtrAgt:
+                      type: object
+                      properties:
+                        FinInstnId:
+                          type: object
+                          properties:
+                            BICFI:
+                              type: string
+                          required:
+                            - BICFI
+                      required:
+                        - FinInstnId
+                    RmtInf:
+                      type: object
+                      properties:
+                        Ustrd:
+                          type: string
+                  required:
+                    - PmtId
+                    - IntrBkSttlmAmt
+                    - IntrBkSttlmDt
+                    - Dbtr
+                    - DbtrAgt
+                    - Cdtr  
+                    - CdtrAgt    
+            attr:
+              type: object
+              properties:
+                'xmlns:xsi': 
+                  type: string
+                  pattern: 'http://www.w3.org/2001/XMLSchema-instance'
+                xmlns:
+                  type: string
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09'
+              required:
+                - xmlns
+          required:
+            - FIToFICstmrCdtTrf
+            - attr
       required:
         - Document
 

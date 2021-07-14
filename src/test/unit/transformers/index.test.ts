@@ -13,19 +13,19 @@
 import fs from 'fs';
 import * as path from 'path';
 import {
-    ICamt003, ICamt004, IErrorInformation, IPartiesByIdResponse, IPartyIdType, PartiesCurrentState
+    ICamt003, ICamt004, IErrorInformation, IPartiesByIdResponse, PartyIdType, PartiesCurrentState
 } from '../../../interfaces'
 import { XML, XSD } from '../../../lib/xmlUtils';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../../transformers';
 
 describe('transformers', () => {
-    const xsdPath = 'src/templates/xsd/camt.004.xsd';
+    const xsdPath = XSD.paths.camt_004;
     describe('camt003ToGetPartiesParams', () => {
         it('should return parameters for `PartiesById` request given a valid camt.003 message', async () => {
             const xmlStr = fs.readFileSync(path.join(__dirname, '../data/camt.003.xml')).toString();
             const camt003 = XML.fromXml(xmlStr)
             const params = camt003ToGetPartiesParams(camt003 as ICamt003);
-            expect(params).toMatchObject({ idType: IPartyIdType.ACCOUNT_ID, idValue: '1234567' });
+            expect(params).toMatchObject({ idType: PartyIdType.ACCOUNT_ID, idValue: '1234567' });
         });
     });
 
@@ -35,7 +35,7 @@ describe('transformers', () => {
                 body: {
                     party: {
                         partyIdInfo: {
-                            partyIdType: IPartyIdType.ACCOUNT_ID,
+                            partyIdType: PartyIdType.ACCOUNT_ID,
                             partyIdentifier: '1234567',
                             fspId: 'mockDfspId'
                         },
@@ -52,7 +52,7 @@ describe('transformers', () => {
                 body: {
                     party: {
                         partyIdInfo: {
-                            partyIdType: IPartyIdType.ACCOUNT_ID,
+                            partyIdType: PartyIdType.ACCOUNT_ID,
                             partyIdentifier: '1234567',
                             fspId: 'mockDfspId',
                             extensionList: [

@@ -9,8 +9,10 @@
  **************************************************************************/
 import { XML } from '../lib/xmlUtils';
 import {
-    ICamt003, IPartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
-    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error,
+    ICamt003, PartyIdType, IPartiesByIdParams, IPartiesByIdResponse,
+    ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
+    IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
+    IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -26,7 +28,7 @@ export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICa
     const body = camt003 as ICamt003;
     const idValue = body.Document.GetAcct.AcctQryDef.AcctCrit.NewCrit.SchCrit.AcctId.EQ.Othr.Id as string;
     const getPartiesParams: IPartiesByIdParams = {
-        idType: IPartyIdType.ACCOUNT_ID,
+        idType: PartyIdType.ACCOUNT_ID,
         idValue,
     };
 
@@ -140,4 +142,141 @@ export const fspiopErrorToCamt004Error = (_errorInformation: IErrorInformation, 
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
     return { body: xml, status: 404 };
+};
+
+/**
+ * Translates ISO 20022 pacs.008 to POST /quotes request body
+ *
+ * @param {Record<string, unknown> | IPacs008} pacs008
+ * @returns {IPostQuotesBody}
+ */
+export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs008)
+: IPostQuotesBody => {
+    const body = pacs008 as IPacs008;
+    const postQuotesBody: IPostQuotesBody = {
+        homeTransactionId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
+        amountType: AmountType.SEND,
+        amount: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt['#text'],
+        currency: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt.attr.Ccy,
+        from: {
+            idType: PartyIdType.ACCOUNT_ID,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.CtctDtls.MobNb,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.BICFI,
+        },
+        to: {
+            idType: PartyIdType.ACCOUNT_ID,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.CtctDtls.MobNb,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.BICFI,
+        },
+        transactionType: TransactionType.TRANSFER,
+        skipPartyLookup: true,
+    };
+
+    // TODO: Add extension list @see `transferResponseToPacs002` in transformers/index.ts
+    postQuotesBody.quoteRequestExtensions = [
+        {
+            key: 'MSGID',
+            value: body.Document.FIToFICstmrCdtTrf.GrpHdr.MsgId,
+        },
+        {
+            key: 'CREDT',
+            value: body.Document.FIToFICstmrCdtTrf.GrpHdr.CreDtTm,
+        },
+        {
+            key: 'INSTRID',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
+        },
+        {
+            key: 'ENDTOENDID',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
+        },
+        {
+            key: 'TXID',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
+        },
+        {
+            key: 'SETTLEDATE',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmDt,
+        },
+        {
+            key: 'USTRD',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Ustrd,
+        },
+        {
+            key: 'REFDOC',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Strd.RfrdDocInf.Nb,
+        },
+        {
+            key: 'DOCDATE',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Strd.RfrdDocInf.RltdDt,
+        },
+
+    ];
+
+    return postQuotesBody;
+};
+
+
+/**
+ * Translates ML's transfer success response to ISO 20022 pacs.002 response.
+ *
+ * @param transferResponse
+ * @returns {IPacs002}
+ */
+export const transferResponseToPacs002 = (
+    transferResponse: ITransferSuccess | ITransferError,
+): string => {
+    let body: ITransferResponse;
+    let extensionList: Array<IExtensionItem>;
+    let [msgId, instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
+
+    if((transferResponse as ITransferSuccess).currentState === TransferStatus.COMPLETED) {
+        body = transferResponse as ITransferSuccess;
+        currentState = body.currentState || TransferStatus.COMPLETED;
+        completedTimestamp = body.fulfil?.body.completedTimestamp || (new Date()).toISOString();
+        extensionList = body.quoteRequestExtensions;
+    } else {
+        body = transferResponse as ITransferError;
+        currentState = body.transferState.currentState || TransferStatus.ERROR_OCCURRED;
+        completedTimestamp = body.transferState.fulfil?.body.completedTimestamp || (new Date()).toISOString();
+        extensionList = body.transferState.quoteRequestExtensions;
+    }
+
+    Object.values(extensionList).forEach(extItem => {
+        if(extItem.key === 'MSGID') {
+            msgId = extItem.value;
+        } else if(extItem.key === 'INSTRID') {
+            instrId = extItem.value;
+        } else if(extItem.key === 'TXID') {
+            txId = extItem.value;
+        } else if(extItem.key === 'ENDTOENDID') {
+            endToEndId = extItem.value;
+        }
+    });
+
+    const pacs002: IPacs002 = {
+        Document: {
+            attr: {
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
+            },
+            FIToFIPmtStsRpt: {
+                GrpHdr: {
+                    MsgId: msgId,
+                    CreDtTm: completedTimestamp || (new Date()).toISOString(),
+                },
+                TxInfAndSts: {
+                    OrgnlInstrId: instrId,
+                    OrgnlEndToEndId: endToEndId,
+                    OrgnlTxId: txId,
+                    TxSts: currentState === TransferStatus.COMPLETED ? 'ACCC' : 'RJCT',
+                },
+            },
+        },
+    };
+
+    let xml = XML.fromJsObject(pacs002);
+    xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
+
+    return xml;
 };

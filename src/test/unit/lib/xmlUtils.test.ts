@@ -40,7 +40,7 @@ describe('xmlUtils', () => {
             it('should validate XML string with supplied XSD', () => {
                 const validXml = fs.readFileSync(path.resolve(process.cwd(), 'src/test/unit/data/camt.003.xml')).toString();
                 const invalidXml = '<a><b><c>Invalid XML</c></b></a>';
-                const xsdPath = 'src/templates/xsd/camt.003.xsd';
+                const xsdPath = XSD.paths.camt_003;
                 expect(XSD.validate(validXml, xsdPath)).toBe(true);
                 expect(XSD.validate(invalidXml, xsdPath)).not.toBe(true);
             })
