@@ -30,7 +30,11 @@ const handleError = (error: Error | ITransferError, ctx: ApiContext) => {
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        if(XSD.validateRequest(ctx, XSD.paths.pacs_008) !== true) return;
+        const validationResult = XSD.validate(ctx.request.rawBody, XSD.paths.pacs_008);
+        if(validationResult !== true) {
+            XSD.handleValidationError(validationResult, ctx);
+            return;
+        }
         // convert pacs.008 to POST /transfers (quoting)
         const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
         let res = await requestQuotes(postQuotesBody);

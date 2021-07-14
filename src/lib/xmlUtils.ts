@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
 import { Config, IXMLOptions } from '../config';
-import { ApiContext } from '~/types';
+import { ApiContext } from '../types';
 
 /**
  * Parse JS object to XML
@@ -50,21 +50,18 @@ const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, 
     return result != null ? result : true;
 };
 
+
 /**
- * Validate an XML request against supplied XSD
-* @param {string} xsdPath
-* @param {ApiContext} ctx
+ * Handle XML/XSD validation error
+ * @param {string} xmlString
+ * @param {string} xsdPath
  * @returns {boolean | Array<Record<string, unknown>>}
  */
-const validateRequest = (ctx: ApiContext, xsdPath: string): boolean | Array<Record<string, unknown>> => {
-    const validationResult = validate(ctx.request.rawBody, xsdPath);
-    if(validationResult !== true) {
-        ctx.state.logger.push({ validationResult }).error(new Error('Schema valdiation error'));
-        ctx.response.type = 'text/html';
-        ctx.response.body = null;
-        ctx.response.status = 400;
-    }
-    return validationResult;
+const handleValidationError = (validationResult: unknown, ctx: ApiContext): void => {
+    ctx.state.logger.push({ validationResult }).error(new Error('Schema valdiation error'));
+    ctx.response.type = 'text/html';
+    ctx.response.body = null;
+    ctx.response.status = 400;
 };
 
 /**
@@ -81,4 +78,4 @@ const paths = {
 };
 
 export const XML = { fromJsObject, fromXml };
-export const XSD = { validate, validateRequest, paths };
+export const XSD = { validate, handleValidationError, paths };

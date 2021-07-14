@@ -32,7 +32,11 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        if(XSD.validateRequest(ctx, XSD.paths.camt_003) !== true) return;
+        const validationResult = XSD.validate(ctx.request.rawBody, XSD.paths.camt_003);
+        if(validationResult !== true) {
+            XSD.handleValidationError(validationResult, ctx);
+            return;
+        }
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await getParties(params);
         ctx.state.logger.debug(JSON.stringify(res.data));
