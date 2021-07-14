@@ -32,8 +32,6 @@ describe('Server', () => {
         });
         config = {
             outboundEndpoint: 'http://localhost:5001',
-            autoAcceptParty: false,
-            autoAcceptQuotes: false,
             logger,
             xmlOptions: Config.xmlOptions,
             templatesPath: Config.templatesPath

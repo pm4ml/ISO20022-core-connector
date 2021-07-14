@@ -17,8 +17,6 @@ dotenv.config();
 export interface IServiceConfig {
     port?: number,
     outboundEndpoint: string,
-    autoAcceptParty: boolean,
-    autoAcceptQuotes: boolean,
     requestTimeout?: number,
     logger?: Logger.Logger,
     xmlOptions: IXMLOptions,
@@ -61,8 +59,6 @@ const xmlOptions: IXMLOptions = {
 export const Config: IServiceConfig = {
     port: env.get('LISTEN_PORT').default('3000').asPortNumber(),
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
-    autoAcceptParty: env.get('AUTO_ACCEPT_PARTY').required().asBool(),
-    autoAcceptQuotes: env.get('AUTO_ACCEPT_QUOTES').required().asBool(),
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
     templatesPath: env.get('TEMPLATES_PATH').required().asString(),
     xmlOptions,

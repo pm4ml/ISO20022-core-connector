@@ -9,9 +9,7 @@
  **************************************************************************/
 
 import { XSD } from '../../lib/xmlUtils';
-import {
-    IPacs008, ITransferError, TransferStatus,
-} from '../../interfaces';
+import { IPacs008, ITransferError, TransferStatus } from '../../interfaces';
 import { acceptQuotes, requestQuotes } from '../../requests/Outbound';
 import { pacs008ToPostQuotesBody, transferResponseToPacs002 } from '../../transformers';
 import { ApiContext } from '../../types';
@@ -33,7 +31,6 @@ const handleError = (error: Error | ITransferError, ctx: ApiContext) => {
 export default async (ctx: ApiContext): Promise<void> => {
     try {
         if(XSD.validateRequest(ctx, XSD.paths.pacs_008) !== true) return;
-
         // convert pacs.008 to POST /transfers (quoting)
         const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
         let res = await requestQuotes(postQuotesBody);
@@ -44,7 +41,6 @@ export default async (ctx: ApiContext): Promise<void> => {
             handleError(res.data, ctx);
             return;
         }
-
         // convert POST /transfers response to PUT /tranfers/{transferId} (quote acceptance) request
         // if no error is received, we send PUT /transfers/{transferId} to accept quote and execute transfer
         res = await acceptQuotes(res.data.transferId, { acceptQuote: true });
@@ -54,8 +50,7 @@ export default async (ctx: ApiContext): Promise<void> => {
             handleError(res.data, ctx);
             return;
         }
-
-        // Transfer completed successfully.
+        // transfer completed successfully
         // convert response to pacs.002 and respond
         ctx.response.type = 'application/xml';
         ctx.response.body = transferResponseToPacs002(res.data);
