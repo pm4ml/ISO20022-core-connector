@@ -8,5 +8,20 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-export * from './outbound';
-export * from './inbound';
+export interface IPostQuoteRequestBody {
+    quoteId: string,
+    transactionId: string,
+    amount: string,
+    currency: string,
+    expiration?: string,
+}
+
+export interface IPostQuoteRequestResponseBody {
+    quoteId: string,
+    transactionId: string,
+    transferAmount: string,
+    transferAmountCurrency: string,
+    payeeReceiveAmount: string,
+    payeeReceiveAmountCurrency: string,
+    expiration?: string,
+}

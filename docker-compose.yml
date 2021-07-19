@@ -1,9 +1,9 @@
 version: '3.4'
 services:
-  core-connector:
+  iso-core-connector:
     build:
       context: .
       dockerfile: Dockerfile
     env_file: ./src/.env
     ports:
-      - "3000:3000"
+      - "7000:7000"

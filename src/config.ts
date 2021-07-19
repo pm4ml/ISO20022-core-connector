@@ -60,6 +60,6 @@ export const Config: IServiceConfig = {
     port: env.get('LISTEN_PORT').default('3000').asPortNumber(),
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
-    templatesPath: env.get('TEMPLATES_PATH').required().asString(),
+    templatesPath: env.get('TEMPLATES_PATH').default('templates').asString(),
     xmlOptions,
 };

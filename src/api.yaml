@@ -17,28 +17,6 @@ paths:
         200:
           description: Returns a success response code if the service is healthy.
 
-  /inbound/parties/:idType/:idValue:
-    get:
-      summary: GET parties
-      description: GET parties
-      tags:
-        - PartiesByTypeAndID
-      responses:
-        200:
-          description: OK
-        404:
-          description: Not Found - The resource specified in the URI was not found.
-          content:
-            application/json:
-              schema:
-                title: NotFoundError
-                type: object
-                properties:
-                  statusCode:
-                    description: Mojaloop error code
-                required:
-                  - statusCode
-
   /inbound/quoterequests:
     post:
       summary: Quotes request
