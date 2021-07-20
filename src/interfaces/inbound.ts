@@ -8,7 +8,9 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { IPostQuotesResponseBody, ITransferParty, TransactionType, AmountType } from "./outbound"
+import {
+    IPostQuotesResponseBody, ITransferParty, TransactionType, AmountType,
+} from './outbound';
 
 
 export interface IPostQuoteRequestBody {
@@ -47,7 +49,7 @@ export interface IPostTransferWithQuoteRequestBody {
 
 }
 
-// export type IPostTransferRequestBody = IPostTransferWithQuoteRequestBody | IPostTransferWithoutQuoteRequestBody;
+export type IPostTransferRequestBody = IPostTransferWithQuoteRequestBody | IPostTransferWithoutQuoteRequestBody;
 
 export interface IPostTransferRequestResponseBody {
     transferId: string,

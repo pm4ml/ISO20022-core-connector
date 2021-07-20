@@ -13,8 +13,8 @@ import {
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
     IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
     IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
-} from '../interfaces/outbound';
-import {IPostTransferWithoutQuoteRequestBody} from '../interfaces/inbound'
+    IPostTransferRequestBody
+} from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
 
@@ -289,10 +289,10 @@ export const transferResponseToPacs002 = (
  * @returns {IPacs008}
  */
 export const postTransferBodyToPacs008 = (
-    transferRequest  IPostTransferWithoutQuoteRequestBody ,
+    transferRequest:  IPostTransferRequestBody,
 ): string => {
 
-    let body: IPostTransfersBody;
+    let body: IPostTransferRequestBody;
 
     let extensionList: Array<IExtensionItem>;
     let [msgId, instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];

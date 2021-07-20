@@ -7,7 +7,9 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
-import { IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferRequestBody, IPostTransferRequestResponseBody } from '~/interfaces';
+import {
+    IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferRequestBody, IPostTransferRequestResponseBody,
+} from '~/interfaces';
 import { ApiContext } from '../../types';
 
 
@@ -40,11 +42,11 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
     try {
-        if(payload.quote ){
+        // if(payload.quote ){
 
-        } else {
+        // } else {
             
-        }
+        // }
         const response = {
             transferId: payload.transferId,
             // transactionId: payload.transactionId,
