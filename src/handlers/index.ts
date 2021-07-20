@@ -9,6 +9,7 @@
  **************************************************************************/
 
 import { ApiContext, HandlerMap } from '../types';
+import { InboundHandlers } from './Inbound';
 import { OutboundHandler } from './Outbound';
 
 const healthCheck = async (ctx: ApiContext): Promise<void> => {
@@ -21,6 +22,9 @@ const Handlers: HandlerMap = {
     },
     '/outbound/iso20022': {
         post: OutboundHandler,
+    },
+    '/inbound/quoterequests': {
+        post: InboundHandlers.postQuotes,
     },
 };
 

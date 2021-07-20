@@ -1,6 +1,6 @@
 version: '3.4'
 services:
-  core-connector:
+  iso-core-connector:
     build:
       context: .
       dockerfile: Dockerfile
