@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
- export enum PartiesCurrentState {
+export enum PartiesCurrentState {
     WAITING_FOR_REQUEST_PARTY_INFORMATION = 'WAITING_FOR_REQUEST_PARTY_INFORMATION',
     COMPLETED = 'COMPLETED',
     ERROR_OCCURRED = 'ERROR_OCCURED',
