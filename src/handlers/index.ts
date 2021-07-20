@@ -26,6 +26,9 @@ const Handlers: HandlerMap = {
     '/inbound/quoterequests': {
         post: InboundHandlers.postQuotes,
     },
+    '/inbound/transfers': {
+        post: InboundHandlers.postTransfers,
+    },
 };
 
 export default Handlers;

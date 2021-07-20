@@ -215,6 +215,20 @@ export interface ITransferBadRequest {
     transferState: ITransferState
 }
 
+export interface IPostTransfersBody {
+    homeTransactionId: string,
+    from: ITransferParty,
+    to: ITransferParty,
+    amountType: AmountType,
+    currency: string,
+    amount: string,
+    transactionType: TransactionType,
+    note?: string,
+    quoteRequestExtensions?: Array<IExtensionItem>,
+    transferRequestExtension?: Array<IExtensionItem>,
+    skipPartyLookup: boolean
+}
+
 export type ITransferServerError = ITransferBadRequest;
 
 export type ITransferTimeoutError = ITransferBadRequest;

@@ -7,7 +7,7 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
-import { IPostQuoteRequestBody, IPostQuoteRequestResponseBody } from '~/interfaces';
+import { IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferRequestBody, IPostTransferRequestResponseBody } from '~/interfaces';
 import { ApiContext } from '../../types';
 
 
@@ -37,6 +37,32 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
     }
 };
 
+const postTransfers = async (ctx: ApiContext): Promise<void> => {
+    const payload = ctx.request.body as unknown as IPostTransferRequestBody;
+    try {
+        if(payload.quote ){
+
+        } else {
+            
+        }
+        const response = {
+            transferId: payload.transferId,
+            // transactionId: payload.transactionId,
+            transferAmount: payload.amount,
+            transferAmountCurrency: payload.currency,
+            // payeeReceiveAmount: payload.amount,
+            // payeeReceiveAmountCurrency: payload.currency,
+        } as IPostTransferRequestResponseBody;
+        // if(payload.expiration) response.expiration = payload.expiration;
+        ctx.response.body = response;
+        ctx.response.status = 200;
+        ctx.response.type = 'application/json';
+    } catch (err) {
+        handleError(err, ctx);
+    }
+};
+
 export const InboundHandlers = {
     postQuotes,
+    postTransfers,
 };

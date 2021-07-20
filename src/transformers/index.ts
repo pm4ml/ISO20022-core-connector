@@ -13,7 +13,8 @@ import {
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
     IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
     IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
-} from '../interfaces';
+} from '../interfaces/outbound';
+import {IPostTransferWithoutQuoteRequestBody} from '../interfaces/inbound'
 import { generateMsgId } from '../lib/iso20022';
 
 
@@ -276,6 +277,68 @@ export const transferResponseToPacs002 = (
     };
 
     let xml = XML.fromJsObject(pacs002);
+    xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
+
+    return xml;
+};
+
+/**
+ * Translates ML's transfer POST request body to ISO 20022 pacs.008 message.
+ *
+ * @param transferPost
+ * @returns {IPacs008}
+ */
+export const postTransferBodyToPacs008 = (
+    transferRequest  IPostTransferWithoutQuoteRequestBody ,
+): string => {
+
+    let body: IPostTransfersBody;
+
+    let extensionList: Array<IExtensionItem>;
+    let [msgId, instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
+    body = transferRequest as IPostTransfersBody;
+
+    extensionList = body.quoteRequestExtensions;
+
+    const pacs008: IPacs008 = {
+        Document: {
+            attr: {
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09',
+            },
+            FIToFICstmrCdtTrf: {
+                GrpHdr: {
+                    MsgId: msgId,
+                    CreDtTm: (new Date()).toISOString(), // completedTimestamp || (new Date()).toISOString(),
+                    NbOfTxs: '1',
+                    SttlmInf: {
+                        SttlmMtd: 'INDA'
+                    },
+                    PmtTpInf: {
+                        CtgyPurp: {
+                        Cd: '0'
+                        }
+                    },
+                    InstgAgt: {
+                        FinInstnId: {
+                            Othr: {
+                                Id:  // Need to get the ID here
+                            }
+                        }
+                    }
+
+                },
+                TxInfAndSts: {
+                    OrgnlInstrId: instrId,
+                    OrgnlEndToEndId: endToEndId,
+                    OrgnlTxId: txId,
+                    TxSts: currentState === TransferStatus.COMPLETED ? 'ACCC' : 'RJCT',
+                },
+            },
+        },
+    };
+
+    let xml = XML.fromJsObject(pacs008);
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
     return xml;
