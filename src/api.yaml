@@ -17,7 +17,7 @@ paths:
         200:
           description: Returns a success response code if the service is healthy.
 
-  /inbound/quoterequests:
+  /quoterequests:
     post:
       summary: Quotes request
       description: Quotes request
@@ -143,7 +143,7 @@ paths:
                 required:
                   - statusCode
 
-  /inbound/transfers:
+  /transfers:
     post:
       summary: Transfer request
       description: Transfer request

@@ -1,6 +1,6 @@
 {
   "name": "iso20022-core-connector",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "ISO20022 Core Connector for Mojaloop",
   "main": "build/index.js",
   "scripts": {

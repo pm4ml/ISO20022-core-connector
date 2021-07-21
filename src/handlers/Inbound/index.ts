@@ -22,7 +22,7 @@ const handleError = (err: Error, ctx: ApiContext) => {
 const postQuotes = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostQuoteRequestBody;
     console.log('GOT a POST /quotes');
-    console.log(ctx.request.body)
+    console.log(ctx.request.body);
 
     try {
         const response = {
@@ -43,16 +43,14 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
 };
 
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
-    const payload = ctx.request.body as unknown //as IPostTransferRequestBody;
+    const payload = ctx.request.body as unknown; // as IPostTransferRequestBody;
     console.log('GOT a POST /transfer');
-    console.log('-------------------------------------------')
-    console.log(payload)
-    console.log('-------------------------------------------')
+    console.log('-------------------------------------------');
+    console.log(payload);
+    console.log('-------------------------------------------');
     try {
         // if(payload.quote ){
-
         // } else {
-            
         // }
         // const response = {
         //     transferId: payload.transferId,
