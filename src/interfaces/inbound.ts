@@ -91,7 +91,6 @@ export interface IPostTransferRequestResponseBody {
 //       note: quote.request.note
 
 
-
 //       transferId: external.transferId,
 //       currency: external.amount.currency,
 //       amount: external.amount.amount,

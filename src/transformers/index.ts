@@ -13,7 +13,7 @@ import {
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
     IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
     IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
-    IPostTransferRequestBody
+    IPostTransferRequestBody,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -289,14 +289,13 @@ export const transferResponseToPacs002 = (
  * @returns {IPacs008}
  */
 export const postTransferBodyToPacs008 = (
-    transferRequest:  IPostTransferRequestBody,
+    transferRequest: IPostTransferRequestBody,
 ): string => {
-
-     let body: IPostTransferRequestBody;
+    let body: IPostTransferRequestBody;
     // console.log(body);
 
     // let extensionList: Array<IExtensionItem>;
-    let [msgId,] = ['']; // instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
+    const [msgId] = ['']; // instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
     body = transferRequest as IPostTransferRequestBody;
     console.log(body);
 
@@ -314,31 +313,31 @@ export const postTransferBodyToPacs008 = (
                     CreDtTm: (new Date()).toISOString(), // completedTimestamp || (new Date()).toISOString(),
                     NbOfTxs: '1',
                     SttlmInf: {
-                        SttlmMtd: 'INDA'
+                        SttlmMtd: 'INDA',
                     },
                     PmtTpInf: {
                         CtgyPurp: {
-                        Cd: '0'
-                        }
+                            Cd: '0',
+                        },
                     },
                     InstgAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id:  '0'// Need to get the ID here
-                            }
-                        }
-                    }
+                                Id: '0', // Need to get the ID here
+                            },
+                        },
+                    },
 
                 },
                 CdtTrfTxInf: {
                     PmtId: {
                         EndToEndId: 'id',
                         InstrId: 'id',
-                        TxId: 'string'
+                        TxId: 'string',
                     },
                     IntrBkSttlmAmt: {
                         attr: {
-                            Ccy: 'string'
+                            Ccy: 'string',
                         },
                         '#text': 'string',
                     },
@@ -373,7 +372,7 @@ export const postTransferBodyToPacs008 = (
                         Strd: {
                             RfrdDocInf: {
                                 Nb: 'string',
-                                RltdDt: 'string'
+                                RltdDt: 'string',
                             },
                         },
                     },
