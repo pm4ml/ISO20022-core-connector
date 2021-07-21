@@ -292,13 +292,15 @@ export const postTransferBodyToPacs008 = (
     transferRequest:  IPostTransferRequestBody,
 ): string => {
 
-    let body: IPostTransferRequestBody;
+     let body: IPostTransferRequestBody;
+    // console.log(body);
 
-    let extensionList: Array<IExtensionItem>;
-    let [msgId, instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
-    body = transferRequest as IPostTransfersBody;
+    // let extensionList: Array<IExtensionItem>;
+    let [msgId,] = ['']; // instrId, endToEndId, txId, completedTimestamp, currentState] = ['', '', '', '', '', ''];
+    body = transferRequest as IPostTransferRequestBody;
+    console.log(body);
 
-    extensionList = body.quoteRequestExtensions;
+    // extensionList = body.quoteRequestExtensions;
 
     const pacs008: IPacs008 = {
         Document: {
@@ -322,17 +324,59 @@ export const postTransferBodyToPacs008 = (
                     InstgAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id:  // Need to get the ID here
+                                Id:  '0'// Need to get the ID here
                             }
                         }
                     }
 
                 },
-                TxInfAndSts: {
-                    OrgnlInstrId: instrId,
-                    OrgnlEndToEndId: endToEndId,
-                    OrgnlTxId: txId,
-                    TxSts: currentState === TransferStatus.COMPLETED ? 'ACCC' : 'RJCT',
+                CdtTrfTxInf: {
+                    PmtId: {
+                        EndToEndId: 'id',
+                        InstrId: 'id',
+                        TxId: 'string'
+                    },
+                    IntrBkSttlmAmt: {
+                        attr: {
+                            Ccy: 'string'
+                        },
+                        '#text': 'string',
+                    },
+                    IntrBkSttlmDt: 'string',
+                    PmtTpInf: {
+                        CtgyPurp: {
+                            Cd: 'string',
+                        },
+                    },
+                    Dbtr: {
+                        CtctDtls: {
+                            MobNb: 'string',
+                        },
+                    },
+                    DbtrAgt: {
+                        FinInstnId: {
+                            BICFI: 'string',
+                        },
+                    },
+                    Cdtr: {
+                        CtctDtls: {
+                            MobNb: 'string',
+                        },
+                    },
+                    CdtrAgt: {
+                        FinInstnId: {
+                            BICFI: 'string',
+                        },
+                    },
+                    RmtInf: {
+                        Ustrd: 'string',
+                        Strd: {
+                            RfrdDocInf: {
+                                Nb: 'string',
+                                RltdDt: 'string'
+                            },
+                        },
+                    },
                 },
             },
         },

@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import {
-    IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferRequestBody, IPostTransferRequestResponseBody,
+    IPostQuoteRequestBody, IPostQuoteRequestResponseBody,// IPostTransferRequestBody, IPostTransferRequestResponseBody,
 } from '~/interfaces';
 import { ApiContext } from '../../types';
 
@@ -21,6 +21,9 @@ const handleError = (err: Error, ctx: ApiContext) => {
 
 const postQuotes = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostQuoteRequestBody;
+    console.log('GOT a POST /quotes');
+    console.log(ctx.request.body)
+
     try {
         const response = {
             quoteId: payload.quoteId,
@@ -40,23 +43,28 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
 };
 
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
-    const payload = ctx.request.body as unknown as IPostTransferRequestBody;
+    const payload = ctx.request.body as unknown //as IPostTransferRequestBody;
+    console.log('GOT a POST /transfer');
+    console.log('-------------------------------------------')
+    console.log(payload)
+    console.log('-------------------------------------------')
     try {
         // if(payload.quote ){
 
         // } else {
             
         // }
-        const response = {
-            transferId: payload.transferId,
-            // transactionId: payload.transactionId,
-            transferAmount: payload.amount,
-            transferAmountCurrency: payload.currency,
-            // payeeReceiveAmount: payload.amount,
-            // payeeReceiveAmountCurrency: payload.currency,
-        } as IPostTransferRequestResponseBody;
-        // if(payload.expiration) response.expiration = payload.expiration;
-        ctx.response.body = response;
+        // const response = {
+        //     transferId: payload.transferId,
+        //     // transactionId: payload.transactionId,
+        //     transferAmount: payload.amount,
+        //     transferAmountCurrency: payload.currency,
+        //     // payeeReceiveAmount: payload.amount,
+        //     // payeeReceiveAmountCurrency: payload.currency,
+        // } as IPostTransferRequestResponseBody;
+        // // if(payload.expiration) response.expiration = payload.expiration;
+        // ctx.response.body = response;
+        ctx.response.body = payload;
         ctx.response.status = 200;
         ctx.response.type = 'application/json';
     } catch (err) {
