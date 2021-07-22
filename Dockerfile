@@ -16,6 +16,6 @@ COPY package.json package-lock.json* /opt/app/
 RUN npm ci --production
 COPY --from=builder /opt/app/build .
 
-EXPOSE 3000
+EXPOSE 3003
 
 CMD ["node", "index.js"]

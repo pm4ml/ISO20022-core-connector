@@ -6,4 +6,4 @@ services:
       dockerfile: Dockerfile
     env_file: ./src/.env
     ports:
-      - "3000:3000"
+      - "3003:3003"
