@@ -8,13 +8,13 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import {
-    IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferWithQuoteRequestBody, IPacs002, // IPostTransferWithQuoteRequestBody,
+    IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferRequestBody, IPacs002, // IPostTransferRequestBody,
 } from '~/interfaces';
 import { ApiContext } from '../../types';
-import {postTransferBodyToPacs008, pacs002ToPutTransfersBody} from '../../transformers'
+import { postTransferBodyToPacs008, pacs002ToPutTransfersBody } from '../../transformers';
 import { requestBackendTransfers } from '../../requests/Inbound';
-import {XML, XSD} from '../../lib/xmlUtils'
- 
+import { XML, XSD } from '../../lib/xmlUtils';
+
 
 const handleError = (err: Error, ctx: ApiContext) => {
     ctx.state.logger.error(err);
@@ -24,7 +24,6 @@ const handleError = (err: Error, ctx: ApiContext) => {
 
 const postQuotes = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostQuoteRequestBody;
-    console.log('GOT a POST /quotes');
     console.log(ctx.request.body);
 
     try {
@@ -45,16 +44,19 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
     }
 };
 
+/**
+ * Handled the incoming POST /transfers from mojaloop-connector
+ * Converts the transfer payload from mojaloop to pacs008 and sends it to external ISO switch
+ * Receives the synchronous response in pacs002 from the ISO compliant switch, converts it into mojaloop format
+ * Sends synchronous response to mojaloop-connector
+ *
+ */
+
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
-    const payload = ctx.request.body as unknown as IPostTransferWithQuoteRequestBody;
-    console.log('GOT a POST /transfer');
-    console.log('-------------------------------------------');
-    console.log(payload);
-    console.log('-------------------------------------------');
+    const payload = ctx.request.body as unknown as IPostTransferRequestBody;
+    console.log(ctx.request.body);
+
     const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
-    console.log('-------------Making a call to requestTransfers------------------------');
-    console.log(postTransfersBodyPacs008)
-    console.log('-------------------------------------');
 
     // send a pacs008 POST /transfers request to RSwitch and get a synchronous pacs002 response
     const res = await requestBackendTransfers(postTransfersBodyPacs008);
@@ -63,28 +65,14 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
         XSD.handleValidationError(validationResult, ctx);
         return;
     }
-    console.log('-------------GOT RESPONSE FROM requestTransfers------------------------');
-    console.log(res.data)
-    let result = XML.fromXml(res.data);
-    console.log('-------------------------------------');
+
+    const xmlData = XML.fromXml(res.data);
 
     // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
-    const transferPutBody = pacs002ToPutTransfersBody(result as unknown as IPacs002);
+    const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
     ctx.response.body = transferPutBody;
     ctx.response.status = 200;
     ctx.response.type = 'application/json';
-
-    // try {
-    //     if('quote' in payload ){
-    //         console.log('WE HAVE GOT THE quote')
-            
-    //     } else {
-    //         console.log('NORMAL REQUEST without quote')
-
-    //     }
-    // } catch (err) {
-    //     handleError(err, ctx);
-    // }
 };
 
 export const InboundHandlers = {

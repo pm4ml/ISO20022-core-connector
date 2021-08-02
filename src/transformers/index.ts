@@ -13,7 +13,7 @@ import {
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
     IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
     IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
-    ITransferFulfilment, MojaloopTransferState, IPostTransferWithQuoteRequestBody,
+    ITransferFulfilment, MojaloopTransferState, IPostTransferRequestBody,
     IPacs008Incoming,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
@@ -290,39 +290,32 @@ export const transferResponseToPacs002 = (
  * @returns {IPacs008}
  */
 export const postTransferBodyToPacs008 = (
-    body: IPostTransferWithQuoteRequestBody,
+    transferRequest: IPostTransferRequestBody,
 ): string => {
-    // console.log(body);
+    const extensionList: Array<IExtensionItem> = transferRequest.quoteRequestExtensions;
+    let [msgId, instrId, endToEndId, txId, createdDateTime, sttlmDt, ustrd, refDoc, docDate] = ['', '', '', '', '', '', '', '', ''];
 
-    let extensionList: Array<IExtensionItem>;
-    let [msgId, instrId, endToEndId, txId, createdDateTime, sttlmDt, ustrd, refDoc, docDate,] = ['', '', '', '', '', '', '', '', '',];
-    let transferRequest = body; // as IPostTransferWithQuoteRequestBody;
-    // console.log(body);
-
-    // if("quoteRequestExtensions" in transferRequest && transferRequest.quoteRequestExtensions){
-
-        extensionList = transferRequest.quoteRequestExtensions;
-        Object.values(extensionList).forEach(extItem => {
-            if(extItem.key === 'MSGID') {
-                msgId = extItem.value;
-            } else if(extItem.key === 'INSTRID') {
-                instrId = extItem.value;
-            } else if(extItem.key === 'TXID') {
-                txId = extItem.value;
-            } else if(extItem.key === 'ENDTOENDID') {
-                endToEndId = extItem.value;
-            } else if(extItem.key === 'CREDT') {
-                createdDateTime = extItem.value;
-            } else if(extItem.key === 'SETTLEDATE') {
-                sttlmDt = extItem.value;
-            } else if(extItem.key === 'USTRD') {
-                ustrd = extItem.value;
-            } else if(extItem.key === 'REFDOC') {
-                refDoc = extItem.value;
-            } 
-        });
-    // }
-    
+    Object.values(extensionList).forEach(extItem => {
+        if(extItem.key === 'MSGID') {
+            msgId = extItem.value;
+        } else if(extItem.key === 'INSTRID') {
+            instrId = extItem.value;
+        } else if(extItem.key === 'TXID') {
+            txId = extItem.value;
+        } else if(extItem.key === 'ENDTOENDID') {
+            endToEndId = extItem.value;
+        } else if(extItem.key === 'CREDT') {
+            createdDateTime = extItem.value;
+        } else if(extItem.key === 'SETTLEDATE') {
+            sttlmDt = extItem.value;
+        } else if(extItem.key === 'USTRD') {
+            ustrd = extItem.value;
+        } else if(extItem.key === 'REFDOC') {
+            refDoc = extItem.value;
+        } else if(extItem.key === 'DOCDATE') {
+            docDate = extItem.value;
+        }
+    });
 
     const pacs008: IPacs008Incoming = {
         Document: {
@@ -334,9 +327,9 @@ export const postTransferBodyToPacs008 = (
                 GrpHdr: {
                     MsgId: msgId, // extensionList["MSGID"].value
                     CreDtTm: createdDateTime, // extensionList["CREDT"].value
-                    NbOfTxs: '1', //fixed value 1
+                    NbOfTxs: '1', // fixed value 1
                     SttlmInf: {
-                        SttlmMtd: 'INDA', //fixed value
+                        SttlmMtd: 'INDA', // fixed value
                     },
                     InstgAgt: {
                         FinInstnId: {
@@ -410,7 +403,7 @@ export const postTransferBodyToPacs008 = (
                         },
                     },
                     Cdtr: {
-                        Nm: 'string' // ilpPacket.data.payee.name
+                        Nm: 'string', // ilpPacket.data.payee.name
                     },
                     CdtrAcct: {
                         Id: {
@@ -429,7 +422,7 @@ export const postTransferBodyToPacs008 = (
                                 Tp: {
                                     CdOrPrtry: {
                                         Cd: 'CINV', // fixed value CINV
-                                    }
+                                    },
                                 },
                                 Nb: refDoc, // extensionList["REFDOC"].value
                                 RltdDt: docDate, // extensionList["DOCDATE"].value
@@ -454,47 +447,44 @@ export const postTransferBodyToPacs008 = (
  * @param {Record<string, unknown> | IPacs002} pacs002
  * @returns {ITransferFulfilment}
  */
- export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPacs002)
- : ITransferFulfilment => {
-     const body = pacs002 as IPacs002;
-     console.log('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+');
-     console.log(body);
-     console.log('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+');
-     const putTransfersBody: ITransferFulfilment = {
-         completedTimestamp: body.Document.FIToFIPmtStsRpt.GrpHdr.CreDtTm,
-         transferState: body.Document.FIToFIPmtStsRpt.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
+export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPacs002)
+: ITransferFulfilment => {
+    const body = pacs002 as IPacs002;
+    const putTransfersBody: ITransferFulfilment = {
+        completedTimestamp: body.Document.FIToFIPmtStsRpt.GrpHdr.CreDtTm,
+        transferState: body.Document.FIToFIPmtStsRpt.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
         //  fulfilment: string,
-     };
-     putTransfersBody.extensionList = [
+    };
+    putTransfersBody.extensionList = [
         {
             key: 'MSGID',
             value: body.Document.FIToFIPmtStsRpt.GrpHdr.MsgId,
         },
     ];
-    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlInstrId){
+    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlInstrId) {
         putTransfersBody.extensionList.push(
             {
                 key: 'INSTRID',
                 value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlInstrId,
-            }
-        )
-     }
-     if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlEndToEndId){
+            },
+        );
+    }
+    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlEndToEndId) {
         putTransfersBody.extensionList.push(
             {
                 key: 'ENDTOENDID',
                 value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlEndToEndId,
-            }
-        )
-     }
-     if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlTxId){
+            },
+        );
+    }
+    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlTxId) {
         putTransfersBody.extensionList.push(
             {
                 key: 'TXID',
                 value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlTxId,
-            }
-        )
-     }
- 
-     return putTransfersBody;
- };
+            },
+        );
+    }
+
+    return putTransfersBody;
+};
