@@ -18,9 +18,9 @@ curl --location --request POST 'http://localhost:5000/outbound/iso20022' \
             </PmtTpInf>
         </GrpHdr>
         <CdtTrfTxInf>
-            <PmtId>                                              <!-- This is the transfer ID  -->
+            <PmtId>                                              
               <InstrId>8c5d9f95</InstrId>
-              <EndToEndId>0120a604-aa80-43da-b6f6-c1d5f8aa622e</EndToEndId>
+              <EndToEndId>0120a604-aa80-43da-b6f6-c1d5f8aa622e</EndToEndId> <!-- This is the transfer ID  -->
               <TxId>acd1ef76</TxId>
             </PmtId>
             <Cndtn>

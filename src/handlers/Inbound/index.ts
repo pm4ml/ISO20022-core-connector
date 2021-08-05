@@ -8,7 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import {
-    IPostQuoteRequestBody, IPostQuoteRequestResponseBody, IPostTransferRequestBody, IPacs002,
+    IPostQuoteRequestBody, IPostQuoteResponseBody, IPostTransferRequestBody, IPacs002,
 } from '~/interfaces';
 import { ApiContext } from '../../types';
 import { postTransferBodyToPacs008, pacs002ToPutTransfersBody } from '../../transformers';
