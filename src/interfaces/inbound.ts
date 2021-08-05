@@ -42,7 +42,7 @@ export interface IPostTransferRequestBody {
     transactionType: TransactionType,
     note?: string
     quoteRequestExtensions: Array<IExtensionItem>,
-
+    ilpPacket: any, // TODO: define the ILP Packet object
 }
 
 export interface IPacs008Incoming extends Record<string, unknown> {
@@ -95,11 +95,13 @@ export interface IPacs008Incoming extends Record<string, unknown> {
                 ChrgBr: string,
                 InitgPty: {
                     Nm: string,
-                    OrgId: {
-                        Othr: {
-                            Id: string,
-                            SchmeNm: {
-                                Cd: string,
+                    Id: {
+                        OrgId: {
+                            Othr: {
+                                Id: string,
+                                SchmeNm: {
+                                    Cd: string,
+                                },
                             },
                         },
                     },

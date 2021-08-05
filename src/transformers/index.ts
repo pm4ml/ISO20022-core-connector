@@ -161,15 +161,57 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
         amount: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt['#text'],
         currency: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt.attr.Ccy,
         from: {
+            displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.CtctDtls.MobNb,
             fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.BICFI,
+            extensionList: [
+                {
+                    key: 'NAME',
+                    value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Nm,
+                },
+            ],
         },
         to: {
+            displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.CtctDtls.MobNb,
             fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.BICFI,
+            extensionList: [
+                {
+                    key: 'NAME',
+                    value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Nm,
+                },
+            ],
         },
+        // payer: {
+        //     name: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.Nm,
+        //     partyIdInfo: {
+        //         partyIdType: PartyIdType.ACCOUNT_ID,
+        //         partyIdentifier: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAcct.Id.Othr.Id,
+        //         fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id,
+        //         extensionList: [
+        //             {
+        //                 key: 'NAME',
+        //                 value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Nm,
+        //             },
+        //         ],
+        //     },
+        // },
+        // payee: {
+        //     name: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
+        //     partyIdInfo: {
+        //         partyIdType: PartyIdType.ACCOUNT_ID,
+        //         partyIdentifier: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
+        //         fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
+        //         extensionList: [
+        //             {
+        //                 key: 'NAME',
+        //                 value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Nm,
+        //             },
+        //         ],
+        //     },
+        // },
         transactionType: TransactionType.TRANSFER,
         skipPartyLookup: true,
     };
@@ -293,7 +335,7 @@ export const postTransferBodyToPacs008 = (
     transferRequest: IPostTransferRequestBody,
 ): string => {
     const extensionList: Array<IExtensionItem> = transferRequest.quoteRequestExtensions;
-    let [msgId, instrId, endToEndId, txId, createdDateTime, sttlmDt, ustrd, refDoc, docDate] = ['', '', '', '', '', '', '', '', ''];
+    let [msgId, instrId, endToEndId, txId, createdDateTime, sttlmDt, ustrd, refDoc, docDate, payerExtName] = ['', '', '', '', '', '', '', '', '', ''];
 
     Object.values(extensionList).forEach(extItem => {
         if(extItem.key === 'MSGID') {
@@ -317,6 +359,15 @@ export const postTransferBodyToPacs008 = (
         }
     });
 
+    const payerExtensionList: Array<IExtensionItem> = transferRequest
+        .ilpPacket.data.payer.partyIdInfo.extensionList.extension;
+
+    Object.values(payerExtensionList).forEach(extItem => {
+        if(extItem.key === 'NAME') {
+            payerExtName = extItem.value;
+        }
+    });
+
     const pacs008: IPacs008Incoming = {
         Document: {
             attr: {
@@ -334,14 +385,14 @@ export const postTransferBodyToPacs008 = (
                     InstgAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.from.fspId ? transferRequest.from.fspId : '', // payerFsp.fspId
+                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId, // payerFsp.fspId
                             },
                         },
                     },
                     InstdAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.to.fspId ? transferRequest.to.fspId : '', // payeeFsp.fspId
+                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.fspId, // payeeFsp.fspId
                             },
                         },
                     },
@@ -364,51 +415,52 @@ export const postTransferBodyToPacs008 = (
                         },
                         '#text': transferRequest.amount, // amount.amount
                     },
-
                     IntrBkSttlmDt: sttlmDt,
                     ChrgBr: 'SHAR', // fixed value SHAR
                     InitgPty: {
-                        Nm: 'string', // ilpPacket.data.payer.extensionList["NAME"].value
-                        OrgId: {
-                            Othr: {
-                                Id: transferRequest.from.fspId ? transferRequest.from.fspId : '', // payerFsp.fspId
-                                SchmeNm: {
-                                    Cd: 'CHAN', // fixed value CHAN
+                        Nm: payerExtName, // ilpPacket.data.payer.extensionList["NAME"].value
+                        Id: {
+                            OrgId: {
+                                Othr: {
+                                    Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId || '', // payerFsp.fspId
+                                    SchmeNm: {
+                                        Cd: 'CHAN', // fixed value CHAN
+                                    },
                                 },
                             },
                         },
                     },
                     Dbtr: {
-                        Nm: 'string', // Optional: ilpPacket.data.payer.name
+                        Nm: transferRequest.ilpPacket.data.payer.name, // Optional: ilpPacket.data.payer.name
                     },
                     DbtrAcct: {
                         Id: {
                             Othr: {
-                                Id: 'string', // ilpPacket.data.payer.partyIdInfo.partyIdentifier
+                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.partyIdentifier, // ilpPacket.data.payer.partyIdInfo.partyIdentifier
                             },
                         },
                     },
                     DbtrAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.from.fspId ? transferRequest.from.fspId : '', // payerFsp.fspId
+                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId, // payerFsp.fspId
                             },
                         },
                     },
                     CdtrAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.to.fspId ? transferRequest.to.fspId : '', // payeeFsp.fspId
+                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.fspId, // payeeFsp.fspId
                             },
                         },
                     },
                     Cdtr: {
-                        Nm: 'string', // ilpPacket.data.payee.name
+                        Nm: transferRequest.ilpPacket.data.payee.name, // ilpPacket.data.payee.name
                     },
                     CdtrAcct: {
                         Id: {
                             Othr: {
-                                Id: 'string', // ilpPacket.data.payee.partyIdInfo.partyIdentifier
+                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.partyIdentifier, // ilpPacket.data.payee.partyIdInfo.partyIdentifier
                             },
                         },
                     },

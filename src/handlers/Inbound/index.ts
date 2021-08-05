@@ -24,7 +24,7 @@ const handleError = (err: Error, ctx: ApiContext) => {
 
 const postQuotes = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostQuoteRequestBody;
-    console.log(ctx.request.body);
+    ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
     try {
         const response = {
@@ -54,7 +54,7 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
 
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
-    console.log(ctx.request.body);
+    ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
     const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
 
@@ -67,7 +67,6 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
     }
 
     const xmlData = XML.fromXml(res.data);
-
     // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
     const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
     ctx.response.body = transferPutBody;
