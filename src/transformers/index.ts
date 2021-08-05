@@ -505,7 +505,7 @@ export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPa
     const putTransfersBody: ITransferFulfilment = {
         completedTimestamp: body.Document.FIToFIPmtStsRpt.GrpHdr.CreDtTm,
         transferState: body.Document.FIToFIPmtStsRpt.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
-        //  fulfilment: string,
+        //  fulfilment: string, //TODO: do we need to send fulfil?
     };
     putTransfersBody.extensionList = [
         {
