@@ -20,6 +20,7 @@ const handleError = (err: Error, ctx: ApiContext) => {
     ctx.state.logger.error(err);
     ctx.response.status = 500;
     ctx.response.body = '';
+    ctx.response.type = 'text/html';
 };
 
 const postQuotes = async (ctx: ApiContext): Promise<void> => {
@@ -27,6 +28,7 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
     ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
     try {
+        if(!payload.quoteId) throw new Error('Invalid quotes request was received.');
         const response = {
             quoteId: payload.quoteId,
             transactionId: payload.transactionId,
@@ -34,7 +36,7 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
             transferAmountCurrency: payload.currency,
             payeeReceiveAmount: payload.amount,
             payeeReceiveAmountCurrency: payload.currency,
-        } as IPostQuoteRequestResponseBody;
+        } as IPostQuoteResponseBody;
         if(payload.expiration) response.expiration = payload.expiration;
         ctx.response.body = response;
         ctx.response.status = 200;

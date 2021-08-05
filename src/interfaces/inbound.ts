@@ -21,7 +21,7 @@ export interface IPostQuoteRequestBody {
     expiration?: string,
 }
 
-export interface IPostQuoteRequestResponseBody {
+export interface IPostQuoteResponseBody {
     quoteId: string,
     transactionId: string,
     transferAmount: string,
