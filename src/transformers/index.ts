@@ -163,8 +163,8 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
         from: {
             displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
-            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.CtctDtls.MobNb,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.BICFI,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAcct.Id.Othr.Id,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id,
             extensionList: [
                 {
                     key: 'NAME',
@@ -175,8 +175,8 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
         to: {
             displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
-            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.CtctDtls.MobNb,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.BICFI,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
             extensionList: [
                 {
                     key: 'NAME',
@@ -184,34 +184,6 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
                 },
             ],
         },
-        // payer: {
-        //     name: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.Nm,
-        //     partyIdInfo: {
-        //         partyIdType: PartyIdType.ACCOUNT_ID,
-        //         partyIdentifier: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAcct.Id.Othr.Id,
-        //         fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id,
-        //         extensionList: [
-        //             {
-        //                 key: 'NAME',
-        //                 value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Nm,
-        //             },
-        //         ],
-        //     },
-        // },
-        // payee: {
-        //     name: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
-        //     partyIdInfo: {
-        //         partyIdType: PartyIdType.ACCOUNT_ID,
-        //         partyIdentifier: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
-        //         fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
-        //         extensionList: [
-        //             {
-        //                 key: 'NAME',
-        //                 value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Nm,
-        //             },
-        //         ],
-        //     },
-        // },
         transactionType: TransactionType.TRANSFER,
         skipPartyLookup: true,
     };
