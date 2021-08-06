@@ -23,8 +23,11 @@ const Handlers: HandlerMap = {
     '/outbound/iso20022': {
         post: OutboundHandler,
     },
-    '/inbound/quoterequests': {
+    '/quoterequests': {
         post: InboundHandlers.postQuotes,
+    },
+    '/transfers': {
+        post: InboundHandlers.postTransfers,
     },
 };
 

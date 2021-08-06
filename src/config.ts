@@ -17,6 +17,7 @@ dotenv.config();
 export interface IServiceConfig {
     port?: number,
     outboundEndpoint: string,
+    backendEndpoint: string,
     requestTimeout?: number,
     logger?: Logger.Logger,
     xmlOptions: IXMLOptions,
@@ -59,6 +60,7 @@ const xmlOptions: IXMLOptions = {
 export const Config: IServiceConfig = {
     port: env.get('LISTEN_PORT').default('3003').asPortNumber(),
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
+    backendEndpoint: env.get('BACKEND_ENDPOINT').required().asString(),
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
     templatesPath: env.get('TEMPLATES_PATH').default('templates').asString(),
     xmlOptions,

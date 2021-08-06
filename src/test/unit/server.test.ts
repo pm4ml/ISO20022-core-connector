@@ -34,7 +34,8 @@ describe('Server', () => {
             outboundEndpoint: 'http://localhost:5001',
             logger,
             xmlOptions: Config.xmlOptions,
-            templatesPath: Config.templatesPath
+            templatesPath: Config.templatesPath,
+            backendEndpoint: 'http://localhost:7001'
         }
         server = new Server(config);
         mockedOas.mockResolvedValue(() => { });

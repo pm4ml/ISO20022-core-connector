@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: ISO 20022 Core Connector
   description: ISO 20022 Core Connector for Mojaloop
@@ -155,7 +155,7 @@ paths:
             schema:
               title: TransfersPostRequest
               type: object
-              oneOf:
+              anyOf:
                 - properties:
                     transferId:
                       description: Transfer ID

@@ -1,6 +1,6 @@
 {
   "name": "iso20022-core-connector",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "ISO20022 Core Connector for Mojaloop",
   "main": "build/index.js",
   "scripts": {
@@ -70,7 +70,7 @@
     "npm-check-updates": "11.8.2",
     "pre-commit": "1.2.2",
     "prettier": "2.3.2",
-    "prettier-eslint": "12.0.0",
+    "prettier-eslint": "13.0.0",
     "prettier-eslint-cli": "5.0.1",
     "supertest": "6.1.3",
     "ts-jest": "27.0.3",

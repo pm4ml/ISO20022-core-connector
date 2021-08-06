@@ -370,21 +370,27 @@ export interface IPacs008 extends Record<string, unknown> {
                 Dbtr: {
                     CtctDtls: {
                         MobNb: string
-                    }
+                    },
+                    Nm: string,
                 },
                 DbtrAgt: {
                     FinInstnId: {
-                        BICFI: string
+                        BICFI: string,
+                        Othr: {
+                            Id: string,
+                        },
                     }
                 },
                 Cdtr: {
                     CtctDtls: {
                         MobNb: string
-                    }
+                    },
+                    Nm: string,
                 },
                 CdtrAgt: {
                     FinInstnId: {
-                        BICFI: string
+                        BICFI: string,
+                        Nm: string,
                     }
                 },
                 RmtInf: {
@@ -395,7 +401,31 @@ export interface IPacs008 extends Record<string, unknown> {
                             RltdDt: string
                         }
                     }
-                }
+                },
+                InitgPty: {
+                    Nm: string,
+                    Id: {
+                        OrgId: {
+                            Othr: {
+                                Id: string,
+                            },
+                        },
+                    },
+                },
+                CdtrAcct: {
+                    Id: {
+                        Othr: {
+                            Id: string,
+                        },
+                    },
+                },
+                DbtrAcct: {
+                    Id: {
+                        Othr: {
+                            Id: string,
+                        },
+                    },
+                },
             }
         }
     }

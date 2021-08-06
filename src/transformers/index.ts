@@ -13,6 +13,8 @@ import {
     ICamt004, ICamt004Acct, IErrorInformation, ICamt004Error, IPacs008,
     IPostQuotesBody, AmountType, TransactionType, ITransferSuccess,
     IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
+    ITransferFulfilment, MojaloopTransferState, IPostTransferRequestBody,
+    IPacs008Incoming,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -159,14 +161,28 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
         amount: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt['#text'],
         currency: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmAmt.attr.Ccy,
         from: {
+            displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
-            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.CtctDtls.MobNb,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.BICFI,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAcct.Id.Othr.Id,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id,
+            extensionList: [
+                {
+                    key: 'NAME',
+                    value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Nm,
+                },
+            ],
         },
         to: {
+            displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
-            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.CtctDtls.MobNb,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.BICFI,
+            idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
+            extensionList: [
+                {
+                    key: 'NAME',
+                    value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Nm,
+                },
+            ],
         },
         transactionType: TransactionType.TRANSFER,
         skipPartyLookup: true,
@@ -279,4 +295,220 @@ export const transferResponseToPacs002 = (
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
     return xml;
+};
+
+/**
+ * Translates ML's transfer POST request body to ISO 20022 pacs.008 message.
+ *
+ * @param transferPost
+ * @returns {IPacs008}
+ */
+export const postTransferBodyToPacs008 = (
+    transferRequest: IPostTransferRequestBody,
+): string => {
+    const extensionList: Array<IExtensionItem> = transferRequest.quoteRequestExtensions;
+    let [msgId, instrId, endToEndId, txId, createdDateTime, sttlmDt, ustrd, refDoc, docDate, payerExtName] = ['', '', '', '', '', '', '', '', '', ''];
+
+    Object.values(extensionList).forEach(extItem => {
+        if(extItem.key === 'MSGID') {
+            msgId = extItem.value;
+        } else if(extItem.key === 'INSTRID') {
+            instrId = extItem.value;
+        } else if(extItem.key === 'TXID') {
+            txId = extItem.value;
+        } else if(extItem.key === 'ENDTOENDID') {
+            endToEndId = extItem.value;
+        } else if(extItem.key === 'CREDT') {
+            createdDateTime = extItem.value;
+        } else if(extItem.key === 'SETTLEDATE') {
+            sttlmDt = extItem.value;
+        } else if(extItem.key === 'USTRD') {
+            ustrd = extItem.value;
+        } else if(extItem.key === 'REFDOC') {
+            refDoc = extItem.value;
+        } else if(extItem.key === 'DOCDATE') {
+            docDate = extItem.value;
+        }
+    });
+
+    const payerExtensionList: Array<IExtensionItem> = transferRequest
+        .ilpPacket.data.payer.partyIdInfo.extensionList.extension;
+
+    Object.values(payerExtensionList).forEach(extItem => {
+        if(extItem.key === 'NAME') {
+            payerExtName = extItem.value;
+        }
+    });
+
+    const pacs008: IPacs008Incoming = {
+        Document: {
+            attr: {
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09',
+            },
+            FIToFICstmrCdtTrf: {
+                GrpHdr: {
+                    MsgId: msgId, // extensionList["MSGID"].value
+                    CreDtTm: createdDateTime, // extensionList["CREDT"].value
+                    NbOfTxs: '1', // fixed value 1
+                    SttlmInf: {
+                        SttlmMtd: 'INDA', // fixed value
+                    },
+                    InstgAgt: {
+                        FinInstnId: {
+                            Othr: {
+                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId, // payerFsp.fspId
+                            },
+                        },
+                    },
+                    InstdAgt: {
+                        FinInstnId: {
+                            Othr: {
+                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.fspId, // payeeFsp.fspId
+                            },
+                        },
+                    },
+
+                },
+                CdtTrfTxInf: {
+                    PmtId: {
+                        InstrId: instrId, // extensionList["INSTRID"].value
+                        EndToEndId: endToEndId, // extensionList["ENDTOENDID"].value
+                        TxId: txId, // extensionList["TXID"].value
+                    },
+                    PmtTpInf: {
+                        CtgyPurp: {
+                            Cd: '0', // fixed value 0
+                        },
+                    },
+                    IntrBkSttlmAmt: {
+                        attr: {
+                            Ccy: transferRequest.currency, // amount.currency
+                        },
+                        '#text': transferRequest.amount, // amount.amount
+                    },
+                    IntrBkSttlmDt: sttlmDt,
+                    ChrgBr: 'SHAR', // fixed value SHAR
+                    InitgPty: {
+                        Nm: payerExtName, // ilpPacket.data.payer.extensionList["NAME"].value
+                        Id: {
+                            OrgId: {
+                                Othr: {
+                                    Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId || '', // payerFsp.fspId
+                                    SchmeNm: {
+                                        Cd: 'CHAN', // fixed value CHAN
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    Dbtr: {
+                        Nm: transferRequest.ilpPacket.data.payer.name, // Optional: ilpPacket.data.payer.name
+                    },
+                    DbtrAcct: {
+                        Id: {
+                            Othr: {
+                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.partyIdentifier, // ilpPacket.data.payer.partyIdInfo.partyIdentifier
+                            },
+                        },
+                    },
+                    DbtrAgt: {
+                        FinInstnId: {
+                            Othr: {
+                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId, // payerFsp.fspId
+                            },
+                        },
+                    },
+                    CdtrAgt: {
+                        FinInstnId: {
+                            Othr: {
+                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.fspId, // payeeFsp.fspId
+                            },
+                        },
+                    },
+                    Cdtr: {
+                        Nm: transferRequest.ilpPacket.data.payee.name, // ilpPacket.data.payee.name
+                    },
+                    CdtrAcct: {
+                        Id: {
+                            Othr: {
+                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.partyIdentifier, // ilpPacket.data.payee.partyIdInfo.partyIdentifier
+                            },
+                        },
+                    },
+                    Purp: {
+                        Cd: 'GDDS', // fixed value GDDS
+                    },
+                    RmtInf: {
+                        Ustrd: ustrd, // extensionList["USTRD"].value
+                        Strd: {
+                            RfrdDocInf: {
+                                Tp: {
+                                    CdOrPrtry: {
+                                        Cd: 'CINV', // fixed value CINV
+                                    },
+                                },
+                                Nb: refDoc, // extensionList["REFDOC"].value
+                                RltdDt: docDate, // extensionList["DOCDATE"].value
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    };
+
+    let xml = XML.fromJsObject(pacs008);
+    xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
+
+    return xml;
+};
+
+
+/**
+ * Translates ISO 20022 pacs.002 to PUT /transfers/{transferId} request body
+ *
+ * @param {Record<string, unknown> | IPacs002} pacs002
+ * @returns {ITransferFulfilment}
+ */
+export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPacs002)
+: ITransferFulfilment => {
+    const body = pacs002 as IPacs002;
+    const putTransfersBody: ITransferFulfilment = {
+        completedTimestamp: body.Document.FIToFIPmtStsRpt.GrpHdr.CreDtTm,
+        transferState: body.Document.FIToFIPmtStsRpt.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
+        //  fulfilment: string, //TODO: do we need to send fulfil?
+    };
+    putTransfersBody.extensionList = [
+        {
+            key: 'MSGID',
+            value: body.Document.FIToFIPmtStsRpt.GrpHdr.MsgId,
+        },
+    ];
+    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlInstrId) {
+        putTransfersBody.extensionList.push(
+            {
+                key: 'INSTRID',
+                value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlInstrId,
+            },
+        );
+    }
+    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlEndToEndId) {
+        putTransfersBody.extensionList.push(
+            {
+                key: 'ENDTOENDID',
+                value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlEndToEndId,
+            },
+        );
+    }
+    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlTxId) {
+        putTransfersBody.extensionList.push(
+            {
+                key: 'TXID',
+                value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlTxId,
+            },
+        );
+    }
+
+    return putTransfersBody;
 };

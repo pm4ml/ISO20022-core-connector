@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+curl --location --request POST 'http://localhost:5000/outbound/iso20022' \
+--header 'Content-Type: application/xml' \
+--data-raw '<?xml version="1.0" encoding="utf-8"?>
 <!-- POST /transfers -->
 <Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09">
     <FIToFICstmrCdtTrf>
@@ -62,7 +64,7 @@
             <CdtrAgt>
                 <FinInstnId>
                     <BICFI>EQBLRWRWXXX</BICFI>
-                    <Nm>EQUITY BANK RWANDA LIMITED</Nm>	                <!-- Creditor's DFSP -->
+                    <Nm>EQUITY BANK RWANDA LIMITED</Nm>	                <!-- Creditor'\''s DFSP -->
                 </FinInstnId>
             </CdtrAgt>
            <Cdtr>
@@ -89,4 +91,4 @@
            </RmtInf>
         </CdtTrfTxInf>
     </FIToFICstmrCdtTrf>
-</Document>
+</Document>'
