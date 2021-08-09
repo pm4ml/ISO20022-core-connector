@@ -63,6 +63,9 @@
                 <FinInstnId>
                     <BICFI>EQBLRWRWXXX</BICFI>
                     <Nm>EQUITY BANK RWANDA LIMITED</Nm>	                <!-- Creditor's DFSP -->
+                    <Othr>
+                        <Id>EQBLRWRWXXX</Id>
+                    </Othr>
                 </FinInstnId>
             </CdtrAgt>
            <Cdtr>

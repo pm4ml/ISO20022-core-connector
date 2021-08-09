@@ -65,6 +65,9 @@ curl --location --request POST 'http://localhost:5000/outbound/iso20022' \
                 <FinInstnId>
                     <BICFI>EQBLRWRWXXX</BICFI>
                     <Nm>EQUITY BANK RWANDA LIMITED</Nm>	                <!-- Creditor'\''s DFSP -->
+                    <Othr>
+                        <Id>EQBLRWRWXXX</Id>
+                    </Othr>
                 </FinInstnId>
             </CdtrAgt>
            <Cdtr>
