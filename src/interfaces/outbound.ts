@@ -391,6 +391,9 @@ export interface IPacs008 extends Record<string, unknown> {
                     FinInstnId: {
                         BICFI: string,
                         Nm: string,
+                        Othr: {
+                            Id: string,
+                        },
                     }
                 },
                 RmtInf: {

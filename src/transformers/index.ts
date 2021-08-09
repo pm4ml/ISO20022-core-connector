@@ -176,7 +176,7 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
             displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAgt.FinInstnId.Othr.Id,
+            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id,
             extensionList: [
                 {
                     key: 'NAME',
