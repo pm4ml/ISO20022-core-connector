@@ -11,7 +11,7 @@
 import { XSD } from '../../lib/xmlUtils';
 import { IPacs008, ITransferError, TransferStatus } from '../../interfaces';
 import { acceptQuotes, requestQuotes } from '../../requests/Outbound';
-import { pacs008ToPostQuotesBody, transferResponseToPacs002 } from '../../transformers';
+import { pacs008ToPostQuotesBody, transferResponseToPacs002, transferErrorResponseToPacs002 } from '../../transformers';
 import { ApiContext } from '../../types';
 
 
@@ -22,8 +22,9 @@ const handleError = (error: Error | ITransferError, ctx: ApiContext) => {
         ctx.response.body = transferResponseToPacs002(error as ITransferError);
         ctx.response.status = 400;
     } else {
-        ctx.response.type = 'text/html';
-        ctx.response.body = null;
+        // for timeout errors we need to construct the error pacs002 xml response
+        ctx.response.type = 'application/xml';
+        ctx.response.body = transferErrorResponseToPacs002(ctx.request.body as IPacs008);
         ctx.response.status = 500;
     }
 };

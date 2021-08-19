@@ -512,3 +512,41 @@ export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPa
 
     return putTransfersBody;
 };
+
+/**
+ * Constructs ISO 20022 error message in pacs.002 format.
+ *
+ * @param {Record<string, unknown> | IPacs008} pacs008
+ * @returns {IPacs002}
+ */
+export const transferErrorResponseToPacs002 = (
+    pacs008: Record<string, unknown> | IPacs008,
+): string => {
+    const body = pacs008 as IPacs008;
+
+    const pacs002Error: IPacs002 = {
+        Document: {
+            attr: {
+                'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
+            },
+            FIToFIPmtStsRpt: {
+                GrpHdr: {
+                    MsgId: body.Document.FIToFICstmrCdtTrf.GrpHdr.MsgId,
+                    CreDtTm: (new Date()).toISOString(),
+                },
+                TxInfAndSts: {
+                    OrgnlInstrId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
+                    OrgnlEndToEndId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
+                    OrgnlTxId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
+                    TxSts: 'RJCT', // error code
+                },
+            },
+        },
+    };
+
+    let xml = XML.fromJsObject(pacs002Error);
+    xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
+
+    return xml;
+};

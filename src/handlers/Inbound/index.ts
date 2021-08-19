@@ -58,22 +58,26 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
     ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
-    const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
+    try {
+        const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
 
-    // send a pacs008 POST /transfers request to RSwitch and get a synchronous pacs002 response
-    const res = await requestBackendTransfers(postTransfersBodyPacs008);
-    const validationResult = XSD.validate(res.data, XSD.paths.pacs_002);
-    if(validationResult !== true) {
-        XSD.handleValidationError(validationResult, ctx);
-        return;
+        // send a pacs008 POST /transfers request to RSwitch and get a synchronous pacs002 response
+        const res = await requestBackendTransfers(postTransfersBodyPacs008);
+        const validationResult = XSD.validate(res.data, XSD.paths.pacs_002);
+        if(validationResult !== true) {
+            XSD.handleValidationError(validationResult, ctx);
+            return;
+        }
+
+        const xmlData = XML.fromXml(res.data);
+        // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
+        const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
+        ctx.response.body = transferPutBody;
+        ctx.response.status = 200;
+        ctx.response.type = 'application/json';
+    } catch (err) {
+        handleError(err, ctx);
     }
-
-    const xmlData = XML.fromXml(res.data);
-    // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
-    const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
-    ctx.response.body = transferPutBody;
-    ctx.response.status = 200;
-    ctx.response.type = 'application/json';
 };
 
 export const InboundHandlers = {
