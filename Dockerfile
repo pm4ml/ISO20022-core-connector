@@ -1,5 +1,5 @@
 FROM node:lts-alpine as builder
-RUN apk add --no-cache git python build-base
+RUN apk add --no-cache git python3 build-base
 WORKDIR /opt/app
 
 COPY tsconfig.json package.json package-lock.json* /opt/app/
@@ -9,7 +9,7 @@ RUN npm run build
 
 
 FROM node:lts-alpine
-RUN apk add --no-cache git python g++ make
+RUN apk add --no-cache git python3 g++ make
 WORKDIR /opt/app
 
 COPY package.json package-lock.json* /opt/app/
