@@ -17,6 +17,7 @@
     "rootDir": "./src",
     "outDir": "build",
     "strict": true,
+    "useUnknownInCatchVariables": false,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,

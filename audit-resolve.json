@@ -7,6 +7,31 @@
     "1771|libxmljs2-xsd>libxmljs2>@mapbox/node-pre-gyp>tar": {
       "decision": "fix",
       "madeAt": 1628202797736
+    },
+    "1002401|koa-oas3>oas-validator>oas-resolver>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1636057774424,
+      "expiresAt": 1638649767815
+    },
+    "1002401|koa-oas3>oas-validator>oas-resolver>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1636057774424,
+      "expiresAt": 1638649767815
+    },
+    "1002401|koa-oas3>oas-validator>oas-resolver>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1636057774424,
+      "expiresAt": 1638649767815
+    },
+    "1002401|libxmljs2-xsd>libxmljs2>@mapbox/node-pre-gyp>npmlog>gauge>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1636057776656,
+      "expiresAt": 1638649767815
+    },
+    "1002401|libxmljs2-xsd>libxmljs2>@mapbox/node-pre-gyp>npmlog>gauge>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1636057776656,
+      "expiresAt": 1638649767815
     }
   },
   "rules": {},

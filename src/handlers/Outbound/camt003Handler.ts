@@ -8,9 +8,10 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
+import { AxiosResponse } from 'axios';
 import { XSD } from '../../lib/xmlUtils';
 import { ICamt003, IErrorInformation } from '../../interfaces';
-import { getParties } from '../../requests/Outbound';
+// import { getParties } from '../../requests/Outbound';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
 
@@ -38,7 +39,35 @@ export default async (ctx: ApiContext): Promise<void> => {
             return;
         }
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
-        const res = await getParties(params);
+        // TODO: Remove this hack
+        // hack to make parties lookup work for phase-A, this needs to be handled by the ALS
+        // For now we will respond with a dummy response for parties lookup
+        // const res = await getParties(params);
+        console.log(params);
+        const res:AxiosResponse = {
+            data: {
+                body: {
+                    party: {
+                        partyIdInfo: {
+                            partyIdType: params.idType,
+                            partyIdentifier: params.idValue,
+                            fspId: 'cogebanquesbx',
+                            extensionList: [{
+                                key: 'MSISDN',
+                                value: '0789493999',
+                            }],
+                        },
+                        name: 'PayerFirst PayerLast',
+                    },
+                    currentState: 'COMPLETED',
+                },
+            },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {},
+        };
+
         ctx.state.logger.debug(JSON.stringify(res.data));
 
         if(res.data.body.errorInformation) {
