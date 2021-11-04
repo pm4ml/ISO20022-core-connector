@@ -1,4 +1,4 @@
-FROM node:lts-alpine as builder
+FROM node:14-alpine as builder
 RUN apk add --no-cache git python3 build-base
 WORKDIR /opt/app
 
@@ -8,7 +8,7 @@ RUN npm install
 RUN npm run build
 
 
-FROM node:lts-alpine
+FROM node:14-alpine
 RUN apk add --no-cache git python3 g++ make
 WORKDIR /opt/app
 
