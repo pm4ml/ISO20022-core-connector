@@ -8,6 +8,8 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
+import { IExtensionItem } from './common';
+
 export enum PartiesCurrentState {
     WAITING_FOR_REQUEST_PARTY_INFORMATION = 'WAITING_FOR_REQUEST_PARTY_INFORMATION',
     COMPLETED = 'COMPLETED',
@@ -43,15 +45,6 @@ export interface INamespacedXMLDoc extends Record<string, unknown> {
             xmlns: string,
         }
     }
-}
-export interface IExtensionItem {
-    key: string,
-    value: string,
-}
-export interface IErrorInformation {
-    errorCode: string,
-    errorDescription: string,
-    extensionList?: Array<IExtensionItem>
 }
 
 export interface IMoney {
@@ -172,6 +165,7 @@ export interface ITransferFulfilment {
     completedTimestamp?: string,
     extensionList?: Array<IExtensionItem>
 }
+
 export interface ITransferState {
     transferId?: string,
     homeTransactionId?: string,
@@ -434,13 +428,25 @@ export interface IPacs008 extends Record<string, unknown> {
     }
 }
 
+export enum TxStsEnum {
+    ACCC = 'ACCC',
+    RJCT = 'RJCT',
+}
+
 export interface IPacs002 extends Record<string, unknown> {
     Document: {
         attr: {
             xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
             'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
         },
-        FIToFIPmtStsRpt: {
+        CstmrPmtStsRpt?: {
+            OrgnlPmtInfAndSts: {
+                TxInfAndSts: {
+                    TxSts: string
+                }
+            }
+        },
+        FIToFIPmtStsRpt?: {
             GrpHdr: {
                 MsgId: string,
                 CreDtTm: string,
@@ -469,7 +475,7 @@ export interface IPacs002 extends Record<string, unknown> {
                 OrgnlInstrId: string,
                 OrgnlEndToEndId: string,
                 OrgnlTxId: string,
-                TxSts: 'ACCC' | 'RJCT'
+                TxSts: TxStsEnum
             }
         },
     }

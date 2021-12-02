@@ -15,6 +15,8 @@ import {
     IPacs002, ITransferError, TransferStatus, ITransferResponse, IExtensionItem,
     ITransferFulfilment, MojaloopTransferState, IPostTransferRequestBody,
     IPacs008Incoming,
+    IErrorResponse,
+    TxStsEnum,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -285,7 +287,7 @@ export const transferResponseToPacs002 = (
                     OrgnlInstrId: instrId,
                     OrgnlEndToEndId: endToEndId,
                     OrgnlTxId: txId,
-                    TxSts: currentState === TransferStatus.COMPLETED ? 'ACCC' : 'RJCT',
+                    TxSts: currentState === TransferStatus.COMPLETED ? TxStsEnum.ACCC : TxStsEnum.RJCT,
                 },
             },
         },
@@ -475,34 +477,38 @@ export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPa
 : ITransferFulfilment => {
     const body = pacs002 as IPacs002;
     const putTransfersBody: ITransferFulfilment = {
-        completedTimestamp: body.Document.FIToFIPmtStsRpt.GrpHdr.CreDtTm,
-        transferState: body.Document.FIToFIPmtStsRpt.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
+        completedTimestamp: body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.CreDtTm,
+        transferState: body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
         //  fulfilment: string, //TODO: do we need to send fulfil?
     };
-    putTransfersBody.extensionList = [
-        {
-            key: 'MSGID',
-            value: body.Document.FIToFIPmtStsRpt.GrpHdr.MsgId,
-        },
-    ];
-    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlInstrId) {
-        putTransfersBody.extensionList.push(
+    putTransfersBody.extensionList = [];
+
+    if(body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId) {
+        putTransfersBody?.extensionList?.push(
+            {
+                key: 'INSTRID',
+                value: body.Document.FIToFIPmtStsRpt.GrpHdr.MsgId,
+            },
+        );
+    }
+    if(body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId) {
+        putTransfersBody?.extensionList?.push(
             {
                 key: 'INSTRID',
                 value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlInstrId,
             },
         );
     }
-    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlEndToEndId) {
-        putTransfersBody.extensionList.push(
+    if(body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId) {
+        putTransfersBody?.extensionList?.push(
             {
                 key: 'ENDTOENDID',
                 value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlEndToEndId,
             },
         );
     }
-    if(body.Document.FIToFIPmtStsRpt.TxInfAndSts?.OrgnlTxId) {
-        putTransfersBody.extensionList.push(
+    if(body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId) {
+        putTransfersBody?.extensionList?.push(
             {
                 key: 'TXID',
                 value: body.Document.FIToFIPmtStsRpt.TxInfAndSts.OrgnlTxId,
@@ -539,7 +545,7 @@ export const transferErrorResponseToPacs002 = (
                     OrgnlInstrId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
                     OrgnlEndToEndId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
                     OrgnlTxId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
-                    TxSts: 'RJCT', // error code
+                    TxSts: TxStsEnum.RJCT, // error code
                 },
             },
         },
@@ -549,4 +555,21 @@ export const transferErrorResponseToPacs002 = (
     xml = `<?xml version="1.0" encoding="utf-8"?>\n${xml}`;
 
     return xml;
+};
+
+/**
+ * Constructs ErrorInformation from ISO 20022 PNDG Failed Status format.
+ *
+ * @param {any} PNDGWithFailedStatus
+ * @returns {IErrorInformation}
+ */
+export const PNDGWithFailedStatusToTransferError = ( // TODO: define expected pndgResponse interface and mapping
+    // pndgResponse: any,
+): IErrorResponse => {
+    const errorResponse: IErrorResponse = {
+        statusCode: '222',
+        message: '1111',
+    };
+
+    return errorResponse;
 };

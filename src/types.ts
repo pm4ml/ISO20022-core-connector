@@ -14,6 +14,7 @@ import { IServiceConfig } from './config';
 export interface ApiState {
     conf: IServiceConfig;
     logger: any;
+    cache: any; // TODO: Fix this to a type
 }
 
 export interface ApiContext extends Koa.Context {

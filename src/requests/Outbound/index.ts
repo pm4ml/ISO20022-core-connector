@@ -10,28 +10,19 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { Config } from '../../config';
-import { IPartiesByIdParams, IPostQuotesBody, ITransferContinuationQuote } from '../../interfaces';
+import {
+    IPartiesByIdParams,
+    IPostQuotesBody,
+    ITransferContinuationQuote,
+    // ITransferFulfilment,
+} from '../../interfaces';
+import { buildJSONHeaders } from '../headers';
 
 const request = axios.create({
     baseURL: Config.outboundEndpoint,
     timeout: Config.requestTimeout,
 });
 
-/**
- * Utility method to build a set of headers required by the SDK outbound API
- *
- * @returns {object} - Object containing key/value pairs of HTTP headers
- */
-export const buildHeaders = (): Record<string, any> => {
-    const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Date: new Date().toUTCString(),
-    };
-
-    return headers;
-};
-
-export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });
-export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildHeaders() });
-export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildHeaders() });
+export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildJSONHeaders() });
+export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildJSONHeaders() });
+export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildJSONHeaders() });

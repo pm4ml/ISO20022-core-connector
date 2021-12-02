@@ -24,6 +24,7 @@ import middlewares from './middlewares';
 import { ApiContext } from './types';
 import { Config, IServiceConfig } from './config';
 import { bodyParser as xmlBodyParser } from './lib/koaXmlBody';
+import Cache from './lib/cache';
 
 export default class Server {
     _conf: IServiceConfig;
@@ -34,11 +35,14 @@ export default class Server {
 
     _logger: Logger.Logger | undefined;
 
+    _cache: any; // TODO: fix this
+
     constructor(conf: IServiceConfig) {
         this._conf = conf;
         this._api = null;
         this._server = null;
         this._logger = conf.logger;
+        this._cache = null;
     }
 
     async setupApi(): Promise<http.Server> {
@@ -58,10 +62,19 @@ export default class Server {
             );
         }
 
+        // Setup cache
+        this._cache = new Cache({
+            ...this._conf.cache,
+            logger: this._logger?.push({ component: 'cache' }),
+            enabledTestFeatures: this._conf?.cache?.enabledTestFeatures,
+        });
+        await this._cache.connect();
+
         this._api.use(async (ctx: ApiContext, next: () => Promise<any>) => {
             ctx.state = {
                 conf: this._conf,
                 logger: this._logger,
+                cache: this._cache,
             };
             await next();
         });

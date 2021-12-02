@@ -8,13 +8,23 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import {
-    IPostQuoteRequestBody, IPostQuoteResponseBody, IPostTransferRequestBody, IPacs002,
+    IPostQuoteRequestBody,
+    IPostQuoteResponseBody,
+    IPostTransferRequestBody,
+    // IPacs002,
 } from '~/interfaces';
-import { ApiContext } from '../../types';
-import { postTransferBodyToPacs008, pacs002ToPutTransfersBody } from '../../transformers';
-import { requestBackendTransfers } from '../../requests/Inbound';
-import { XML, XSD } from '../../lib/xmlUtils';
-
+import { ApiContext, ApiState } from '../../types';
+import {
+    postTransferBodyToPacs008,
+    // pacs002ToPutTransfersBody,
+    // PNDGWithFailedStatusToTransferError,
+} from '../../transformers';
+import { sendPACS008toReceiverBackend } from '../../requests/Inbound';
+import {
+    // XML,
+    XSD,
+} from '../../lib/xmlUtils';
+import { registerCallbackHandler } from '../../lib/callbackHandler';
 
 const handleError = (err: Error, ctx: ApiContext) => {
     ctx.state.logger.error(err);
@@ -24,6 +34,11 @@ const handleError = (err: Error, ctx: ApiContext) => {
 };
 
 const postQuotes = async (ctx: ApiContext): Promise<void> => {
+    ctx.state.logger.info(JSON.stringify({
+        postQuotes: {
+            request: ctx.request,
+        },
+    }, null, 4));
     const payload = ctx.request.body as unknown as IPostQuoteRequestBody;
     ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
@@ -41,9 +56,14 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
         ctx.response.body = response;
         ctx.response.status = 200;
         ctx.response.type = 'application/json';
-    } catch (err) {
-        handleError(err, ctx);
+    } catch (err: unknown) {
+        handleError(err as Error, ctx);
     }
+    ctx.state.logger.info(JSON.stringify({
+        postQuotes: {
+            response: ctx.response,
+        },
+    }, null, 4));
 };
 
 /**
@@ -55,29 +75,75 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
  */
 
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
+    ctx.state.logger.info(JSON.stringify({
+        postTransfers: {
+            request: ctx.request,
+        },
+    }, null, 4));
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
     ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
     try {
         const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
 
+        // define callbackHandler
+        const callbackHandler = async (id: any, subId: any, msg: any, state: ApiState): Promise<any> => {
+            state.logger.push({
+                id,
+                subId,
+                msg,
+                state,
+            }).log('test');
+            return Promise.resolve('test');
+        };
+
+        // setup handlers for callback
+        await registerCallbackHandler(
+            payload.transferId,
+            'tr',
+            payload,
+            ctx.state,
+            callbackHandler,
+        );
+
         // send a pacs008 POST /transfers request to RSwitch and get a synchronous pacs002 response
-        const res = await requestBackendTransfers(postTransfersBodyPacs008);
+        const res = await sendPACS008toReceiverBackend(postTransfersBodyPacs008);
         const validationResult = XSD.validate(res.data, XSD.paths.pacs_002);
         if(validationResult !== true) {
             XSD.handleValidationError(validationResult, ctx);
             return;
         }
 
-        const xmlData = XML.fromXml(res.data);
+        // const xmlData = XML.fromXml(res.data);
         // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
-        const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
-        ctx.response.body = transferPutBody;
-        ctx.response.status = 200;
+
+
+        if(res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts === 'PDNG') {
+            // const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
+            // ctx.response.body = transferPutBody; // TODO: how do we respond here?
+            ctx.response.body = {
+                homeTransactionId: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.OrgnlPmtInfId, // TODO: what should this be?
+            };
+            ctx.response.status = 200;
+        } else {
+            // const transferErrorPutBody = PNDGWithFailedStatusToTransferError(xmlData as unknown as IPacs002);
+            ctx.response.body = {
+                statusCode: '200', // what goes here?
+                message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
+            }; // TODO: confirm the error message
+            ctx.response.status = 500; // TODO: Confirm this error code
+        }
+
         ctx.response.type = 'application/json';
-    } catch (err) {
-        handleError(err, ctx);
+    } catch (err: unknown) {
+        handleError(err as Error, ctx);
     }
+
+    ctx.state.logger.info(JSON.stringify({
+        postTransfers: {
+            response: ctx.response,
+        },
+    }, null, 4));
 };
 
 export const InboundHandlers = {

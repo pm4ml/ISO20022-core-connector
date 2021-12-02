@@ -9,12 +9,14 @@
  **************************************************************************/
 import { INamespacedXMLDoc } from '../../interfaces';
 import { ApiContext, OutboundHandlerMap } from '../../types';
-import camt003Handler from '../Outbound/camt003Handler';
+import camt003Handler from './camt003Handler';
+import pacs002Handler from './pacs002Handler';
 import pacs008Handler from './pacs008Handler';
 
 const xmlnToHandlerMap: OutboundHandlerMap = {
     'urn:iso:std:iso:20022:tech:xsd:camt.003.001.07': camt003Handler,
     'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09': pacs008Handler,
+    'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10': pacs002Handler,
 };
 
 const handleError = (err: Error, ctx: ApiContext) => {
@@ -26,9 +28,21 @@ export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     const body = ctx.request.body as INamespacedXMLDoc;
     const namespace = body.Document.attr.xmlns;
     const handler = xmlnToHandlerMap[namespace];
+    ctx.state.logger.push({
+        request123: ctx.request,
+    }).log('test');
+    // ctx.state.logger.log({
+    //     request: ctx.request,
+    // });
     try {
         await handler(ctx);
     } catch (err) {
         handleError(err, ctx);
     }
+    ctx.state.logger.info(JSON.stringify({
+        OutboundHandler: {
+            namespace,
+            response: ctx.response,
+        },
+    }, null, 4));
 };

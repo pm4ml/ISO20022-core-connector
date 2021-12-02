@@ -9,27 +9,17 @@
  **************************************************************************/
 
 import axios, { AxiosResponse } from 'axios';
+import { IErrorInformation, ITransferFulfilment } from '../../interfaces';
 import { Config } from '../../config';
+import { buildJSONHeaders, buildXMLHeaders } from '../headers';
 
 const request = axios.create({
     baseURL: Config.backendEndpoint,
     timeout: Config.requestTimeout,
 });
 
-/**
-  * Utility method to build a set of headers required by the ISO inbound API
-  *
-  * @returns {object} - Object containing key/value pairs of HTTP headers
-  */
-export const buildHeaders = (): Record<string, any> => {
-    const headers = {
-        'Content-Type': 'application/xml',
-        Accept: 'application/xml',
-        Date: new Date().toUTCString(),
-    };
-
-    return headers;
-};
-
 // Send request to external ISO switch (e.g. RSWITCH)
-export const requestBackendTransfers = (postTransfersBody: string): Promise<AxiosResponse<any>> => request.post('/transfers', postTransfersBody, { headers: buildHeaders() });
+export const sendPACS008toReceiverBackend = (postTransfersBody: string): Promise<AxiosResponse<any>> => request.post('/transfers', postTransfersBody, { headers: buildXMLHeaders() });
+export const sendPACS002toSenderBackend = (xmlBody: string): Promise<AxiosResponse<any>> => request.post('/transfers', xmlBody, { headers: buildXMLHeaders() });
+export const acceptBackendTransfers = (transferId: string, putTransfersBody: ITransferFulfilment): Promise<AxiosResponse<any>> => request.post(`/transfers/${transferId}`, putTransfersBody, { headers: buildJSONHeaders() });
+export const sendTransfersError = (transferId: string, putTransfersErrorBody: IErrorInformation): Promise<AxiosResponse<any>> => request.post(`/transfers/${transferId}/error`, putTransfersErrorBody, { headers: buildJSONHeaders() });

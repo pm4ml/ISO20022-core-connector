@@ -1,4 +1,4 @@
-curl --location --request POST 'http://localhost:5000/outbound/iso20022' \
+curl --location --request POST 'http://localhost:3003/outbound/iso20022' \
 --header 'Content-Type: application/xml' \
 --data-raw '<?xml version="1.0" encoding="utf-8"?>
 <!-- POST /transfers -->

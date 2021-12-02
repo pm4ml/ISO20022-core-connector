@@ -50,7 +50,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         ctx.response.type = 'application/xml';
         ctx.response.body = partiesByIdResponseToCamt004(res.data);
         ctx.response.status = 200;
-    } catch (e) {
-        handleError(e, ctx);
+    } catch (e: unknown) {
+        handleError(e as Error, ctx);
     }
 };

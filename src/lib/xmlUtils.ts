@@ -29,7 +29,7 @@ const fromJsObject = (obj: Record<string, unknown>, xmlOptions?: IXMLOptions): s
  * @returns {string}
  */
 // eslint-disable-next-line max-len
-const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown> => parseXML(xml, xmlOptions || Config.xmlOptions);
+const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown> => parseXML(xml, xmlOptions || Config.xmlOptions) as Record<string, unknown>;
 
 
 /**

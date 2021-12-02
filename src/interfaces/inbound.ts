@@ -8,8 +8,9 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
+import { IExtensionItem } from './common';
 import {
-    IPostQuotesResponseBody, ITransferParty, TransactionType, AmountType, IExtensionItem,
+    IPostQuotesResponseBody, ITransferParty, TransactionType, AmountType,
 } from './outbound';
 
 
@@ -43,6 +44,11 @@ export interface IPostTransferRequestBody {
     note?: string
     quoteRequestExtensions: Array<IExtensionItem>,
     ilpPacket: any, // TODO: define the ILP Packet object
+    extensionList?: Array<IExtensionItem>
+}
+
+export interface ITransfersByIdParams {
+    idValue: string
 }
 
 export interface IPacs008Incoming extends Record<string, unknown> {
@@ -157,6 +163,51 @@ export interface IPacs008Incoming extends Record<string, unknown> {
                         },
                     },
                 },
+            },
+        },
+    },
+}
+
+
+export interface IPain002Response extends Record<string, unknown> {
+    Document: {
+        attr: {
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pain.002.001.10',
+            'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
+        },
+        CstmrPmtStsRpt: {
+            GrpHdr: {
+                MsgId: string,
+                NbOfTxs: string,
+                CreDtTm: string,
+                SttlmInf: {
+                    SttlmMtd: string,
+                },
+                InstgAgt: {
+                    FinInstnId: {
+                        Othr: {
+                            Id: string,
+                        },
+                    },
+                },
+                InstdAgt: {
+                    FinInstnId: {
+                        Othr: {
+                            Id: string,
+                        },
+                    },
+                },
+            },
+            OrgnlGrpInfAndSts: {
+                OrgnlMsgId: string,
+                OrgnlMsgNmId: string,
+                OrgnlCreDtTm: string,
+                OrgnlNbOfTxs: string
+            },
+            OrgnlPmtInfAndSts: {
+                TxInfAndSts: {
+                    TxSts: string
+                }
             },
         },
     },

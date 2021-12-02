@@ -2,7 +2,8 @@
   "exclude": [
     "node_modules",
     "build",
-    "src/test"
+    "src/test",
+    "jest.config.js"
   ],
   "compilerOptions": {
     "target": "es2018",
@@ -36,6 +37,6 @@
     },
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "allowJs": false
+    "allowJs": true
   },
 }
