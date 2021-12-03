@@ -102,7 +102,6 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         }).log('acceptQuotes request');
 
         res = await acceptQuotes(res.data.transferId as string, acceptQuoteRequest);
-        console.log(res);
 
         ctx.state.logger.push({
             acceptQuotesRes: {
