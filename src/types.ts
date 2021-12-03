@@ -15,6 +15,9 @@ export interface ApiState {
     conf: IServiceConfig;
     logger: any;
     cache: any; // TODO: Fix this to a type
+    meta?: {
+        [key: string]: any;
+    }
 }
 
 export interface ApiContext extends Koa.Context {

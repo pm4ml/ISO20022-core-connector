@@ -17,6 +17,7 @@ import {
     IPacs008Incoming,
     IErrorResponse,
     TxStsEnum,
+    IPacsState,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
 
@@ -276,7 +277,7 @@ export const transferResponseToPacs002 = (
         Document: {
             attr: {
                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10',
             },
             FIToFIPmtStsRpt: {
                 GrpHdr: {
@@ -287,7 +288,8 @@ export const transferResponseToPacs002 = (
                     OrgnlInstrId: instrId,
                     OrgnlEndToEndId: endToEndId,
                     OrgnlTxId: txId,
-                    TxSts: currentState === TransferStatus.COMPLETED ? TxStsEnum.ACCC : TxStsEnum.RJCT,
+                    // TxSts: currentState === TransferStatus.COMPLETED ? TxStsEnum.ACCC : TxStsEnum.RJCT,
+                    TxSts: currentState === TransferStatus.COMPLETED ? TxStsEnum.ACSC : TxStsEnum.RJCT,
                 },
             },
         },
@@ -519,32 +521,35 @@ export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPa
     return putTransfersBody;
 };
 
+
 /**
  * Constructs ISO 20022 error message in pacs.002 format.
  *
- * @param {Record<string, unknown> | IPacs008} pacs008
+ * @param {IPacsState} pacsState
  * @returns {IPacs002}
  */
-export const transferErrorResponseToPacs002 = (
-    pacs008: Record<string, unknown> | IPacs008,
+export const pacsStateToPacs002Error = (
+    pacsState: IPacsState,
 ): string => {
-    const body = pacs008 as IPacs008;
-
     const pacs002Error: IPacs002 = {
         Document: {
             attr: {
                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10',
             },
             FIToFIPmtStsRpt: {
                 GrpHdr: {
-                    MsgId: body.Document.FIToFICstmrCdtTrf.GrpHdr.MsgId,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    MsgId: pacsState.MsgId!,
                     CreDtTm: (new Date()).toISOString(),
                 },
                 TxInfAndSts: {
-                    OrgnlInstrId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
-                    OrgnlEndToEndId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
-                    OrgnlTxId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    OrgnlInstrId: pacsState.OrgnlInstrId!,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    OrgnlEndToEndId: pacsState.OrgnlEndToEndId!,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    OrgnlTxId: pacsState.OrgnlTxId!,
                     TxSts: TxStsEnum.RJCT, // error code
                 },
             },

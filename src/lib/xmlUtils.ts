@@ -45,8 +45,10 @@ const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, 
     if(!xml.length) {
         throw new Error('XML content cannot be blank.');
     }
+
     const schema = xsd.parseFile(xsdPath);
-    const result = schema.validate(xml);
+    const result = schema.validate(xml, false);
+
     return result != null ? result : true;
 };
 
@@ -71,7 +73,7 @@ const paths = {
     camt_003: `${Config.templatesPath}/xsd/camt.003.001.07.xsd`,
     camt_004: `${Config.templatesPath}/xsd/camt.004.001.08.xsd`,
     pacs_008: `${Config.templatesPath}/xsd/pacs.008.001.09.xsd`,
-    pacs_002: `${Config.templatesPath}/xsd/pacs.002.001.12.xsd`,
+    pacs_002: `${Config.templatesPath}/xsd/pacs.002.001.10.xsd`,
     pain_001: `${Config.templatesPath}/xsd/pain.001.001.10_1.xsd`,
     pain_002: `${Config.templatesPath}/xsd/pain.002.001.11.xsd`,
     pain_013: `${Config.templatesPath}/xsd/pain.013.001.08.xsd`,

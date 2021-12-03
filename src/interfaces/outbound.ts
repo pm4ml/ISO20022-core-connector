@@ -315,6 +315,12 @@ export interface ICamt004Error extends Record<string, unknown> {
     }
 }
 
+export interface IPacsState {
+    MsgId?: string,
+    OrgnlInstrId?: string,
+    OrgnlEndToEndId?: string,
+    OrgnlTxId?: string,
+}
 
 export interface IPacs008 extends Record<string, unknown> {
     Document: {
@@ -431,12 +437,13 @@ export interface IPacs008 extends Record<string, unknown> {
 export enum TxStsEnum {
     ACCC = 'ACCC',
     RJCT = 'RJCT',
+    ACSC = 'ACSC',
 }
 
 export interface IPacs002 extends Record<string, unknown> {
     Document: {
         attr: {
-            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12',
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10',
             'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
         },
         CstmrPmtStsRpt?: {

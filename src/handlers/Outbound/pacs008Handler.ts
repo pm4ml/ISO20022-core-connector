@@ -8,41 +8,64 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
-import { XSD } from '../../lib/xmlUtils';
+import {
+    // XML,
+    XSD,
+} from '../../lib/xmlUtils';
 import {
     // AmountType,
     IPacs008,
-    ITransferError,
+    IPacsState,
+    // IPostQuotesBody,
+    // ITransferError,
     // ITransferState,
     // PartyIdType,
     // PayerType,
     // TransactionType,
     TransferStatus,
 } from '../../interfaces';
-import { acceptQuotes, requestQuotes } from '../../requests/Outbound';
-import { pacs008ToPostQuotesBody, transferResponseToPacs002, transferErrorResponseToPacs002 } from '../../transformers';
+import {
+    acceptQuotes,
+    requestQuotes,
+} from '../../requests/Outbound';
+import {
+    pacs008ToPostQuotesBody,
+    pacsStateToPacs002Error,
+    transferResponseToPacs002,
+    // transferErrorResponseToPacs002,
+} from '../../transformers';
 import { ApiContext } from '../../types';
 import { sendPACS002toSenderBackend } from '../../requests/Inbound';
 
 
-const handleError = (error: any | Error | ITransferError, ctx: ApiContext) => {
-    ctx.state.logger.error(error);
-    if((error as ITransferError).transferState) {
-        ctx.response.type = 'application/xml';
-        ctx.response.body = transferResponseToPacs002(error as ITransferError);
-        ctx.response.status = 400;
-    } else {
-        // for timeout errors we need to construct the error pacs002 xml response
-        ctx.response.type = 'application/xml';
-        ctx.response.body = transferErrorResponseToPacs002(ctx.request.body as IPacs008);
-        ctx.response.status = 500;
-    }
-};
+// const handleError = (error: any | Error | ITransferError, ctx: ApiContext) => {
+//     ctx.state.logger.error(error);
+//     if((error as ITransferError).transferState) {
+//         ctx.response.type = 'application/xml';
+//         ctx.response.body = transferResponseToPacs002(error as ITransferError);
+//         ctx.response.status = 400;
+//     } else {
+//         // for timeout errors we need to construct the error pacs002 xml response
+//         ctx.response.type = 'application/xml';
+//         ctx.response.body = transferErrorResponseToPacs002(ctx.request.body as IPacs008);
+//         ctx.response.status = 500;
+//     }
+// };
 
 export const processTransferRequest = async (ctx: ApiContext): Promise<void> => {
     let res: any;
+
+    let pacsState: IPacsState | undefined;
+
     try {
         const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
+
+        // map to
+        pacsState = {};
+        pacsState.MsgId = (ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId;
+        pacsState.OrgnlInstrId = (ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId;
+        pacsState.OrgnlEndToEndId = (ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId;
+        pacsState.OrgnlTxId = (ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId;
 
         ctx.state.logger.push({
             request: postQuotesBody,
@@ -65,14 +88,14 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         const acceptQuoteRequest = { acceptQuote: true };
 
         ctx.state.logger.push({
-            transferId: res.data.transferId,
+            transferId: res?.data?.transferId,
             request: acceptQuoteRequest,
         }).log('acceptQuotes request');
 
         res = await acceptQuotes(res.data.transferId as string, { acceptQuote: true });
 
         ctx.state.logger.push({
-            transferId: res.data.transferId,
+            transferId: res?.data?.transferId,
             response: res,
         }).log('acceptQuotes response');
 
@@ -86,23 +109,19 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         const request = transferResponseToPacs002(res.data);
         ctx.state.logger.push({ request }).log('sendPACS002toSenderBackend request');
         // Send ISO 2022 callback response message to Sender
-        const response = await sendPACS002toSenderBackend(JSON.stringify(request));
+        const response = await sendPACS002toSenderBackend(request);
         ctx.state.logger.push({ response }).log('sendPACS002toSenderBackend response');
     } catch (error) {
         ctx.state.logger.error(error);
-        // TODO: what do I send here?
-        let requestError: any;
 
-        if((res as ITransferError)?.transferState) {
-            requestError = transferResponseToPacs002(error as ITransferError);
-        } else {
-            // for timeout errors we need to construct the error pacs002 xml response
-            requestError = transferErrorResponseToPacs002(ctx.request.body as IPacs008);
+        if(pacsState === undefined) {
+            throw error;
         }
+        const requestError = pacsStateToPacs002Error(pacsState);
 
         ctx.state.logger.push({ requestError }).log('sendPACS002toSenderBackend request');
 
-        const errorResponse = await sendPACS002toSenderBackend(JSON.stringify(requestError));
+        const errorResponse = await sendPACS002toSenderBackend(requestError);
 
         ctx.state.logger.push({ response: errorResponse }).log('sendPACS002toSenderBackend response');
 
@@ -124,6 +143,8 @@ export default async (ctx: ApiContext): Promise<void> => {
         ctx.response.body = {}; // TODO: What should be returned here?
         ctx.response.status = 200;
     } catch (e: unknown) {
-        handleError(e as Error, ctx);
+        ctx.response.type = 'application/xml';
+        ctx.response.body = {}; // TODO: What should be returned here?
+        ctx.response.status = 500;
     }
 };
