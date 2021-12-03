@@ -127,7 +127,7 @@ describe('pacs008Handler', () => {
         expect(getExtensionKeyValue('ENDTOENDID',putTransfersBody?.extensionList)?.value).toEqual(endToEndId);
         expect(ctx.state.cache.publish).toBeCalled();
         expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.body).toEqual({});
+        expect(ctx.response.body).toEqual('');
         expect(ctx.response.status).toEqual(200);
     });
 
@@ -162,7 +162,7 @@ describe('pacs008Handler', () => {
         expect(getExtensionKeyValue('ENDTOENDID',putTransfersBody?.extensionList)?.value).toEqual(endToEndId);
         expect(ctx.state.cache.publish).toBeCalled();
         expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.body).toEqual({});
+        expect(ctx.response.body).toEqual('');
         expect(ctx.response.status).toEqual(200);
     });
 
@@ -197,7 +197,7 @@ describe('pacs008Handler', () => {
         expect(getExtensionKeyValue('ENDTOENDID',putTransfersBody?.extensionList)?.value).toEqual(endToEndId);
         expect(ctx.state.cache.publish).toBeCalled();
         expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.body).toEqual({});
+        expect(ctx.response.body).toEqual('');
         expect(ctx.response.status).toEqual(500);
     });
 });

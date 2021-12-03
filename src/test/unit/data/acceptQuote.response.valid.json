@@ -1,0 +1,22 @@
+{
+    "currentState": "COMPLETED",
+    "transferId": "0120a604-aa80-43da-b6f6-c1d5f8aa622e",
+    "quoteRequestExtensions": [
+        {
+            "key": "MSGID",
+            "value": "RNDPS/4e9b19494e5f0c7d61a607"
+        },
+        {
+            "key": "INSTRID",
+            "value": "8c5d9f95"
+        },
+        {
+            "key": "TXID",
+            "value": "acd1ef76"
+        },
+        {
+            "key": "ENDTOENDID",
+            "value": "000400078911122"
+        }
+    ]
+}

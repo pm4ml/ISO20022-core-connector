@@ -438,6 +438,7 @@ export enum TxStsEnum {
     ACCC = 'ACCC',
     RJCT = 'RJCT',
     ACSC = 'ACSC',
+    PNDG = 'PNDG',
 }
 
 export interface IPacs002 extends Record<string, unknown> {

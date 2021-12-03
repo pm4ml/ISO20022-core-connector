@@ -151,7 +151,7 @@ describe('pacs008Handler', () => {
 
         // ### test
         expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.body).toEqual({});
+        expect(ctx.response.body).toEqual('');
         expect(ctx.response.status).toEqual(200);
     });
 

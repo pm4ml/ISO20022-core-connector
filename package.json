@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "start": "npm run build && node build/index.js",
-    "start:withMocks": "CACHE_HOST=localhost CACHE_PORT=6379 TEMPLATES_PATH=build/templates OUTBOUND_ENDPOINT=http://localhost:1080 BACKEND_ENDPOINT=http://localhost:1080/backend npm start",
+    "start:withMocks": "CACHE_HOST=localhost CACHE_PORT=6379 OUTBOUND_ENDPOINT=http://localhost:1080/outbound BACKEND_ENDPOINT=http://localhost:1080/backend TEMPLATES_PATH=build/templates npm start",
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
     "build": "tsc -p ./tsconfig.json",

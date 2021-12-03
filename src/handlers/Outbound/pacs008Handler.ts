@@ -68,13 +68,19 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         pacsState.OrgnlTxId = (ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId;
 
         ctx.state.logger.push({
-            request: postQuotesBody,
+            requestQuotesReq: {
+                pacsState,
+                request: postQuotesBody,
+            },
         }).log('requestQuotes request');
 
         res = await requestQuotes(postQuotesBody);
 
         ctx.state.logger.push({
-            response: res,
+            requestQuotesRes: {
+                pacsState,
+                response: res.data,
+            },
         }).log('requestQuotes response');
 
         if(res.data.transferState
@@ -88,15 +94,22 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         const acceptQuoteRequest = { acceptQuote: true };
 
         ctx.state.logger.push({
-            transferId: res?.data?.transferId,
-            request: acceptQuoteRequest,
+            acceptQuotesReq: {
+                pacsState,
+                transferId: res?.data?.transferId,
+                request: acceptQuoteRequest,
+            },
         }).log('acceptQuotes request');
 
-        res = await acceptQuotes(res.data.transferId as string, { acceptQuote: true });
+        res = await acceptQuotes(res.data.transferId as string, acceptQuoteRequest);
+        console.log(res);
 
         ctx.state.logger.push({
-            transferId: res?.data?.transferId,
-            response: res,
+            acceptQuotesRes: {
+                pacsState,
+                transferId: res?.data?.transferId,
+                response: res.data,
+            },
         }).log('acceptQuotes response');
 
         if(res.data.transferState
@@ -107,10 +120,22 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
 
         // Transform ML Connector response into ISO 2022
         const request = transferResponseToPacs002(res.data);
-        ctx.state.logger.push({ request }).log('sendPACS002toSenderBackend request');
+
+        ctx.state.logger.push({
+            sendPACS002toSenderBackendReq: {
+                pacsState,
+                request,
+            },
+        }).log('sendPACS002toSenderBackend request');
         // Send ISO 2022 callback response message to Sender
-        const response = await sendPACS002toSenderBackend(request);
-        ctx.state.logger.push({ response }).log('sendPACS002toSenderBackend response');
+        res = await sendPACS002toSenderBackend(request);
+
+        ctx.state.logger.push({
+            sendPACS002toSenderBackendRes: {
+                pacsState,
+                response: res.data,
+            },
+        }).log('sendPACS002toSenderBackend response');
     } catch (error) {
         ctx.state.logger.error(error);
 
@@ -119,11 +144,21 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         }
         const requestError = pacsStateToPacs002Error(pacsState);
 
-        ctx.state.logger.push({ requestError }).log('sendPACS002toSenderBackend request');
+        ctx.state.logger.push({
+            sendPACS002toSenderBackendErrorReq: {
+                pacsState,
+                requestError,
+            },
+        }).log('sendPACS002toSenderBackend request');
 
-        const errorResponse = await sendPACS002toSenderBackend(requestError);
+        res = await sendPACS002toSenderBackend(requestError);
 
-        ctx.state.logger.push({ response: errorResponse }).log('sendPACS002toSenderBackend response');
+        ctx.state.logger.push({
+            sendPACS002toSenderBackendErrorRes: {
+                pacsState,
+                response: res.data,
+            },
+        }).log('sendPACS002toSenderBackend errorResponse');
 
         throw error;
     }
@@ -140,11 +175,11 @@ export default async (ctx: ApiContext): Promise<void> => {
         processTransferRequest(ctx); // lets process the request asynchronously
 
         ctx.response.type = 'application/xml';
-        ctx.response.body = {}; // TODO: What should be returned here?
+        ctx.response.body = ''; // TODO: What should be returned here?
         ctx.response.status = 200;
     } catch (e: unknown) {
         ctx.response.type = 'application/xml';
-        ctx.response.body = {}; // TODO: What should be returned here?
+        ctx.response.body = ''; // TODO: What should be returned here?
         ctx.response.status = 500;
     }
 };
