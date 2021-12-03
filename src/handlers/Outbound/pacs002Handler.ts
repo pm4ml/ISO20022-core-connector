@@ -69,7 +69,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         });
 
         ctx.state.logger.push({
-            publish: {
+            publishRequest: {
                 pacsState,
                 channelName: key,
                 request: transferPutBody,
@@ -83,7 +83,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         });
 
         ctx.state.logger.push({
-            publish: {
+            publishResponse: {
                 pacsState,
                 channelName: key,
                 response: res,
