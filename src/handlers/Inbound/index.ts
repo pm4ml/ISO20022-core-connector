@@ -78,6 +78,8 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
  */
 
 const postTransfers = async (ctx: ApiContext): Promise<void> => {
+    // TODO: wrap this with a promise
+    // TODO: re-do loggers here!
     ctx.state.logger.info(JSON.stringify({
         postTransfers: {
             request: ctx.request,
@@ -108,6 +110,8 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
                 // state,
             }).log('test');
             return Promise.resolve('test');
+            // TODO: handle ctx.response and resolve promise!
+            // TODO: introduce the timeout portion from the registerCallbackHandler so we can reject it here!
         };
 
         // setup handlers for callback
