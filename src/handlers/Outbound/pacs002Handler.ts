@@ -36,7 +36,7 @@ import { channelName, ChannelTypeEnum } from '../../lib/callbackHandler';
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);
     ctx.response.type = 'application/xml';
-    ctx.response.body = {};
+    ctx.response.body = '';
     ctx.response.status = 500;
 };
 
@@ -68,13 +68,29 @@ export default async (ctx: ApiContext): Promise<void> => {
             id: pacsState.OrgnlEndToEndId!,
         });
 
-        await ctx.state.cache.publish(key, {
+        ctx.state.logger.push({
+            publish: {
+                pacsState,
+                channelName: key,
+                request: transferPutBody,
+            },
+        }).log('publish pacs002 request');
+
+        const res = await ctx.state.cache.publish(key, {
             type: ChannelTypeEnum.PACS02RESPONSETOPACS008,
             data: transferPutBody,
             headers: ctx.request.headers,
         });
 
-        ctx.response.body = {};
+        ctx.state.logger.push({
+            publish: {
+                pacsState,
+                channelName: key,
+                response: res,
+            },
+        }).log('publish pacs002 response');
+
+        ctx.response.body = '';
         ctx.response.status = 200;
         ctx.response.type = 'application/xml';
     } catch (e: unknown) {

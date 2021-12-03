@@ -55,6 +55,10 @@ export default class Server {
                 file: apiSpecPath,
                 endpoint: '/openapi.json',
                 uiEndpoint: '/',
+                validatePaths: [ // need to add these or the XML messages will be validated by the JSON parser
+                    '/quoterequests',
+                    '/transfers',
+                ],
             });
         } catch (e) {
             throw new Error(
