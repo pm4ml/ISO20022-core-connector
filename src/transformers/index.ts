@@ -480,7 +480,7 @@ export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPa
     const body = pacs002 as IPacs002;
     const putTransfersBody: ITransferFulfilment = {
         completedTimestamp: body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.CreDtTm,
-        transferState: body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts === 'ACCC' ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
+        transferState: body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts === TxStsEnum.ACSC ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
         //  fulfilment: string, //TODO: do we need to send fulfil?
     };
     putTransfersBody.extensionList = [];
@@ -488,7 +488,7 @@ export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPa
     if(body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId) {
         putTransfersBody?.extensionList?.push(
             {
-                key: 'INSTRID',
+                key: 'MSGID',
                 value: body.Document.FIToFIPmtStsRpt.GrpHdr.MsgId,
             },
         );

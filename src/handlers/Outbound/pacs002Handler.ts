@@ -5,7 +5,7 @@
  *  specified in the corresponding source code repository.                *
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
- *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *      Miguel de Barros - miguel.debarros@modusbox.com                   *
  **************************************************************************/
 
 import { XML, XSD } from '../../lib/xmlUtils';
@@ -16,12 +16,13 @@ import {
     // ITransfersByIdParams,
     IErrorInformation,
     IPacs002,
-    IPain002Response,
+    IPacsState,
+    // IPain002Response,
 } from '../../interfaces';
-import {
-    acceptBackendTransfers,
-    // sendTransfersError,
-} from '../../requests/Inbound';
+// import {
+//     acceptBackendTransfers,
+//     // sendTransfersError,
+// } from '../../requests/Inbound';
 import {
     // pacs008ToPostQuotesBody,
     // transferErrorResponseToPacs002,
@@ -29,13 +30,13 @@ import {
     // PNDGWithFailedStatusToTransferError,
 } from '../../transformers';
 import { ApiContext } from '../../types';
+import { channelName, ChannelTypeEnum } from '../../lib/callbackHandler';
 
 
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);
-    // for timeout errors we need to construct the error pacs002 xml response
     ctx.response.type = 'application/xml';
-    // ctx.response.body = transferErrorResponseToPacs002(ctx.request.body as IPacs008); // TODO: What happens here?
+    ctx.response.body = {};
     ctx.response.status = 500;
 };
 
@@ -51,18 +52,29 @@ export default async (ctx: ApiContext): Promise<void> => {
         const xmlData = XML.fromXml(ctx.request.rawBody);
         // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
         const pacs002RequestBody: IPacs002 = xmlData as unknown as IPacs002;
-        let response: any;
-        if(pacs002RequestBody?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts === 'PDNG') { // TODO: CHECK PNDG STATUS FOR SUCCESSS
-            const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPain002Response);
-            response = await acceptBackendTransfers('123', transferPutBody); // where do I map the transfer from?
-        } else {
-            // const transferPutErrorBody = PNDGWithFailedStatusToTransferError(xmlData as unknown as IPacs002);
-            // response = await sendTransfersError('123', transferPutErrorBody); // what do we send here?
 
-            // ctx.response.body = response; // TODO: this should be a “PNDG status”???
-            response = {}; // TODO: this should be a “PNDG status”???
-        }
-        ctx.response.body = response;
+        // map to
+        const pacsState: IPacsState | undefined = {};
+        pacsState.MsgId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId;
+        pacsState.OrgnlInstrId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId;
+        pacsState.OrgnlEndToEndId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId;
+        pacsState.OrgnlTxId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId;
+
+        const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
+
+        // publish message to pub-sub cache
+        const key = channelName({
+            type: ChannelTypeEnum.PACS02RESPONSETOPACS008,
+            id: pacsState.OrgnlEndToEndId!,
+        });
+
+        await ctx.state.cache.publish(key, {
+            type: ChannelTypeEnum.PACS02RESPONSETOPACS008,
+            data: transferPutBody,
+            headers: ctx.request.headers,
+        });
+
+        ctx.response.body = {};
         ctx.response.status = 200;
         ctx.response.type = 'application/xml';
     } catch (e: unknown) {

@@ -1,8 +1,12 @@
 import util from 'util';
 import { ApiState } from '~/types';
 
+export enum ChannelTypeEnum {
+    PACS02RESPONSETOPACS008 = 'PACS02ResponseToPACS008',
+}
+
 export interface ChannelOptions {
-    type: string,
+    type: ChannelTypeEnum,
     id: string,
 }
 
@@ -22,24 +26,24 @@ export const channelName = (ops: ChannelOptions): string => {
 };
 
 // eslint-disable-next-line max-len, no-async-promise-executor
-export const registerCallbackHandler = async (type: any, id: any, data: any, state: ApiState, handler: (id: any, subId: any, msg: any, state: ApiState) => Promise<any>): Promise<any | Error> => new Promise(async (resolve, reject) => {
+export const registerCallbackHandler = async (type: ChannelTypeEnum, id: any, data: any, state: ApiState, handler: (id: any, subId: any, msg: any, state: ApiState) => Promise<any>): Promise<any | Error> => new Promise(async (resolve, reject) => {
     // listen for resolution events on the payee idType and idValue
-    const transferKey = channelName({
+    const key = channelName({
         type,
         id,
     });
 
     state.logger.push({
-        transferKey,
+        key,
         data,
         state,
     }).log('resolveTransfer');
 
     // hook up a subscriber to handle response messages
     // eslint-disable-next-line @typescript-eslint/no-shadow, consistent-return
-    const subId = await state.cache.subscribe(transferKey, async (cn: any, msg: any, subId: any) => {
+    const subId = await state.cache.subscribe(key, async (cn: any, msg: any, subId: any) => {
         state.logger.push({
-            transferKey,
+            key,
             cn,
             msg,
             subId,
@@ -47,21 +51,21 @@ export const registerCallbackHandler = async (type: any, id: any, data: any, sta
 
         try {
             const parsedMsg = JSON.parse(msg);
-            const result = await handler(transferKey, subId, parsedMsg, state);
+            const result = await handler(key, subId, parsedMsg, state);
             state.logger.push({
-                transferKey,
+                key,
                 cn,
                 subId,
                 result,
             }).log('subscribe::success');
         } catch (err: unknown) {
-            state.cache.unsubscribe(transferKey, subId).catch((e: Error) => {
+            state.cache.unsubscribe(key, subId).catch((e: Error) => {
                 state.logger.push({
-                    transferKey,
+                    key,
                     cn,
                     subId,
                     e,
-                }).log(`Error unsubscribing (in subscribe error handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
+                }).log(`Error unsubscribing (in subscribe error handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
                 // state.logger.log(`Error unsubscribing (in subscribe error handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
             });
             // reject(err);
@@ -70,16 +74,16 @@ export const registerCallbackHandler = async (type: any, id: any, data: any, sta
 
     // set up a timeout for the request
     setTimeout(() => {
-        const err = new Error(`Timeout requesting transfer ${transferKey}`);
+        const err = new Error(`Timeout requesting transfer ${key}`);
 
         // we dont really care if the unsubscribe fails but we should log it regardless
-        state.cache.unsubscribe(transferKey, subId).catch((e: Error) => {
+        state.cache.unsubscribe(key, subId).catch((e: Error) => {
             // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
             state.logger.push({
-                transferKey,
+                key,
                 subId,
                 e,
-            }).log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
+            }).log(`Error unsubscribing (in timeout handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
         });
         return reject(err);
     }, state.conf.callbacksTimeout * 1000); // TODO: make this configurable. Default is 30s.

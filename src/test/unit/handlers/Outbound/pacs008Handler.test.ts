@@ -43,8 +43,8 @@ const mockedSendPACS002toSenderBackend = mocked(sendPACS002toSenderBackend, true
 
 const XmlFileMap = {
     PACS_008_001_09: {
-        valid: '../../data/pacs.008.valid.xml',
-        invalid: '../../data/pacs.008.invalid.xml',
+        valid: '../../data/pacs.008.outgoing.valid.xml',
+        invalid: '../../data/pacs.008.outgoing.invalid.xml',
     },
 };
 
@@ -55,7 +55,7 @@ interface ITestData {
     quoteRequestExtensions: Array<IExtensionItem>,
 };
 
-const getTestData = (importXmlFile: string = '../../data/pacs.008.valid.xml'): ITestData => {
+const getTestData = (importXmlFile: string = '../../data/pacs.008.outgoing.valid.xml'): ITestData => {
     let ctx: any;
     let xmlStr: string;
     let postQuotesBody: IPostQuotesBody;
@@ -487,6 +487,5 @@ describe('pacs008Handler', () => {
         expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
         expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
         expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
-        
     });
 });

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10">
+  <FIToFIPmtStsRpt>
+    <GrpHdr>
+      <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>
+      <CreDtTm>2021-12-03T14:09:39.288Z</CreDtTm>
+    </GrpHdr>
+    <TxInfAndSts>
+      <OrgnlInstrId>8c5d9f95</OrgnlInstrId>
+      <OrgnlEndToEndId>000400078911122</OrgnlEndToEndId>
+      <OrgnlTxId>acd1ef76</OrgnlTxId>
+      <TxSts>RJCT</TxSts>
+    </TxInfAndSts>
+  </FIToFIPmtStsRpt>
+</Document>

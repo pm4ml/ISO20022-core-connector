@@ -24,7 +24,7 @@ import {
     // XML,
     XSD,
 } from '../../lib/xmlUtils';
-import { registerCallbackHandler } from '../../lib/callbackHandler';
+import { ChannelTypeEnum, registerCallbackHandler } from '../../lib/callbackHandler';
 
 const handleError = (err: Error, ctx: ApiContext) => {
     ctx.state.logger.error(err);
@@ -99,8 +99,8 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
 
         // setup handlers for callback
         await registerCallbackHandler(
+            ChannelTypeEnum.PACS02RESPONSETOPACS008,
             payload.transferId,
-            'tr',
             payload,
             ctx.state,
             callbackHandler,
