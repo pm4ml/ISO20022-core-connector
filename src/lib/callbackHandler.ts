@@ -70,7 +70,7 @@ export const registerCallbackHandler = async (type: ChannelTypeEnum, id: any, da
             });
             // reject(err);
         }
-    }).bind(this);
+    });
 
     // set up a timeout for the request
     setTimeout(() => {

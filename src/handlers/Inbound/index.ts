@@ -8,6 +8,8 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import {
+    IPacs008,
+    IPacsState,
     IPostQuoteRequestBody,
     IPostQuoteResponseBody,
     IPostTransferRequestBody,
@@ -21,6 +23,7 @@ import {
 } from '../../transformers';
 import { sendPACS008toReceiverBackend } from '../../requests/Inbound';
 import {
+    XML,
     // XML,
     XSD,
 } from '../../lib/xmlUtils';
@@ -81,10 +84,20 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
         },
     }, null, 4));
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
-    ctx.state.logger.log(JSON.stringify(ctx.request.body));
+    // ctx.state.logger.log(JSON.stringify(ctx.request.body));
+
+    let pacsState: IPacsState | undefined;
 
     try {
         const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
+        const pacs008 = XML.fromXml(postTransfersBodyPacs008) as IPacs008;
+
+        // map to
+        pacsState = {};
+        pacsState.MsgId = (pacs008 as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId;
+        pacsState.OrgnlInstrId = (pacs008 as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId;
+        pacsState.OrgnlEndToEndId = (pacs008 as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId;
+        pacsState.OrgnlTxId = (pacs008 as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId;
 
         // define callbackHandler
         const callbackHandler = async (id: any, subId: any, msg: any, state: ApiState): Promise<any> => {
@@ -92,7 +105,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
                 id,
                 subId,
                 msg,
-                state,
+                // state,
             }).log('test');
             return Promise.resolve('test');
         };
@@ -100,7 +113,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
         // setup handlers for callback
         await registerCallbackHandler(
             ChannelTypeEnum.PACS02RESPONSETOPACS008,
-            payload.transferId,
+            pacsState.OrgnlEndToEndId,
             payload,
             ctx.state,
             callbackHandler,

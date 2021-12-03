@@ -1,0 +1,124 @@
+{
+    "transferId": "80f4f795-0415-4d1d-ae28-117ae5d2eae8",
+    "quote": {
+        "quoteId": "d20fc7c3-943e-4995-b6f2-2493e427fa6a",
+        "transactionId": "80f4f795-0415-4d1d-ae28-117ae5d2eae8",
+        "transferAmount": "10",
+        "transferAmountCurrency": "RWF",
+        "payeeReceiveAmount": "10",
+        "payeeReceiveAmountCurrency": "RWF",
+        "expiration": "2021-12-01T18:20:00.326Z"
+    },
+    "from": {
+        "idType": "MSISDN",
+        "idValue": "25644444444",
+        "fspId": "pm4mlsenderfsp",
+        "extensionList": [
+            {
+                "key": "NAME",
+                "value": "LAKE CITY BANK"
+            }
+        ],
+        "displayName": "PayerFirst PayerLast"
+    },
+    "to": {
+        "idType": "ACCOUNT_ID",
+        "idValue": "0789493999",
+        "fspId": "cogebanquesbx",
+        "extensionList": [
+            {
+                "key": "NAME",
+                "value": "EQUITY BANK RWANDA LIMITED"
+            }
+        ]
+    },
+    "amountType": "SEND",
+    "currency": "RWF",
+    "amount": "10",
+    "transactionType": "TRANSFER",
+    "ilpPacket": {
+        "data": {
+            "transactionId": "80f4f795-0415-4d1d-ae28-117ae5d2eae8",
+            "quoteId": "d20fc7c3-943e-4995-b6f2-2493e427fa6a",
+            "payee": {
+                "partyIdInfo": {
+                    "partyIdType": "ACCOUNT_ID",
+                    "partyIdentifier": "0789493999",
+                    "fspId": "cogebanquesbx",
+                    "extensionList": {
+                        "extension": [
+                            {
+                                "key": "NAME",
+                                "value": "EQUITY BANK RWANDA LIMITED"
+                            }
+                        ]
+                    }
+                }
+            },
+            "payer": {
+                "partyIdInfo": {
+                    "partyIdType": "MSISDN",
+                    "partyIdentifier": "25644444444",
+                    "fspId": "pm4mlsenderfsp",
+                    "extensionList": {
+                        "extension": [
+                            {
+                                "key": "NAME",
+                                "value": "LAKE CITY BANK"
+                            }
+                        ]
+                    }
+                },
+                "name": "PayerFirst PayerLast"
+            },
+            "amount": {
+                "amount": "10",
+                "currency": "RWF"
+            },
+            "transactionType": {
+                "scenario": "TRANSFER",
+                "initiator": "PAYER",
+                "initiatorType": "CONSUMER"
+            }
+        }
+    },
+    "note": "test payment",
+    "quoteRequestExtensions": {
+        "0": {
+            "key": "MSGID",
+            "value": "RNDPS/4e9b19494e5f0c7d61a607"
+        },
+        "1": {
+            "key": "CREDT",
+            "value": "2021-02-10T15:07:38.6875000+03:00"
+        },
+        "2": {
+            "key": "INSTRID",
+            "value": "8c5d9f95"
+        },
+        "3": {
+            "key": "ENDTOENDID",
+            "value": "000400078911122"
+        },
+        "4": {
+            "key": "TXID",
+            "value": "acd1ef76"
+        },
+        "5": {
+            "key": "SETTLEDATE",
+            "value": "2021-07-13"
+        },
+        "6": {
+            "key": "USTRD",
+            "value": "000400078911122"
+        },
+        "7": {
+            "key": "REFDOC",
+            "value": "hsuikdfgdgg"
+        },
+        "8": {
+            "key": "DOCDATE",
+            "value": "2021-07-13"
+        }
+    }
+}

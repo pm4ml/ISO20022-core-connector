@@ -39,14 +39,6 @@ interface ITestData {
     xmlStr: string,
 };
 
-const getExtensionKeyValue = (key: string, extensionList?: Array<IExtensionItem>): IExtensionItem | undefined => {
-    if (extensionList === undefined) return;
-    const result = extensionList.filter( extensionItem => extensionItem.key === key);
-    if (result?.length === 1) return result[0];
-    if (result.length > 1) throw new Error(`Duplicate key ${key} for Array<IExtensionItem>`);
-    return;
-}
-
 const getTestData = (importXmlFile: string = '../../data/pacs.002.outgoing.valid.accepted.xml'): ITestData => {
     let ctx: any;
     let xmlStr: string;
