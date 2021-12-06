@@ -120,7 +120,7 @@ describe('pacs008Handler', () => {
         const endToEndId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId
         const putTransfersBody = publishArgs.msg.data as ITransferFulfilment;
 
-        expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.PACS02RESPONSETOPACS008);
+        expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.POST_TRANSFERS_INBOUND);
         expect(putTransfersBody.transferState).toEqual(MojaloopTransferState.COMMITTED);
         expect(getExtensionKeyValue('MSGID',putTransfersBody?.extensionList)?.value).toEqual(msgId);
         expect(getExtensionKeyValue('INSTRID',putTransfersBody?.extensionList)?.value).toEqual(orgnlInstrId);
@@ -155,7 +155,7 @@ describe('pacs008Handler', () => {
         const endToEndId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId
         const putTransfersBody = publishArgs.msg.data as ITransferFulfilment;
 
-        expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.PACS02RESPONSETOPACS008);
+        expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.POST_TRANSFERS_INBOUND);
         expect(putTransfersBody.transferState).toEqual(MojaloopTransferState.ABORTED);
         expect(getExtensionKeyValue('MSGID',putTransfersBody?.extensionList)?.value).toEqual(msgId);
         expect(getExtensionKeyValue('INSTRID',putTransfersBody?.extensionList)?.value).toEqual(orgnlInstrId);
@@ -190,7 +190,7 @@ describe('pacs008Handler', () => {
         const endToEndId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId
         const putTransfersBody = publishArgs.msg.data as ITransferFulfilment;
 
-        expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.PACS02RESPONSETOPACS008);
+        expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.POST_TRANSFERS_INBOUND);
         expect(putTransfersBody.transferState).toEqual(MojaloopTransferState.ABORTED);
         expect(getExtensionKeyValue('MSGID',putTransfersBody?.extensionList)?.value).toEqual(msgId);
         expect(getExtensionKeyValue('INSTRID',putTransfersBody?.extensionList)?.value).toEqual(orgnlInstrId);

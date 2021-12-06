@@ -8,6 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import * as fs from 'fs';
+import Path from 'path';
 import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
 import { Config, IXMLOptions } from '../config';
@@ -39,7 +40,8 @@ const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown>
  * @returns {boolean | Array<Record<string, unknown>>}
  */
 const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, unknown>> => {
-    if(!fs.existsSync(xsdPath)) {
+    const path = Path.resolve(xsdPath);
+    if(!fs.existsSync(path)) {
         throw new Error(`XSD file not found: ${xsdPath}`);
     }
     if(!xml.length) {

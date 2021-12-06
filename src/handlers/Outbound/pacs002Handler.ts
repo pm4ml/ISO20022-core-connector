@@ -8,7 +8,10 @@
  *      Miguel de Barros - miguel.debarros@modusbox.com                   *
  **************************************************************************/
 
-import { XML, XSD } from '../../lib/xmlUtils';
+import {
+    XML,
+    XSD,
+} from '../../lib/xmlUtils';
 import {
     // IPacs002,
     // ITransferError,
@@ -64,7 +67,7 @@ export default async (ctx: ApiContext): Promise<void> => {
 
         // publish message to pub-sub cache
         const key = channelName({
-            type: ChannelTypeEnum.PACS02RESPONSETOPACS008,
+            type: ChannelTypeEnum.POST_TRANSFERS_INBOUND,
             id: pacsState.OrgnlEndToEndId!,
         });
 
@@ -77,7 +80,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         }).log('publish pacs002 request');
 
         const res = await ctx.state.cache.publish(key, {
-            type: ChannelTypeEnum.PACS02RESPONSETOPACS008,
+            type: ChannelTypeEnum.POST_TRANSFERS_INBOUND,
             data: transferPutBody,
             headers: ctx.request.headers,
         });

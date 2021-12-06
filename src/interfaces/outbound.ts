@@ -320,6 +320,7 @@ export interface IPacsState {
     OrgnlInstrId?: string,
     OrgnlEndToEndId?: string,
     OrgnlTxId?: string,
+    publishSubId?: string,
 }
 
 export interface IPacs008 extends Record<string, unknown> {

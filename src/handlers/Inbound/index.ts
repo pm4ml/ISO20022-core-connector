@@ -7,14 +7,21 @@
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
+import util from 'util';
 import {
+    IErrorInformation,
+    IPacs002,
     IPacs008,
     IPacsState,
     IPostQuoteRequestBody,
     IPostQuoteResponseBody,
     IPostTransferRequestBody,
+    ITransferFulfilment,
+    MojaloopTransferState,
+    // TransferStatus,
+    TxStsEnum,
     // IPacs002,
-} from '~/interfaces';
+} from '../../interfaces';
 import { ApiContext, ApiState } from '../../types';
 import {
     postTransferBodyToPacs008,
@@ -24,7 +31,6 @@ import {
 import { sendPACS008toReceiverBackend } from '../../requests/Inbound';
 import {
     XML,
-    // XML,
     XSD,
 } from '../../lib/xmlUtils';
 import { ChannelTypeEnum, registerCallbackHandler } from '../../lib/callbackHandler';
@@ -77,17 +83,21 @@ const postQuotes = async (ctx: ApiContext): Promise<void> => {
  *
  */
 
-const postTransfers = async (ctx: ApiContext): Promise<void> => {
-    // TODO: wrap this with a promise
-    // TODO: re-do loggers here!
-    ctx.state.logger.info(JSON.stringify({
-        postTransfers: {
-            request: ctx.request,
+// eslint-disable-next-line no-async-promise-executor
+const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(async (
+    resolve,
+    // reject,
+) => {
+    ctx.state.logger.push({
+        postTransfersRequest: {
+            header: ctx?.request?.header,
+            request: ctx?.request?.body,
         },
-    }, null, 4));
+    }).log('postTransfers request');
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
-    // ctx.state.logger.log(JSON.stringify(ctx.request.body));
 
+    // let res: any;
+    let pacsRes: IPacs002;
     let pacsState: IPacsState | undefined;
 
     try {
@@ -104,64 +114,149 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => {
         // define callbackHandler
         const callbackHandler = async (id: any, subId: any, msg: any, state: ApiState): Promise<any> => {
             state.logger.push({
-                id,
-                subId,
-                msg,
-                // state,
-            }).log('test');
-            return Promise.resolve('test');
-            // TODO: handle ctx.response and resolve promise!
-            // TODO: introduce the timeout portion from the registerCallbackHandler so we can reject it here!
+                callbackHandlerRequest: {
+                    id,
+                    subId,
+                    msg,
+                    // state,
+                },
+            }).log('callbackHandlerRequest processing');
+
+            const transferResponse = msg?.data as ITransferFulfilment | IErrorInformation;
+            if((transferResponse as ITransferFulfilment)?.transferState === MojaloopTransferState.COMMITTED) {
+                ctx.response.body = {
+                    homeTransactionId: pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId,
+                };
+            } else {
+                ctx.response.body = {
+                    statusCode: (transferResponse as IErrorInformation)?.errorCode || '500', // what goes here?
+                    // message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
+                    message: `Transfer request was not accepted with OrgnlEndToEndId: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}, status: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}`, // what goes here?
+                }; // TODO: confirm the error message
+                ctx.response.status = 500; // TODO: Confirm this error code
+            }
+
+            ctx.state.logger.push({
+                postTransfersResponse: {
+                    id: pacsState?.OrgnlEndToEndId,
+                    subId: pacsState?.publishSubId,
+                    header: ctx?.request?.header,
+                    response: ctx?.response?.body,
+                },
+            }).log('postTransfers response');
+
+            resolve();
         };
 
+        // set up a timeout for the request
+        // const timeoutHandler = () => {
+        //     const err = new Error(`Timeout requesting transfer ${pacsState!.OrgnlEndToEndId}`);
+        //     // we dont really care if the unsubscribe fails but we should log it regardless
+        //     ctx.state.cache.unsubscribe(pacsState!.OrgnlEndToEndId, subId).catch((e: Error) => {
+        //         // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
+        //         ctx.state.logger.push({
+        //             key: pacsState?.OrgnlEndToEndId,
+        //             subId,
+        //             e,
+        //         }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId} ${subId}: ${e.stack || util.inspect(e)}`);
+        //     });
+        //     return reject(err);
+        // };
+
         // setup handlers for callback
-        await registerCallbackHandler(
-            ChannelTypeEnum.PACS02RESPONSETOPACS008,
+        pacsState.publishSubId = await registerCallbackHandler(
+            ChannelTypeEnum.POST_TRANSFERS_INBOUND,
             pacsState.OrgnlEndToEndId,
             payload,
             ctx.state,
             callbackHandler,
+            // timeoutHandler,
         );
+
+        // set up a timeout for the request
+        const timeoutHandler = () => {
+            // we dont really care if the unsubscribe fails but we should log it regardless
+            ctx.state.cache.unsubscribe(pacsState!.OrgnlEndToEndId, pacsState?.publishSubId).catch((e: Error) => {
+                // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
+                ctx.state.logger.push({
+                    key: pacsState?.OrgnlEndToEndId,
+                    subId: pacsState?.publishSubId,
+                    e,
+                }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId}:${pacsState?.publishSubId}: ${e.stack || util.inspect(e)}`);
+            });
+            ctx.response.body = {
+                statusCode: '500', // what goes here?
+                // message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
+                message: `Transfer request timed-out with OrgnlEndToEndId: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}, status: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}`, // what goes here?
+            }; // TODO: confirm the error message
+            ctx.response.status = 500; // TODO: Confirm this error code
+            return resolve();
+        };
+        setTimeout(timeoutHandler, ctx.state.conf.callbackTimeout * 1000); // TODO: make this configurable. Default is 30s.
+
+        ctx.state.logger.push({
+            sendPACS008toReceiverBackendRequest: {
+                id: pacsState?.OrgnlEndToEndId,
+                subId: pacsState?.publishSubId,
+                request: postTransfersBodyPacs008,
+            },
+        }).log('sendPACS008toReceiverBackend request');
 
         // send a pacs008 POST /transfers request to RSwitch and get a synchronous pacs002 response
         const res = await sendPACS008toReceiverBackend(postTransfersBodyPacs008);
+
+        ctx.state.logger.push({
+            sendPACS008toReceiverBackendResponse: {
+                id: pacsState?.OrgnlEndToEndId,
+                subId: pacsState?.publishSubId,
+                header: res.headers,
+                response: res.data,
+            },
+        }).log('sendPACS008toReceiverBackend request');
+
         const validationResult = XSD.validate(res.data, XSD.paths.pacs_002);
         if(validationResult !== true) {
             XSD.handleValidationError(validationResult, ctx);
             return;
         }
 
-        // const xmlData = XML.fromXml(res.data);
+        pacsRes = XML.fromXml(res.data) as IPacs002;
         // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
 
+        if(pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts !== TxStsEnum.PNDG) { // handle error since the receiver did NOT accept the transfer request
+            // we dont really care if the unsubscribe fails but we should log it regardless
+            ctx.state.cache.unsubscribe(pacsState.OrgnlEndToEndId, pacsState.publishSubId).catch((e: Error) => {
+                // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
+                ctx.state.logger.push({
+                    key: pacsState?.OrgnlEndToEndId,
+                    subId: pacsState?.publishSubId,
+                    e,
+                }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId} ${pacsState?.publishSubId}: ${e.stack || util.inspect(e)}`);
+            });
 
-        if(res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts === 'PDNG') {
-            // const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
-            // ctx.response.body = transferPutBody; // TODO: how do we respond here?
             ctx.response.body = {
-                homeTransactionId: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.OrgnlPmtInfId, // TODO: what should this be?
-            };
-            ctx.response.status = 200;
-        } else {
-            // const transferErrorPutBody = PNDGWithFailedStatusToTransferError(xmlData as unknown as IPacs002);
-            ctx.response.body = {
-                statusCode: '200', // what goes here?
-                message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
+                statusCode: '500', // what goes here?
+                message: `Transfer request was not accepted with OrgnlEndToEndId: ${pacsState?.OrgnlEndToEndId}, status: ${res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}`, // what goes here?
             }; // TODO: confirm the error message
             ctx.response.status = 500; // TODO: Confirm this error code
+
+            ctx.state.logger.push({
+                postTransfersResponse: {
+                    id: pacsState?.OrgnlEndToEndId,
+                    subId: pacsState?.publishSubId,
+                    header: ctx?.request?.header,
+                    response: ctx?.response?.body,
+                },
+            }).log('postTransfers response');
+            // reject();
+            resolve();
         }
 
         ctx.response.type = 'application/json';
     } catch (err: unknown) {
         handleError(err as Error, ctx);
     }
-
-    ctx.state.logger.info(JSON.stringify({
-        postTransfers: {
-            response: ctx.response,
-        },
-    }, null, 4));
-};
+});
 
 export const InboundHandlers = {
     postQuotes,
