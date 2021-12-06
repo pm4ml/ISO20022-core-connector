@@ -15,6 +15,7 @@ import {
     // TransferStatus,
     // ITransfersByIdParams,
     IErrorInformation,
+    // IExtensionItem,
     IPacs002,
     IPacsState,
     // IPain002Response,
@@ -31,7 +32,6 @@ import {
 } from '../../transformers';
 import { ApiContext } from '../../types';
 import { channelName, ChannelTypeEnum } from '../../lib/callbackHandler';
-
 
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);

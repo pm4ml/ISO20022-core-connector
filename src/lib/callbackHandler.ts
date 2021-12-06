@@ -86,6 +86,6 @@ export const registerCallbackHandler = async (type: ChannelTypeEnum, id: any, da
             }).log(`Error unsubscribing (in timeout handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
         });
         return reject(err);
-    }, state.conf.callbacksTimeout * 1000); // TODO: make this configurable. Default is 30s.
+    }, state.conf.callbackTimeout * 1000); // TODO: make this configurable. Default is 30s.
     resolve(true);
 });

@@ -23,7 +23,7 @@ export interface IServiceConfig {
     xmlOptions: IXMLOptions,
     templatesPath: string
     cache: CacheConfig,
-    callbacksTimeout: number,
+    callbackTimeout: number,
 }
 
 export interface IXMLOptions {
@@ -72,9 +72,9 @@ export const Config: IServiceConfig = {
     templatesPath: env.get('TEMPLATES_PATH').default('templates').asString(),
     xmlOptions,
     cache: {
-        host: env.get('CACHE_HOST').required().asString(),
-        port: env.get('CACHE_PORT').required().asPortNumber(),
+        host: env.get('CACHE_HOST').default('localhost').asString(),
+        port: env.get('CACHE_PORT').default(6379).asPortNumber(),
         enabledTestFeatures: env.get('CACHE_ENABLED_TEST_FEATURES').asBool() || false,
     },
-    callbacksTimeout: env.get('CACHE_PORT').default(30).asPortNumber(),
+    callbackTimeout: env.get('CALLBACK_TIMEOUT').default(30).asPortNumber(),
 };

@@ -28,18 +28,27 @@ export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
     const body = ctx.request.body as INamespacedXMLDoc;
     const namespace = body.Document.attr.xmlns;
     const handler = xmlnToHandlerMap[namespace];
-    ctx.state.logger = ctx.state.logger.push({
-        namespace,
-    });
+
     ctx.state.logger.log({
-        request: ctx.request,
+        outboundHandlerRequest: {
+            namespace,
+            header: ctx.request.header,
+            request: body,
+        },
     });
+
     try {
         await handler(ctx);
     } catch (error) {
         handleError(error as Error, ctx);
     }
+
     ctx.state.logger.log({
-        response: ctx.response,
+        outboundHandlerResponse: {
+            namespace,
+            header: ctx.response.header,
+            response: ctx.response.body,
+            status: ctx.response.status,
+        },
     });
 };

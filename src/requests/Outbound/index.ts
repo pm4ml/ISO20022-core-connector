@@ -23,6 +23,7 @@ const request = axios.create({
     timeout: Config.requestTimeout,
 });
 
+export const buildHeaders = buildJSONHeaders;
 export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildJSONHeaders() });
 export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildJSONHeaders() });
 export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildJSONHeaders() });

@@ -19,7 +19,10 @@ const mockedAxios = mocked(axios, true);
 const mockedAxiosInstance = { get: jest.fn() }
 mockedAxios.create.mockReturnValueOnce(mockedAxiosInstance as any)
 
-import  { getParties, buildHeaders } from '../../../../requests/Outbound';
+import  {
+    getParties,
+    buildHeaders,
+} from '../../../../requests/Outbound';
 
 describe('Outbound requests', () => {
     describe('getParties', () => {

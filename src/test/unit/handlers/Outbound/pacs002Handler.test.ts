@@ -34,6 +34,14 @@ const XmlFileMap = {
     },
 };
 
+const getExtensionKeyValue = (key: string, extensionList?: Array<IExtensionItem>): IExtensionItem | undefined => {
+    if (extensionList === undefined) return;
+    const result = extensionList.filter( extensionItem => extensionItem.key === key);
+    if (result?.length === 1) return result[0];
+    if (result.length > 1) throw new Error(`Duplicate key ${key} for Array<IExtensionItem>`);
+    return;
+}
+
 interface ITestData {
     ctx: any,
     xmlStr: string,
