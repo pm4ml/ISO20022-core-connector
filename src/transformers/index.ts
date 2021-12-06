@@ -348,7 +348,7 @@ export const postTransferBodyToPacs008 = (
         Document: {
             attr: {
                 'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09',
+                xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08',
             },
             FIToFICstmrCdtTrf: {
                 GrpHdr: {

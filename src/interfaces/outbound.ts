@@ -320,13 +320,16 @@ export interface IPacsState {
     OrgnlInstrId?: string,
     OrgnlEndToEndId?: string,
     OrgnlTxId?: string,
-    publishSubId?: string,
+    subscribeMeta?: {
+        key?: string,
+        subId?: string,
+    },
 }
 
 export interface IPacs008 extends Record<string, unknown> {
     Document: {
         attr: {
-            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09',
+            xmlns: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08',
             'xmlns:xsi'?: 'http://www.w3.org/2001/XMLSchema-instance'
         },
         FIToFICstmrCdtTrf: {

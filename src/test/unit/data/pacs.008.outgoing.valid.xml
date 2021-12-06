@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- POST /transfers -->
-<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09">
+<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
     <FIToFICstmrCdtTrf>
         <GrpHdr>
             <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>     <!-- This is The transaction ID -->

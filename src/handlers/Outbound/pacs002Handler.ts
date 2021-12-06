@@ -9,7 +9,7 @@
  **************************************************************************/
 
 import {
-    XML,
+    // XML,
     XSD,
 } from '../../lib/xmlUtils';
 import {
@@ -52,9 +52,8 @@ export default async (ctx: ApiContext): Promise<void> => {
             return;
         }
 
-        const xmlData = XML.fromXml(ctx.request.rawBody);
         // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
-        const pacs002RequestBody: IPacs002 = xmlData as unknown as IPacs002;
+        const pacs002RequestBody: IPacs002 = ctx.request.body as unknown as IPacs002;
 
         // map to
         const pacsState: IPacsState | undefined = {};
@@ -63,7 +62,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         pacsState.OrgnlEndToEndId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId;
         pacsState.OrgnlTxId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId;
 
-        const transferPutBody = pacs002ToPutTransfersBody(xmlData as unknown as IPacs002);
+        const transferPutBody = pacs002ToPutTransfersBody(pacs002RequestBody as unknown as IPacs002);
 
         // publish message to pub-sub cache
         const key = channelName({

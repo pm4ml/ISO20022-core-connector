@@ -139,7 +139,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             ctx.state.logger.push({
                 postTransfersResponse: {
                     id: pacsState?.OrgnlEndToEndId,
-                    subId: pacsState?.publishSubId,
+                    subscribeMeta: pacsState?.subscribeMeta,
                     header: ctx?.request?.header,
                     response: ctx?.response?.body,
                 },
@@ -149,55 +149,40 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
         };
 
         // set up a timeout for the request
-        // const timeoutHandler = () => {
-        //     const err = new Error(`Timeout requesting transfer ${pacsState!.OrgnlEndToEndId}`);
-        //     // we dont really care if the unsubscribe fails but we should log it regardless
-        //     ctx.state.cache.unsubscribe(pacsState!.OrgnlEndToEndId, subId).catch((e: Error) => {
-        //         // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
-        //         ctx.state.logger.push({
-        //             key: pacsState?.OrgnlEndToEndId,
-        //             subId,
-        //             e,
-        //         }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId} ${subId}: ${e.stack || util.inspect(e)}`);
-        //     });
-        //     return reject(err);
-        // };
+        const timeoutHandler = () => {
+            ctx.response.body = {
+                statusCode: '500', // what goes here?
+                // message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
+                message: `Transfer request timed-out with OrgnlEndToEndId: ${pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId}, status: ${pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts}`, // what goes here?
+            }; // TODO: confirm the error message
+            ctx.response.status = 500; // TODO: Confirm this error code
+
+            ctx.state.logger.push({
+                postTransfersResponse: {
+                    id: pacsState?.OrgnlEndToEndId,
+                    subscribeMeta: pacsState?.subscribeMeta,
+                    header: ctx?.request?.header,
+                    response: ctx?.response?.body,
+                },
+            }).log('postTransfers response');
+
+            return resolve();
+        };
 
         // setup handlers for callback
-        pacsState.publishSubId = await registerCallbackHandler(
+        pacsState.subscribeMeta = await registerCallbackHandler(
             ChannelTypeEnum.POST_TRANSFERS_INBOUND,
             pacsState.OrgnlEndToEndId,
             payload,
             ctx.state,
-            callbackHandler,
-            // timeoutHandler,
+            callbackHandler.bind(this),
+            timeoutHandler.bind(this),
         );
-
-        // set up a timeout for the request
-        const timeoutHandler = () => {
-            // we dont really care if the unsubscribe fails but we should log it regardless
-            ctx.state.cache.unsubscribe(pacsState!.OrgnlEndToEndId, pacsState?.publishSubId).catch((e: Error) => {
-                // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
-                ctx.state.logger.push({
-                    key: pacsState?.OrgnlEndToEndId,
-                    subId: pacsState?.publishSubId,
-                    e,
-                }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId}:${pacsState?.publishSubId}: ${e.stack || util.inspect(e)}`);
-            });
-            ctx.response.body = {
-                statusCode: '500', // what goes here?
-                // message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
-                message: `Transfer request timed-out with OrgnlEndToEndId: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}, status: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}`, // what goes here?
-            }; // TODO: confirm the error message
-            ctx.response.status = 500; // TODO: Confirm this error code
-            return resolve();
-        };
-        setTimeout(timeoutHandler, ctx.state.conf.callbackTimeout * 1000); // TODO: make this configurable. Default is 30s.
 
         ctx.state.logger.push({
             sendPACS008toReceiverBackendRequest: {
                 id: pacsState?.OrgnlEndToEndId,
-                subId: pacsState?.publishSubId,
+                subscribeMeta: pacsState?.subscribeMeta,
                 request: postTransfersBodyPacs008,
             },
         }).log('sendPACS008toReceiverBackend request');
@@ -208,7 +193,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
         ctx.state.logger.push({
             sendPACS008toReceiverBackendResponse: {
                 id: pacsState?.OrgnlEndToEndId,
-                subId: pacsState?.publishSubId,
+                subscribeMeta: pacsState?.subscribeMeta,
                 header: res.headers,
                 response: res.data,
             },
@@ -225,13 +210,13 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
 
         if(pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts !== TxStsEnum.PNDG) { // handle error since the receiver did NOT accept the transfer request
             // we dont really care if the unsubscribe fails but we should log it regardless
-            ctx.state.cache.unsubscribe(pacsState.OrgnlEndToEndId, pacsState.publishSubId).catch((e: Error) => {
+            ctx.state.cache.unsubscribe(pacsState.OrgnlEndToEndId, pacsState.subscribeMeta?.subId).catch((e: Error) => {
                 // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
                 ctx.state.logger.push({
                     key: pacsState?.OrgnlEndToEndId,
-                    subId: pacsState?.publishSubId,
+                    subscribeMeta: pacsState?.subscribeMeta,
                     e,
-                }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId} ${pacsState?.publishSubId}: ${e.stack || util.inspect(e)}`);
+                }).log(`Error unsubscribing (in timeout handler) ${pacsState?.OrgnlEndToEndId} ${pacsState?.subscribeMeta?.subId}: ${e.stack || util.inspect(e)}`);
             });
 
             ctx.response.body = {
@@ -243,7 +228,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             ctx.state.logger.push({
                 postTransfersResponse: {
                     id: pacsState?.OrgnlEndToEndId,
-                    subId: pacsState?.publishSubId,
+                    subscribeMeta: pacsState?.subscribeMeta,
                     header: ctx?.request?.header,
                     response: ctx?.response?.body,
                 },

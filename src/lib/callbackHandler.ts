@@ -31,7 +31,7 @@ export const registerCallbackHandler = async (
     data: any,
     state: ApiState,
     handler: (id: any, subId: any, msg: any, state: ApiState) => Promise<any>,
-    // timeoutHandler: ()=> void,
+    timeoutHandler: ()=> void,
 // eslint-disable-next-line no-async-promise-executor
 ): Promise<any | Error> => new Promise(async (
     resolve,
@@ -68,33 +68,42 @@ export const registerCallbackHandler = async (
                 subId,
                 result,
             }).log('subscribe::success');
-        } catch (err: unknown) {
-            state.cache.unsubscribe(key, subId).catch((e: Error) => {
-                state.logger.push({
-                    key,
-                    cn,
-                    subId,
-                    e,
-                }).log(`Error unsubscribing (in subscribe error handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
-            });
+        } catch (error: any) {
+            state.logger.push({
+                key,
+                cn,
+                subId,
+                error,
+            }).log(`Error unsubscribing (in subscribe error handler) ${key} ${subId}: ${error.stack || util.inspect(error)}`);
         }
+        // lets clean-up after we have done our work
+        state.cache.unsubscribe(key, subId).catch((e: Error) => {
+            state.logger.push({
+                key,
+                cn,
+                subId,
+                e,
+            }).log(`Error unsubscribing (in subscribe error handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
+        });
     });
 
     // set up a timeout for the request
     // setTimeout(timeoutHandler, state.conf.callbackTimeout * 1000); // TODO: make this configurable. Default is 30s.
-    // setTimeout(() => {
-    //     const err = new Error(`Timeout requesting transfer ${key}`);
-
-    //     // we dont really care if the unsubscribe fails but we should log it regardless
-    //     state.cache.unsubscribe(key, subId).catch((e: Error) => {
-    //         // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);
-    //         state.logger.push({
-    //             key,
-    //             subId,
-    //             e,
-    //         }).log(`Error unsubscribing (in timeout handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
-    //     });
-    //     return reject(err);
-    // }, state.conf.callbackTimeout * 1000); // TODO: make this configurable. Default is 30s.
-    resolve(subId);
+    setTimeout(() => {
+        // we dont really care if the unsubscribe fails but we should log it regardless
+        state.cache.unsubscribe(key, subId).catch((e: Error) => {
+            state.logger.push({
+                timeoutCallbackHandler: {
+                    key,
+                    subId,
+                    e,
+                },
+            }).log(`Error unsubscribing (in timeout handler) ${key} ${subId}: ${e.stack || util.inspect(e)}`);
+        });
+        timeoutHandler();
+    }, state.conf.callbackTimeout * 1000);
+    resolve({
+        key,
+        subId,
+    });
 });
