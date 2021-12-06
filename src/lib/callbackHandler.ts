@@ -46,7 +46,7 @@ export const registerCallbackHandler = async (
     state.logger.push({
         key,
         data,
-        state,
+        // state,
     }).log('resolveTransfer');
 
     // hook up a subscriber to handle response messages

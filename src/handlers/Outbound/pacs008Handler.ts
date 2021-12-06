@@ -78,6 +78,8 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
 
         ctx.state.logger.push({
             requestQuotesRes: {
+                baseURL: res?.config?.baseURL,
+                url: res?.config?.url,
                 pacsState,
                 response: res.data,
             },
@@ -105,6 +107,8 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
 
         ctx.state.logger.push({
             acceptQuotesRes: {
+                baseURL: res?.config?.baseURL,
+                url: res?.config?.url,
                 pacsState,
                 transferId: res?.data?.transferId,
                 response: res.data,
@@ -131,6 +135,8 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
 
         ctx.state.logger.push({
             sendPACS002toSenderBackendRes: {
+                baseURL: res?.config?.baseURL,
+                url: res?.config?.url,
                 pacsState,
                 response: res.data,
             },
@@ -154,6 +160,8 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
 
         ctx.state.logger.push({
             sendPACS002toSenderBackendErrorRes: {
+                baseURL: res?.config?.baseURL,
+                url: res?.config?.url,
                 pacsState,
                 response: res.data,
             },

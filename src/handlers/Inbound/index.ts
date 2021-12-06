@@ -194,6 +194,8 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             sendPACS008toReceiverBackendResponse: {
                 id: pacsState?.OrgnlEndToEndId,
                 subscribeMeta: pacsState?.subscribeMeta,
+                baseURL: res?.config?.baseURL,
+                url: res?.config?.url,
                 header: res.headers,
                 response: res.data,
             },
