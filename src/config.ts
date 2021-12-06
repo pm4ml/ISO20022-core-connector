@@ -76,5 +76,5 @@ export const Config: IServiceConfig = {
         port: env.get('CACHE_PORT').default(6379).asPortNumber(),
         enabledTestFeatures: env.get('CACHE_ENABLED_TEST_FEATURES').asBool() || false,
     },
-    callbackTimeout: env.get('CALLBACK_TIMEOUT').default(30).asPortNumber(),
+    callbackTimeout: env.get('CALLBACK_TIMEOUT').default(30).asInt(),
 };
