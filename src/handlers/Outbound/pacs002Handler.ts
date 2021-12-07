@@ -27,12 +27,12 @@ import {
 //     acceptBackendTransfers,
 //     // sendTransfersError,
 // } from '../../requests/Inbound';
-import {
-    // pacs008ToPostQuotesBody,
-    // transferErrorResponseToPacs002,
-    pacs002ToPutTransfersBody,
-    // PNDGWithFailedStatusToTransferError,
-} from '../../transformers';
+// import {
+//     // pacs008ToPostQuotesBody,
+//     // transferErrorResponseToPacs002,
+//     pacs002ToPutTransfersBody,
+//     // PNDGWithFailedStatusToTransferError,
+// } from '../../transformers';
 import { ApiContext } from '../../types';
 import { channelName, ChannelTypeEnum } from '../../lib/callbackHandler';
 
@@ -62,7 +62,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         pacsState.OrgnlEndToEndId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId;
         pacsState.OrgnlTxId = (pacs002RequestBody as IPacs002)?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId;
 
-        const transferPutBody = pacs002ToPutTransfersBody(pacs002RequestBody as unknown as IPacs002);
+        // const transferPutBody = pacs002ToPutTransfersBody(pacs002RequestBody as unknown as IPacs002);
 
         // publish message to pub-sub cache
         const key = channelName({
@@ -74,13 +74,13 @@ export default async (ctx: ApiContext): Promise<void> => {
             publishRequest: {
                 pacsState,
                 channelName: key,
-                request: transferPutBody,
+                request: pacs002RequestBody,
             },
         }).log('publish pacs002 request');
 
         const res = await ctx.state.cache.publish(key, {
             type: ChannelTypeEnum.POST_TRANSFERS_INBOUND,
-            data: transferPutBody,
+            data: pacs002RequestBody,
             headers: ctx.request.headers,
         });
 

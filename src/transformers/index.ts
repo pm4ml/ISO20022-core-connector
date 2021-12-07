@@ -568,7 +568,7 @@ export const pacsStateToPacs002Error = (
  * @param {any} PNDGWithFailedStatus
  * @returns {IErrorInformation}
  */
-export const PNDGWithFailedStatusToTransferError = ( // TODO: define expected pndgResponse interface and mapping
+export const PNDGWithFailedStatusToTransferError = ( // TODO: define expected pndgResponse interface and mapping. NOT USED, SHOULD BE REMOVED!
     // pndgResponse: any,
 ): IErrorResponse => {
     const errorResponse: IErrorResponse = {

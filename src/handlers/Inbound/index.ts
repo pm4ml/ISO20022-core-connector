@@ -8,6 +8,7 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 import util from 'util';
+import { Errors } from '@mojaloop/sdk-standard-components';
 import {
     IErrorInformation,
     IPacs002,
@@ -24,6 +25,7 @@ import {
 } from '../../interfaces';
 import { ApiContext, ApiState } from '../../types';
 import {
+    pacs002ToPutTransfersBody,
     postTransferBodyToPacs008,
     // pacs002ToPutTransfersBody,
     // PNDGWithFailedStatusToTransferError,
@@ -122,18 +124,18 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
                 },
             }).log('callbackHandlerRequest processing');
 
-            const transferResponse = msg?.data as ITransferFulfilment | IErrorInformation;
+            const pacs002Msg = msg?.data as unknown as IPacs002;
+            const transferResponse = pacs002ToPutTransfersBody(pacs002Msg as unknown as IPacs002) as ITransferFulfilment | IErrorInformation;
             if((transferResponse as ITransferFulfilment)?.transferState === MojaloopTransferState.COMMITTED) {
                 ctx.response.body = {
-                    homeTransactionId: pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId,
+                    homeTransactionId: pacs002Msg?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId,
                 };
             } else {
                 ctx.response.body = {
-                    statusCode: (transferResponse as IErrorInformation)?.errorCode || '500', // what goes here?
-                    // message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
-                    message: `Transfer request was not accepted with OrgnlEndToEndId: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}, status: ${pacsRes?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}`, // what goes here?
-                }; // TODO: confirm the error message
-                ctx.response.status = 500; // TODO: Confirm this error code
+                    statusCode: (transferResponse as IErrorInformation)?.errorCode || Errors.MojaloopApiErrorCodes.PAYEE_FSP_REJECTED_TXN.code, // what goes here?
+                    message: `Transfer request was not accepted with OrgnlEndToEndId: ${pacs002Msg?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId}, status: ${pacs002Msg?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts}`, // what goes here?
+                };
+                ctx.response.status = 500;
             }
 
             ctx.state.logger.push({
@@ -151,7 +153,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
         // set up a timeout for the request
         const timeoutHandler = () => {
             ctx.response.body = {
-                statusCode: '500', // what goes here?
+                statusCode: Errors.MojaloopApiErrorCodes.SERVER_TIMED_OUT.code, // what goes here?
                 // message: res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts, // what goes here?
                 message: `Transfer request timed-out with OrgnlEndToEndId: ${pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId}, status: ${pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts}`, // what goes here?
             }; // TODO: confirm the error message
@@ -222,7 +224,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             });
 
             ctx.response.body = {
-                statusCode: '500', // what goes here?
+                statusCode: Errors.MojaloopApiErrorCodes.PAYEE_FSP_REJECTED_TXN.code, // what goes here?
                 message: `Transfer request was not accepted with OrgnlEndToEndId: ${pacsState?.OrgnlEndToEndId}, status: ${res?.data?.Document?.CstmrPmtStsRpt?.OrgnlPmtInfAndSts?.TxInfAndSts?.TxSts}`, // what goes here?
             }; // TODO: confirm the error message
             ctx.response.status = 500; // TODO: Confirm this error code
