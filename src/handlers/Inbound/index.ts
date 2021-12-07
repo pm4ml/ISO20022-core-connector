@@ -17,18 +17,15 @@ import {
     IPostQuoteRequestBody,
     IPostQuoteResponseBody,
     IPostTransferRequestBody,
+    IPostTransferResponseBody,
     ITransferFulfilment,
     MojaloopTransferState,
-    // TransferStatus,
     TxStsEnum,
-    // IPacs002,
 } from '../../interfaces';
 import { ApiContext, ApiState } from '../../types';
 import {
     pacs002ToPutTransfersBody,
     postTransferBodyToPacs008,
-    // pacs002ToPutTransfersBody,
-    // PNDGWithFailedStatusToTransferError,
 } from '../../transformers';
 import { sendPACS008toReceiverBackend } from '../../requests/Inbound';
 import {
@@ -129,12 +126,12 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             if((transferResponse as ITransferFulfilment)?.transferState === MojaloopTransferState.COMMITTED) {
                 ctx.response.body = {
                     homeTransactionId: pacs002Msg?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId,
-                };
+                } as IPostTransferResponseBody;
             } else {
                 ctx.response.body = {
                     statusCode: (transferResponse as IErrorInformation)?.errorCode || Errors.MojaloopApiErrorCodes.PAYEE_FSP_REJECTED_TXN.code, // what goes here?
                     message: `Transfer request was not accepted with OrgnlEndToEndId: ${pacs002Msg?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId}, status: ${pacs002Msg?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts}`, // what goes here?
-                };
+                } as IPostTransferResponseBody;
                 ctx.response.status = 500;
             }
 
@@ -203,16 +200,23 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             },
         }).log('sendPACS008toReceiverBackend request');
 
+        let tempPacsRes = XML.fromXml(res.data) as any;
+        if((tempPacsRes as any)?.BusinessMessage?.Document) { // lets strip the BusinessMessage
+            tempPacsRes = {
+                Document: (tempPacsRes as any)?.BusinessMessage?.Document,
+            };
+            res.data = XML.fromJsObject(tempPacsRes as Record<string, unknown>);
+        }
+
         const validationResult = XSD.validate(res.data, XSD.paths.pacs_002);
         if(validationResult !== true) {
             XSD.handleValidationError(validationResult, ctx);
             return;
         }
 
-        pacsRes = XML.fromXml(res.data) as IPacs002;
+        pacsRes = tempPacsRes as IPacs002;
         // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
-
-        if(pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts !== TxStsEnum.PNDG) { // handle error since the receiver did NOT accept the transfer request
+        if(pacsRes?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts !== TxStsEnum.PDNG) { // handle error since the receiver did NOT accept the transfer request
             // we dont really care if the unsubscribe fails but we should log it regardless
             ctx.state.cache.unsubscribe(pacsState.OrgnlEndToEndId, pacsState.subscribeMeta?.subId).catch((e: Error) => {
                 // state.logger.log(`Error unsubscribing (in timeout handler) ${transferKey} ${subId}: ${e.stack || util.inspect(e)}`);

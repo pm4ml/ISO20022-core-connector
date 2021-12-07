@@ -563,13 +563,13 @@ export const pacsStateToPacs002Error = (
 };
 
 /**
- * Constructs ErrorInformation from ISO 20022 PNDG Failed Status format.
+ * Constructs ErrorInformation from ISO 20022 PDNG Failed Status format.
  *
- * @param {any} PNDGWithFailedStatus
+ * @param {any} PDNGWithFailedStatus
  * @returns {IErrorInformation}
  */
-export const PNDGWithFailedStatusToTransferError = ( // TODO: define expected pndgResponse interface and mapping. NOT USED, SHOULD BE REMOVED!
-    // pndgResponse: any,
+export const PDNGWithFailedStatusToTransferError = ( // TODO: define expected PDNGResponse interface and mapping. NOT USED, SHOULD BE REMOVED!
+    // PDNGResponse: any,
 ): IErrorResponse => {
     const errorResponse: IErrorResponse = {
         statusCode: '222',

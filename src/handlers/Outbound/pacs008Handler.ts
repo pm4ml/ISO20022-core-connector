@@ -9,19 +9,11 @@
  **************************************************************************/
 
 import {
-    // XML,
     XSD,
 } from '../../lib/xmlUtils';
 import {
-    // AmountType,
     IPacs008,
     IPacsState,
-    // IPostQuotesBody,
-    // ITransferError,
-    // ITransferState,
-    // PartyIdType,
-    // PayerType,
-    // TransactionType,
     TransferStatus,
 } from '../../interfaces';
 import {
@@ -32,7 +24,6 @@ import {
     pacs008ToPostQuotesBody,
     pacsStateToPacs002Error,
     transferResponseToPacs002,
-    // transferErrorResponseToPacs002,
 } from '../../transformers';
 import { ApiContext } from '../../types';
 import { sendPACS002toSenderBackend } from '../../requests/Inbound';

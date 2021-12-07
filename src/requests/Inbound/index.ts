@@ -19,7 +19,7 @@ const request = axios.create({
 });
 
 // Send request to external ISO switch (e.g. RSWITCH)
-export const sendPACS008toReceiverBackend = (postTransfersBody: string): Promise<AxiosResponse<any>> => request.post('/transfers', postTransfersBody, { headers: buildXMLHeaders() });
-export const sendPACS002toSenderBackend = (xmlBody: string): Promise<AxiosResponse<any>> => request.post('/transfers', xmlBody, { headers: buildXMLHeaders() });
+export const sendPACS008toReceiverBackend = (postTransfersBody: string): Promise<AxiosResponse<any>> => request.post('', postTransfersBody, { headers: buildXMLHeaders() });
+export const sendPACS002toSenderBackend = (xmlBody: string): Promise<AxiosResponse<any>> => request.post('', xmlBody, { headers: buildXMLHeaders() });
 export const acceptBackendTransfers = (transferId: string, putTransfersBody: ITransferFulfilment): Promise<AxiosResponse<any>> => request.post(`/transfers/${transferId}`, putTransfersBody, { headers: buildJSONHeaders() });
 export const sendTransfersError = (transferId: string, putTransfersErrorBody: IErrorInformation): Promise<AxiosResponse<any>> => request.post(`/transfers/${transferId}/error`, putTransfersErrorBody, { headers: buildJSONHeaders() });

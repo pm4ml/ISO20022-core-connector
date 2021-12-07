@@ -47,6 +47,17 @@ export interface IPostTransferRequestBody {
     extensionList?: Array<IExtensionItem>
 }
 
+export interface IPostTransferSuccessResponseBody {
+    homeTransactionId: string
+}
+
+export interface IPostTransferErrorResponseBody {
+    statusCode: string,
+    message: string,
+}
+
+export type IPostTransferResponseBody = IPostTransferSuccessResponseBody | IPostTransferErrorResponseBody;
+
 export interface ITransfersByIdParams {
     idValue: string
 }

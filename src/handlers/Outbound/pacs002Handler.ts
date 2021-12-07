@@ -9,30 +9,13 @@
  **************************************************************************/
 
 import {
-    // XML,
     XSD,
 } from '../../lib/xmlUtils';
 import {
-    // IPacs002,
-    // ITransferError,
-    // TransferStatus,
-    // ITransfersByIdParams,
     IErrorInformation,
-    // IExtensionItem,
     IPacs002,
     IPacsState,
-    // IPain002Response,
 } from '../../interfaces';
-// import {
-//     acceptBackendTransfers,
-//     // sendTransfersError,
-// } from '../../requests/Inbound';
-// import {
-//     // pacs008ToPostQuotesBody,
-//     // transferErrorResponseToPacs002,
-//     pacs002ToPutTransfersBody,
-//     // PNDGWithFailedStatusToTransferError,
-// } from '../../transformers';
 import { ApiContext } from '../../types';
 import { channelName, ChannelTypeEnum } from '../../lib/callbackHandler';
 
@@ -49,6 +32,7 @@ export default async (ctx: ApiContext): Promise<void> => {
 
         if(validationResult !== true) {
             XSD.handleValidationError(validationResult, ctx);
+            // TODO: should we publish an ITransferError?
             return;
         }
 
