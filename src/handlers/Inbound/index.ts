@@ -27,7 +27,7 @@ import {
     pacs002ToPutTransfersBody,
     postTransferBodyToPacs008,
 } from '../../transformers';
-import { sendPACS008toReceiverBackend } from '../../requests/Inbound';
+import { InboundRequester, RequesterOptions } from '../../requests';
 import {
     XML,
     XSD,
@@ -94,6 +94,13 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
         },
     }).log('postTransfers request');
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
+
+    const inboundRequesterOps: RequesterOptions = {
+        baseURL: ctx.state.conf.backendEndpoint,
+        timeout: ctx.state.conf.requestTimeout,
+        logger: ctx.state.logger,
+    };
+    const inboundRequester = new InboundRequester(inboundRequesterOps);
 
     // let res: any;
     let pacsRes: IPacs002;
@@ -187,7 +194,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
         }).log('sendPACS008toReceiverBackend request');
 
         // send a pacs008 POST /transfers request to RSwitch and get a synchronous pacs002 response
-        const res = await sendPACS008toReceiverBackend(postTransfersBodyPacs008);
+        const res = await inboundRequester.sendPACS008toReceiverBackend(postTransfersBodyPacs008);
 
         ctx.state.logger.push({
             sendPACS008toReceiverBackendResponse: {

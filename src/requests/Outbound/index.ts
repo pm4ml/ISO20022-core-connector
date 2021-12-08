@@ -6,24 +6,22 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *       Miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
-import axios, { AxiosResponse } from 'axios';
-import { Config } from '../../config';
+import { AxiosResponse } from 'axios';
 import {
     IPartiesByIdParams,
     IPostQuotesBody,
     ITransferContinuationQuote,
-    // ITransferFulfilment,
 } from '../../interfaces';
 import { buildJSONHeaders } from '../headers';
+import { BaseRequester } from '../baseRequester';
 
-const request = axios.create({
-    baseURL: Config.outboundEndpoint,
-    timeout: Config.requestTimeout,
-});
+export default class Requester extends BaseRequester {
+    getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => this.axiosInstance.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildJSONHeaders() });
 
-export const buildHeaders = buildJSONHeaders;
-export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildJSONHeaders() });
-export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildJSONHeaders() });
-export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildJSONHeaders() });
+    requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => this.axiosInstance.post('/transfers', postQuotesBody, { headers: buildJSONHeaders() });
+
+    acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => this.axiosInstance.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildJSONHeaders() });
+}

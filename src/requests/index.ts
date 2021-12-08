@@ -6,6 +6,7 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *       Miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import * as util from 'util';
@@ -30,3 +31,7 @@ export class HTTPResponseError extends Error {
         return JSON.stringify(this.params);
     }
 }
+
+export * from './baseRequester';
+export { default as OutboundRequester } from './Outbound';
+export { default as InboundRequester } from './Inbound';

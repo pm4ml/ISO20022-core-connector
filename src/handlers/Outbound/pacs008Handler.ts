@@ -17,18 +17,19 @@ import {
     TransferStatus,
 } from '../../interfaces';
 import {
-    acceptQuotes,
-    requestQuotes,
-} from '../../requests/Outbound';
+    RequesterOptions,
+    OutboundRequester,
+    InboundRequester,
+} from '../../requests';
 import {
     pacs008ToPostQuotesBody,
     pacsStateToPacs002Error,
     transferResponseToPacs002,
 } from '../../transformers';
 import { ApiContext } from '../../types';
-import { sendPACS002toSenderBackend } from '../../requests/Inbound';
+import { SystemError } from '../../errors';
 
-
+// TODO: uncomment this once we have a IPacs002Error definition
 // const handleError = (error: any | Error | ITransferError, ctx: ApiContext) => {
 //     ctx.state.logger.error(error);
 //     if((error as ITransferError).transferState) {
@@ -48,6 +49,21 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
 
     let pacsState: IPacsState | undefined;
 
+    const inboundRequesterOps: RequesterOptions = {
+        baseURL: ctx.state.conf.backendEndpoint,
+        timeout: ctx.state.conf.requestTimeout,
+        logger: ctx.state.logger,
+    };
+    const inboundRequester = new InboundRequester(inboundRequesterOps);
+
+    const outboundRequesterOps: RequesterOptions = {
+        baseURL: ctx.state.conf.outboundEndpoint,
+        timeout: ctx.state.conf.requestTimeout,
+        logger: ctx.state.logger,
+    };
+
+    const outboundRequester = new OutboundRequester(outboundRequesterOps);
+
     try {
         const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
 
@@ -65,7 +81,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
             },
         }).log('requestQuotes request');
 
-        res = await requestQuotes(postQuotesBody);
+        res = await outboundRequester.requestQuotes(postQuotesBody);
 
         ctx.state.logger.push({
             requestQuotesRes: {
@@ -79,7 +95,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         if(res.data.transferState
             && (res.data.transferState.currentState === TransferStatus.ERROR_OCCURRED
                 || res.data.transferState.currentState !== TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE)) {
-            throw new Error(`requestQuotes response transferState.currentState=${res.data?.transferState?.currentState} is invalid`);
+            throw new SystemError({ msg: `requestQuotes response transferState.currentState=${res.data?.transferState?.currentState} is invalid` });
         }
 
         // convert POST /transfers response to PUT /tranfers/{transferId} (quote acceptance) request
@@ -94,7 +110,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
             },
         }).log('acceptQuotes request');
 
-        res = await acceptQuotes(res.data.transferId as string, acceptQuoteRequest);
+        res = await outboundRequester.acceptQuotes(res.data.transferId as string, acceptQuoteRequest);
 
         ctx.state.logger.push({
             acceptQuotesRes: {
@@ -109,7 +125,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
         if(res.data.transferState
             && (res.data.transferState.currentState === TransferStatus.ERROR_OCCURRED
                 || res.data.transferState.currentState !== TransferStatus.COMPLETED)) {
-            throw new Error(`acceptQuotes response transferState.currentState=${res.data?.transferState?.currentState} is invalid`);
+            throw new SystemError({ msg: `acceptQuotes response transferState.currentState=${res.data?.transferState?.currentState} is invalid` });
         }
 
         // Transform ML Connector response into ISO 2022
@@ -122,7 +138,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
             },
         }).log('sendPACS002toSenderBackend request');
         // Send ISO 2022 callback response message to Sender
-        res = await sendPACS002toSenderBackend(request);
+        res = await inboundRequester.sendPACS002toSenderBackend(request);
 
         ctx.state.logger.push({
             sendPACS002toSenderBackendRes: {
@@ -147,7 +163,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
             },
         }).log('sendPACS002toSenderBackend request');
 
-        res = await sendPACS002toSenderBackend(requestError);
+        res = await inboundRequester.sendPACS002toSenderBackend(requestError);
 
         ctx.state.logger.push({
             sendPACS002toSenderBackendErrorRes: {

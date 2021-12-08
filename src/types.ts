@@ -30,5 +30,8 @@ export interface HandlerMap {
 }
 
 export interface OutboundHandlerMap {
-    [key: string]: (ctx: ApiContext, next?: Koa.Next) => void
+    [key: string]: {
+        callback: (ctx: ApiContext, next?: Koa.Next) => void
+        xsd: string,
+    }
 }

@@ -9,33 +9,30 @@
  **************************************************************************/
 
 import {
-    XSD,
-} from '../../lib/xmlUtils';
-import {
     IErrorInformation,
     IPacs002,
     IPacsState,
 } from '../../interfaces';
 import { ApiContext } from '../../types';
 import { channelName, ChannelTypeEnum } from '../../lib/callbackHandler';
+import { SystemError } from '../../errors';
 
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
     ctx.state.logger.error(error);
-    ctx.response.type = 'application/xml';
-    ctx.response.body = '';
-    ctx.response.status = 500;
+    // TODO: uncomment this once we have a IPacs002Error definition
+    // if((error as IErrorInformation).errorCode) {
+    //     const originalMsgId = (ctx.request.body as ICamt003).Document.GetAcct.MsgHdr.MsgId;
+    //     const { body, status } = fspiopErrorToCamt004Error(error as IErrorInformation, originalMsgId);
+    //     ctx.response.type = 'application/xml';
+    //     ctx.response.body = body;
+    //     ctx.response.status = status;
+    // } else {
+    throw new SystemError({ msg: 'error handling pacs002 outbound message', error: error as unknown as Error });
+    // }
 };
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        const validationResult = XSD.validate(ctx.request.rawBody, XSD.paths.pacs_002);
-
-        if(validationResult !== true) {
-            XSD.handleValidationError(validationResult, ctx);
-            // TODO: should we publish an ITransferError?
-            return;
-        }
-
         // Convert the pacs002 to mojaloop PUT /transfers/{transferId} body object and send it back to mojaloop connector
         const pacs002RequestBody: IPacs002 = ctx.request.body as unknown as IPacs002;
 
