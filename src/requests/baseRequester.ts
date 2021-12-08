@@ -47,7 +47,7 @@ export abstract class BaseRequester {
                     headers: req?.headers,
                     data: util.inspect(req?.data),
                 },
-            }).log('AxiosRequest');
+            }).log();
             return req;
         });
 
@@ -55,11 +55,14 @@ export abstract class BaseRequester {
         this.axiosInstance.interceptors.response.use((res: AxiosResponse) => {
             this.options.logger.push({
                 axiosResponse: {
+                    baseURL: res?.config?.baseURL,
+                    url: res?.config?.url,
+                    method: res?.config?.method,
                     status: res?.status,
                     headers: res?.headers,
                     data: util.inspect(res?.data),
                 },
-            }).log('AxiosResponse');
+            }).log();
             return res;
         });
     }
