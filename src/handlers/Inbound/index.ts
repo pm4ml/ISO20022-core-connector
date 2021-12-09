@@ -92,7 +92,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
             header: ctx?.request?.header,
             request: ctx?.request?.body,
         },
-    }).log('postTransfers request');
+    }).log();
     const payload = ctx.request.body as unknown as IPostTransferRequestBody;
 
     const inboundRequesterOps: RequesterOptions = {
@@ -149,7 +149,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
                     header: ctx?.request?.header,
                     response: ctx?.response?.body,
                 },
-            }).log('postTransfers response');
+            }).log('postTransfersResponse callbackHandler');
 
             resolve();
         };
@@ -170,7 +170,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
                     header: ctx?.request?.header,
                     response: ctx?.response?.body,
                 },
-            }).log('postTransfers response');
+            }).log('postTransfersResponse timeout');
 
             return resolve();
         };
@@ -247,8 +247,8 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
                     header: ctx?.request?.header,
                     response: ctx?.response?.body,
                 },
-            }).log('postTransfers response');
-            // reject();
+            }).log('postTransfersResponse reject');
+
             resolve();
         }
 

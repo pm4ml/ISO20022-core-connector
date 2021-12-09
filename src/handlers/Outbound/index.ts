@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 import { XML, XSD } from '../../lib/xmlUtils';
 import { INamespacedXMLDoc } from '../../interfaces';
@@ -14,7 +17,6 @@ import camt003Handler from './camt003Handler';
 import pacs002Handler from './pacs002Handler';
 import pacs008Handler from './pacs008Handler';
 import {
-    // toXml as ErrorToXml,
     IGeneralError,
     ValidationError,
 } from '../../errors';
@@ -42,12 +44,12 @@ const handleError = (err: Error, ctx: ApiContext, responseCode = 500) => {
 };
 
 export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
-    ctx.state.logger.log({
+    ctx.state.logger.push({
         outboundHandlerRequest: {
             header: ctx.request.header,
             request: ctx.request.body,
         },
-    });
+    }).log();
 
     if((ctx?.request?.body as any)?.BusinessMessage?.Document) { // lets strip the BusinessMessage
         ctx.request.body = {
@@ -64,14 +66,14 @@ export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
         const error = new ValidationError({ msg: `Unable to route Outbound ISO message to handler as namespace='${namespace}' is not recognized.` });
         handleError(error, ctx);
 
-        ctx.state.logger.log({
+        ctx.state.logger.push({
             outboundHandlerResponse: {
                 namespace,
                 header: ctx.response.header,
                 response: error,
                 status: ctx.response.status,
             },
-        });
+        }).log('outboundHandlerResponse routing ValidationError');
         return;
     }
 
@@ -85,23 +87,23 @@ export const OutboundHandler = async (ctx: ApiContext): Promise<void> => {
         await handler.callback(ctx);
     } catch (error) {
         handleError(error as Error, ctx, 500);
-        ctx.state.logger.log({
+        ctx.state.logger.push({
             outboundHandlerResponse: {
                 namespace,
                 header: ctx.response.header,
                 response: error,
                 status: ctx.response.status,
             },
-        });
+        }).log('outboundHandlerResponse handleError');
         return;
     }
 
-    ctx.state.logger.log({
+    ctx.state.logger.push({
         outboundHandlerResponse: {
             namespace,
             header: ctx.response.header,
             response: ctx.response.body,
             status: ctx.response.status,
         },
-    });
+    }).log('outboundHandlerResponse success');
 };

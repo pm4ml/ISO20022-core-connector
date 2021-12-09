@@ -168,69 +168,101 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAcct.Id.Othr.Id,
             fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id,
-            extensionList: [
-                {
-                    key: 'NAME',
-                    value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Nm,
-                },
-            ],
         },
         to: {
             displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
             fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id,
-            extensionList: [
-                {
-                    key: 'NAME',
-                    value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Nm,
-                },
-            ],
         },
         transactionType: TransactionType.TRANSFER,
         skipPartyLookup: true,
     };
 
-    // TODO: Add extension list @see `transferResponseToPacs002` in transformers/index.ts
-    postQuotesBody.quoteRequestExtensions = [
-        {
+    // lets safely map the from.extensionList
+    const fromExtensionList = [];
+
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.InitgPty?.Nm) {
+        fromExtensionList.push({
+            key: 'NAME',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Nm,
+        });
+    }
+
+    if(fromExtensionList.length > 0) postQuotesBody.from.extensionList = fromExtensionList;
+
+    // lets safely map the to.extensionList
+    const toExtensionList = [];
+
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.CdtrAgt?.FinInstnId?.Nm) {
+        toExtensionList.push({
+            key: 'NAME',
+            value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Nm,
+        });
+    }
+
+    if(toExtensionList.length > 0) postQuotesBody.to.extensionList = toExtensionList;
+
+    // lets safely map the quoteRequestExtensions
+    const quoteRequestExtensions = [];
+
+    if(body.Document?.FIToFICstmrCdtTrf?.GrpHdr?.MsgId) {
+        quoteRequestExtensions.push({
             key: 'MSGID',
             value: body.Document.FIToFICstmrCdtTrf.GrpHdr.MsgId,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.GrpHdr?.CreDtTm) {
+        quoteRequestExtensions.push({
             key: 'CREDT',
             value: body.Document.FIToFICstmrCdtTrf.GrpHdr.CreDtTm,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.PmtId?.InstrId) {
+        quoteRequestExtensions.push({
             key: 'INSTRID',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.PmtId?.EndToEndId) {
+        quoteRequestExtensions.push({
             key: 'ENDTOENDID',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.PmtId?.TxId) {
+        quoteRequestExtensions.push({
             key: 'TXID',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.IntrBkSttlmDt) {
+        quoteRequestExtensions.push({
             key: 'SETTLEDATE',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.IntrBkSttlmDt,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.RmtInf?.Ustrd) {
+        quoteRequestExtensions.push({
             key: 'USTRD',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Ustrd,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.RmtInf?.Strd?.RfrdDocInf?.Nb) {
+        quoteRequestExtensions.push({
             key: 'REFDOC',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Strd.RfrdDocInf.Nb,
-        },
-        {
+        });
+    }
+    if(body.Document?.FIToFICstmrCdtTrf?.CdtTrfTxInf?.RmtInf?.Strd?.RfrdDocInf?.RltdDt) {
+        quoteRequestExtensions.push({
             key: 'DOCDATE',
             value: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.RmtInf.Strd.RfrdDocInf.RltdDt,
-        },
+        });
+    }
 
-    ];
+    // TODO: Add extension list @see `transferResponseToPacs002` in transformers/index.ts
+    if(quoteRequestExtensions.length > 0) postQuotesBody.quoteRequestExtensions = quoteRequestExtensions;
 
     return postQuotesBody;
 };

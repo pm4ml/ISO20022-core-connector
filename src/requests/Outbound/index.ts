@@ -6,7 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
- *       Miguel de Barros - miguel.de.barros@modusbox.com                 *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import { AxiosResponse } from 'axios';
