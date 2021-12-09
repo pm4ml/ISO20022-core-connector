@@ -76,7 +76,7 @@ export default async (ctx: ApiContext): Promise<void> => {
         ctx.response.body = '';
         ctx.response.status = 200;
         ctx.response.type = 'application/xml';
-    } catch (e: unknown) {
-        handleError(e as Error, ctx);
+    } catch (err: unknown) {
+        handleError(err as Error, ctx);
     }
 };

@@ -14,14 +14,20 @@
 
 import fs from 'fs';
 import * as path from 'path';
-import * as pacs02Handler from '../../../../handlers/Outbound/pacs002Handler';
+import pacs02Handler from '../../../../handlers/Outbound/pacs002Handler';
 import {
     XML,
     // XSD,
 } from '../../../../lib/xmlUtils';
 import Cache from '../../../../lib/cache';
-import { IExtensionItem, ITransferFulfilment, MojaloopTransferState } from '../../../../interfaces';
+import { 
+    // IExtensionItem,
+    IPacs002,
+    // ITransferFulfilment,
+    // MojaloopTransferState,
+} from '../../../../interfaces';
 import { ChannelTypeEnum } from '../../../../lib/callbackHandler';
+import { SystemError } from '../../../../errors';
 jest.mock('../../../../lib/cache');
 
 const XmlFileMap = {
@@ -34,13 +40,13 @@ const XmlFileMap = {
     },
 };
 
-const getExtensionKeyValue = (key: string, extensionList?: Array<IExtensionItem>): IExtensionItem | undefined => {
-    if (extensionList === undefined) return;
-    const result = extensionList.filter( extensionItem => extensionItem.key === key);
-    if (result?.length === 1) return result[0];
-    if (result.length > 1) throw new Error(`Duplicate key ${key} for Array<IExtensionItem>`);
-    return;
-}
+// const getExtensionKeyValue = (key: string, extensionList?: Array<IExtensionItem>): IExtensionItem | undefined => {
+//     if (extensionList === undefined) return;
+//     const result = extensionList.filter( extensionItem => extensionItem.key === key);
+//     if (result?.length === 1) return result[0];
+//     if (result.length > 1) throw new Error(`Duplicate key ${key} for Array<IExtensionItem>`);
+//     return;
+// }
 
 interface ITestData {
     ctx: any,
@@ -96,7 +102,7 @@ describe('pacs008Handler', () => {
         jest.resetAllMocks();
     })
 
-    it('should initiate publish of transferResponse request with COMMITTED', async () => {
+    it('should initiate publish message with valid XML PACS.002 async request callback with status accepted', async () => {
         // ### setup
         (Cache as jest.Mock).mockImplementation(() => {
             return {
@@ -107,7 +113,7 @@ describe('pacs008Handler', () => {
         const { ctx } = getTestData(XmlFileMap.PACS_002_001_10.valid.accepted);
 
         // ### act
-        await pacs02Handler.default(ctx as any);
+        await pacs02Handler(ctx as any);
 
         // ### test
         const publishArgs = {
@@ -115,23 +121,17 @@ describe('pacs008Handler', () => {
             msg: ctx.state.cache.publish.mock.calls[0][1],
         };
 
-        const msgId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId
-        const orgnlInstrId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId
-        const endToEndId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId
-        const putTransfersBody = publishArgs.msg.data as ITransferFulfilment;
+        const publishedMessage = publishArgs.msg.data as IPacs002;
 
         expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.POST_TRANSFERS_INBOUND);
-        expect(putTransfersBody.transferState).toEqual(MojaloopTransferState.COMMITTED);
-        expect(getExtensionKeyValue('MSGID',putTransfersBody?.extensionList)?.value).toEqual(msgId);
-        expect(getExtensionKeyValue('INSTRID',putTransfersBody?.extensionList)?.value).toEqual(orgnlInstrId);
-        expect(getExtensionKeyValue('ENDTOENDID',putTransfersBody?.extensionList)?.value).toEqual(endToEndId);
+        expect(publishedMessage).toMatchObject(ctx.request.body);
         expect(ctx.state.cache.publish).toBeCalled();
         expect(ctx.response.type).toEqual('application/xml');
         expect(ctx.response.body).toEqual('');
         expect(ctx.response.status).toEqual(200);
     });
 
-    it('should initiate publish of transferResponse request with ABORTED', async () => {
+    it('should initiate publish message with valid XML PACS.002 async request callback with status rejected', async () => {
         // ### setup
         (Cache as jest.Mock).mockImplementation(() => {
             return {
@@ -142,7 +142,7 @@ describe('pacs008Handler', () => {
         const { ctx } = getTestData(XmlFileMap.PACS_002_001_10.valid.rejected);
 
         // ### act
-        await pacs02Handler.default(ctx as any);
+        await pacs02Handler(ctx as any);
 
         // ### test
         const publishArgs = {
@@ -150,16 +150,10 @@ describe('pacs008Handler', () => {
             msg: ctx.state.cache.publish.mock.calls[0][1],
         };
 
-        const msgId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId
-        const orgnlInstrId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId
-        const endToEndId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId
-        const putTransfersBody = publishArgs.msg.data as ITransferFulfilment;
+        const publishedMessage = publishArgs.msg.data as IPacs002;
 
         expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.POST_TRANSFERS_INBOUND);
-        expect(putTransfersBody.transferState).toEqual(MojaloopTransferState.ABORTED);
-        expect(getExtensionKeyValue('MSGID',putTransfersBody?.extensionList)?.value).toEqual(msgId);
-        expect(getExtensionKeyValue('INSTRID',putTransfersBody?.extensionList)?.value).toEqual(orgnlInstrId);
-        expect(getExtensionKeyValue('ENDTOENDID',putTransfersBody?.extensionList)?.value).toEqual(endToEndId);
+        expect(publishedMessage).toMatchObject(ctx.request.body);
         expect(ctx.state.cache.publish).toBeCalled();
         expect(ctx.response.type).toEqual('application/xml');
         expect(ctx.response.body).toEqual('');
@@ -176,8 +170,14 @@ describe('pacs008Handler', () => {
 
         const { ctx } = getTestData(XmlFileMap.PACS_002_001_10.valid.rejected);
 
+        let caughtError: SystemError | undefined;
         // ### act
-        await pacs02Handler.default(ctx as any);
+        try {
+            await pacs02Handler(ctx as any);
+        } catch(error) {
+            caughtError = error as unknown as Error as SystemError;
+            console.log(caughtError);
+        }
 
         // ### test
         const publishArgs = {
@@ -185,19 +185,13 @@ describe('pacs008Handler', () => {
             msg: ctx.state.cache.publish.mock.calls[0][1],
         };
 
-        const msgId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId
-        const orgnlInstrId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId
-        const endToEndId = ctx.request.body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId
-        const putTransfersBody = publishArgs.msg.data as ITransferFulfilment;
+        const publishedMessage = publishArgs.msg.data as IPacs002;
 
         expect(publishArgs.msg.type).toEqual(ChannelTypeEnum.POST_TRANSFERS_INBOUND);
-        expect(putTransfersBody.transferState).toEqual(MojaloopTransferState.ABORTED);
-        expect(getExtensionKeyValue('MSGID',putTransfersBody?.extensionList)?.value).toEqual(msgId);
-        expect(getExtensionKeyValue('INSTRID',putTransfersBody?.extensionList)?.value).toEqual(orgnlInstrId);
-        expect(getExtensionKeyValue('ENDTOENDID',putTransfersBody?.extensionList)?.value).toEqual(endToEndId);
+        expect(publishedMessage).toMatchObject(ctx.request.body);
         expect(ctx.state.cache.publish).toBeCalled();
-        expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.body).toEqual('');
-        expect(ctx.response.status).toEqual(500);
+        expect(caughtError?.name).toEqual('SystemError');
+        expect(caughtError?.message).toEqual('error handling pacs002 outbound message');
+        expect(caughtError?.params?.error?.message).toEqual('Connection Error!');
     });
 });
