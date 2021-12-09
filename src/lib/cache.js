@@ -6,7 +6,12 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       James Bush - james.bush@modusbox.com                             *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
+
+// TODO: Make this typescript. This was copied over and modified from sdk-scheme-adapter.
 
 import { inspect } from 'util';
 import { createClient } from 'redis';

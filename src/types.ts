@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       James Bush - james.bush@modusbox.com                             *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import Koa from 'koa';

@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Murthy Kakarlamudi - murthy@modusbox.com                         *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import Koa from 'koa';
@@ -55,7 +58,7 @@ export default class Server {
                 file: apiSpecPath,
                 endpoint: '/openapi.json',
                 uiEndpoint: '/',
-                validatePaths: [ // need to add these or the XML messages will be validated by the JSON parser
+                validatePaths: [ // TODO: this should be removed once all ISO paths are handled by the api.yml. This is here because the ISO paths are not properly handled by the api.yml validation
                     '/quoterequests',
                     '/transfers',
                 ],

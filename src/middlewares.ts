@@ -7,6 +7,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Murthy Kakarlamudi - murthy@modusbox.com                         *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import * as util from 'util';
