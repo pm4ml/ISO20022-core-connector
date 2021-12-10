@@ -26,7 +26,7 @@ Refer to the [.env.example](./.env.example) for a description of configurable en
 npm test
 ```
 
-## Integration
+### Integration
 
 1. Make a copy of [.env.example](./.env.example) as `.env` (leave as default).
 
