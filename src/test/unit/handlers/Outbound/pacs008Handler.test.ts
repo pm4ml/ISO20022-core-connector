@@ -13,23 +13,17 @@
 'use strict'
 
 import {
-    // AxiosInstance,
-    // AxiosInstance,
     AxiosResponse
 } from 'axios';
 import fs from 'fs';
 import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
-// import pacs008Handler from '../../../../handlers/Outbound/pacs008Handler';
-// import { processTransferRequest } from '../../../../handlers/Outbound/pacs008Handler';
 import { 
     IExtensionItem,
     IPacs002,
     IPacs008,
-    // IPartiesByIdParams,
     IPostQuotesBody,
     IPostQuotesResponseBody,
-    // ITransferContinuationQuote,
     ITransferError,
     ITransferSuccess,
     TransferStatus,
@@ -39,24 +33,15 @@ import {
     XML,
     XSD,
 } from '../../../../lib/xmlUtils';
-// import {
-//     InboundRequester,
-//     OutboundRequester,
-//     // RequesterOptions
-// } from '../../../../requests';
-// import { requestQuotes, acceptQuotes } from '../../../../requests/Outbound'
 import {
     pacs008ToPostQuotesBody, transferResponseToPacs002,
-    // transferResponseToPacs00,
 } from '../../../../transformers';
 
 import * as pacs008Handler from '../../../../handlers/Outbound/pacs008Handler';
 import {
     InboundRequester,
     OutboundRequester,
-    // RequesterOptions
 } from '../../../../requests';
-// import { MockedObjectDeep } from 'ts-jest/dist/utils/testing';
 import {
     mockInboundRequesterHelper,
     mockOutboundRequesterHelper
