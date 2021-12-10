@@ -4,15 +4,15 @@ networks:
     name: mojaloop-net
 
 services:
-  # iso-core-connector:
-  #   networks:
-  #     - mojaloop-net
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   env_file: ./.env
-  #   ports:
-  #     - "3003:3003"
+  iso-core-connector:
+    networks:
+      - mojaloop-net
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: ./.env
+    ports:
+     - "3003:3003"
 
   mockserver:
     networks:

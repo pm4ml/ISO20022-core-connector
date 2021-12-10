@@ -6,6 +6,55 @@ ISO20022 Core Connector for Mojaloop
 
 Refer to the [.env.example](./.env.example) for a description of configurable environment variables.
 
+## Starting Application
+
+1. Make a copy of [.env.example](./.env.example) as `.env`
+
+2. Modify `.env` to suite your environment
+
+3. Start Connector
+
+    ```bash
+    npm start
+    ```
+
+## Testing
+
+### Unit
+
+```bash
+npm test
+```
+
+## Integration
+
+1. Make a copy of [.env.example](./.env.example) as `.env` (leave as default).
+
+2. Startup redis
+
+    ```bash
+    docker-compose up -d redis
+    ```
+
+3. Startup Mock-server
+
+    ```bash
+    sh ./src/test/scripts/restartMockServer.sh
+
+    ```
+
+    This will start [mock-server](https://www.mock-server.com) using docker, and create expectations (i.e. responses).
+
+4. Start Connector
+
+    ```bash
+    npm start
+    ```
+
+5. Postman Collection
+
+    Import [iso-connector.postman_collection.json](./examples/iso-connector.postman_collection.json) into Postman.
+
 ## TODO
 
 - Update api.yml to include new Outbound end-point for PACS.002
