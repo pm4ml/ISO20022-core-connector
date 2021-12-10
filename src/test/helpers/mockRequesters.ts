@@ -1,3 +1,13 @@
+/**************************************************************************
+ *  (C) Copyright ModusBox Inc. 2021 - All rights reserved.               *
+ *                                                                        *
+ *  This file is made available under the terms of the license agreement  *
+ *  specified in the corresponding source code repository.                *
+ *                                                                        *
+ *  ORIGINAL AUTHOR:                                                      *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
+ **************************************************************************/
+
 import { AxiosInstance, AxiosResponse } from "axios";
 import { MockedObjectDeep } from "ts-jest/dist/utils/testing";
 import { InboundRequester, OutboundRequester, RequesterOptions } from "../../requests";
