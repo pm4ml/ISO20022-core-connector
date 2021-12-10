@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 import util from 'util';
 import { Errors } from '@mojaloop/sdk-standard-components';

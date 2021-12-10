@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *      Steven Oderayi - steven.oderayi@modusbox.com                      *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 // @ts-nocheck11
@@ -36,8 +39,8 @@ import {
 import {
     pacs008ToPostQuotesBody, transferResponseToPacs002,
 } from '../../../../transformers';
-
 import * as pacs008Handler from '../../../../handlers/Outbound/pacs008Handler';
+import XmlFileMap from '../../../helpers/xmlFiles'
 import {
     InboundRequester,
     OutboundRequester,
@@ -46,6 +49,7 @@ import {
     mockInboundRequesterHelper,
     mockOutboundRequesterHelper
 } from '../../../helpers/mockRequesters';
+import { BaseError } from '../../../../errors';
 
 // Mock Requesters
 jest.mock('../../../../requests');
@@ -54,13 +58,6 @@ const MockedOutboundRequester = mocked(OutboundRequester, true);
 
 // Mock axios
 jest.mock('axios');
-
-const XmlFileMap = {
-    PACS_008_001_09: {
-        valid: '../../data/pacs.008.outgoing.valid.xml',
-        invalid: '../../data/pacs.008.outgoing.invalid.xml',
-    },
-};
 
 interface ITestData {
     ctx: any,
@@ -315,7 +312,8 @@ describe('pacs008Handler', () => {
         }
 
         // ### test
-        expect(caughtError).toEqual(requestQuotesResponseError);
+        expect((caughtError as BaseError).params?.error).toEqual(requestQuotesResponseError);
+        expect(caughtError?.name).toEqual('SystemError');
         expect(ctx.state.logger.error).toBeCalledWith(requestQuotesResponseError);
 
         expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
@@ -430,7 +428,8 @@ describe('pacs008Handler', () => {
         }
 
         // ### Test
-        expect(caughtError).toEqual(acceptQuotesResponseError);
+        expect((caughtError as BaseError).params?.error).toEqual(acceptQuotesResponseError);
+        expect(caughtError?.name).toEqual('SystemError');
         expect(ctx.state.logger.error).toBeCalledWith(acceptQuotesResponseError);
 
         expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);

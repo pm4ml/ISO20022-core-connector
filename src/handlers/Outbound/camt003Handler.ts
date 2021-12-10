@@ -6,12 +6,14 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
-import { RequesterOptions } from '../../requests';
-import { SystemError } from '../../errors';
+import { RequesterOptions, OutboundRequester } from '../../requests';
+import { SystemError, BaseError } from '../../errors';
 import { ICamt003, IErrorInformation } from '../../interfaces';
-import OutboundRequester from '../../requests/Outbound';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
 
@@ -25,18 +27,21 @@ const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
         ctx.response.body = body;
         ctx.response.status = status;
     } else {
+        if(error instanceof BaseError) {
+            throw error;
+        }
         throw new SystemError({ msg: 'error handling camt003 outbound message', error: error as unknown as Error });
     }
 };
 
 export default async (ctx: ApiContext): Promise<void> => {
     try {
-        const inboundRequesterOps: RequesterOptions = {
+        const outboundRequesterOps: RequesterOptions = {
             baseURL: ctx.state.conf.backendEndpoint,
             timeout: ctx.state.conf.requestTimeout,
             logger: ctx.state.logger,
         };
-        const outboundRequester = new OutboundRequester(inboundRequesterOps);
+        const outboundRequester = new OutboundRequester(outboundRequesterOps);
 
         const params = camt003ToGetPartiesParams(ctx.request.body as ICamt003);
         const res = await outboundRequester.getParties(params);

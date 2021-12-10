@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import {
@@ -14,6 +17,7 @@ import {
 import {
     IPacs008,
     IPacsState,
+    ITransferError,
     TransferStatus,
 } from '../../interfaces';
 import {
@@ -27,22 +31,22 @@ import {
     transferResponseToPacs002,
 } from '../../transformers';
 import { ApiContext } from '../../types';
-import { SystemError } from '../../errors';
+import { BaseError, SystemError } from '../../errors';
 
 // TODO: uncomment this once we have a IPacs002Error definition
-// const handleError = (error: any | Error | ITransferError, ctx: ApiContext) => {
-//     ctx.state.logger.error(error);
-//     if((error as ITransferError).transferState) {
-//         ctx.response.type = 'application/xml';
-//         ctx.response.body = transferResponseToPacs002(error as ITransferError);
-//         ctx.response.status = 400;
-//     } else {
-//         // for timeout errors we need to construct the error pacs002 xml response
-//         ctx.response.type = 'application/xml';
-//         ctx.response.body = transferErrorResponseToPacs002(ctx.request.body as IPacs008);
-//         ctx.response.status = 500;
-//     }
-// };
+const handleError = (error: any | Error | ITransferError, ctx: ApiContext) => {
+    ctx.state.logger.error(error);
+    if((error as ITransferError).transferState) {
+        ctx.response.type = 'application/xml';
+        ctx.response.body = transferResponseToPacs002(error as ITransferError);
+        ctx.response.status = 400;
+    } else {
+        if(error instanceof BaseError) {
+            throw error;
+        }
+        throw new SystemError({ msg: 'error handling pacs008 outbound message', error: error as unknown as Error });
+    }
+};
 
 export const processTransferRequest = async (ctx: ApiContext): Promise<void> => {
     let res: any;
@@ -174,7 +178,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
             },
         }).log('sendPACS002toSenderBackend errorResponse');
 
-        throw error;
+        handleError(error, ctx);
     }
 };
 

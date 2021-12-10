@@ -22,7 +22,7 @@ interface IGeneralError {
     params: ErrorParams,
 }
 
-abstract class BaseError extends Error implements IGeneralError {
+export abstract class BaseError extends Error implements IGeneralError {
     httpResponseCode = 500; // default
 
     params: ErrorParams;
