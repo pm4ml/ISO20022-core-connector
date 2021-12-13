@@ -1,4 +1,4 @@
-FROM node:12.22.6-alpine as builder
+FROM node:14.18.2-alpine as builder
 RUN apk add --no-cache git python3 build-base
 WORKDIR /opt/app
 
@@ -8,7 +8,7 @@ RUN npm install
 RUN npm run build
 
 
-FROM node:12.22.6-alpine
+FROM node:14.18.2-alpine
 RUN apk add --no-cache git python3 g++ make
 WORKDIR /opt/app
 
