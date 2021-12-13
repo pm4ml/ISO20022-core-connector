@@ -6,10 +6,10 @@
     "jest.config.js"
   ],
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2019",
     "module": "commonjs",
     "lib": [
-      "esnext"
+      "ES2019"
     ],
     "importHelpers": true,
     "declaration": true,
