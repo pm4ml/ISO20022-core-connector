@@ -9,7 +9,7 @@
     "target": "es2019",
     "module": "commonjs",
     "lib": [
-      "esnext"
+      "ES2019"
     ],
     "importHelpers": true,
     "declaration": true,
