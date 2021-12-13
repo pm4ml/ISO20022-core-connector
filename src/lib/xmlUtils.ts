@@ -6,12 +6,17 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 import * as fs from 'fs';
+import Path from 'path';
 import { j2xParser as J2xParser, parse as parseXML } from 'fast-xml-parser';
 import * as xsd from 'libxmljs2-xsd';
 import { Config, IXMLOptions } from '../config';
 import { ApiContext } from '../types';
+import { ValidationError } from '../errors';
 
 /**
  * Parse JS object to XML
@@ -29,8 +34,7 @@ const fromJsObject = (obj: Record<string, unknown>, xmlOptions?: IXMLOptions): s
  * @returns {string}
  */
 // eslint-disable-next-line max-len
-const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown> => parseXML(xml, xmlOptions || Config.xmlOptions);
-
+const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown> => parseXML(xml, xmlOptions || Config.xmlOptions) as Record<string, unknown>;
 
 /**
  * Validate an XML string against supplied XSD
@@ -39,14 +43,22 @@ const fromXml = (xml: string, xmlOptions?: IXMLOptions): Record<string, unknown>
  * @returns {boolean | Array<Record<string, unknown>>}
  */
 const validate = (xml: string, xsdPath: string): boolean | Array<Record<string, unknown>> => {
-    if(!fs.existsSync(xsdPath)) {
-        throw new Error(`XSD file not found: ${xsdPath}`);
+    const path = Path.resolve(xsdPath);
+    if(!fs.existsSync(path)) {
+        throw new ValidationError({ msg: `XSD file not found: ${xsdPath}` });
     }
     if(!xml.length) {
-        throw new Error('XML content cannot be blank.');
+        throw new ValidationError({ msg: 'XML content cannot be blank.' });
     }
+
     const schema = xsd.parseFile(xsdPath);
-    const result = schema.validate(xml);
+    let result: any;
+    try {
+        result = schema.validate(xml, false);
+    } catch (error) {
+        throw new ValidationError({ msg: `XML validation failed against XSD ${xsdPath}`, error: error as unknown as Error });
+    }
+
     return result != null ? result : true;
 };
 
@@ -70,8 +82,8 @@ const handleValidationError = (validationResult: unknown, ctx: ApiContext): void
 const paths = {
     camt_003: `${Config.templatesPath}/xsd/camt.003.001.07.xsd`,
     camt_004: `${Config.templatesPath}/xsd/camt.004.001.08.xsd`,
-    pacs_008: `${Config.templatesPath}/xsd/pacs.008.001.09.xsd`,
-    pacs_002: `${Config.templatesPath}/xsd/pacs.002.001.12.xsd`,
+    pacs_008: `${Config.templatesPath}/xsd/pacs.008.001.08.xsd`,
+    pacs_002: `${Config.templatesPath}/xsd/pacs.002.001.10.xsd`,
     pain_001: `${Config.templatesPath}/xsd/pain.001.001.10_1.xsd`,
     pain_002: `${Config.templatesPath}/xsd/pain.002.001.11.xsd`,
     pain_013: `${Config.templatesPath}/xsd/pain.013.001.08.xsd`,

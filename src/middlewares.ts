@@ -7,6 +7,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Murthy Kakarlamudi - murthy@modusbox.com                         *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import * as util from 'util';
@@ -68,9 +71,11 @@ const createLogger = (logger: Logger.Logger) => async (
             id: ctx.request.id,
             path: ctx.path,
             method: ctx.method,
+            body: ctx.request.body,
         },
     });
-    ctx.state.logger.push({ body: ctx.request.body }).log('Request received');
+    // ctx.state.logger.push({ body: ctx.request.body }).log('Request received');
+    ctx.state.logger.log('Request received');
 
     // allow exceptions to bubble up. they should be caught by our general error handler back up the chain
     await next();
@@ -113,16 +118,18 @@ const createRouter = (handlerMap: HandlerMap): Router.IMiddleware<any, any> => {
                 koaEndpoint,
                 async (ctx: ApiContext, next: () => Promise<any>) => {
                     try {
+                        ctx.state.logger.push({ ctx }).log('Request Context');
                         await Promise.resolve(handler(ctx, next));
-                    } catch (e) {
-                        ctx.state.logger.push({ error: e }).log('Error');
-                        ctx.body = e.message;
+                    } catch (e: unknown) {
+                        ctx.state.logger.push({ error: e as Error }).log('Error');
+                        ctx.body = (e as Error).message;
                         ctx.status = 500;
                         if(e instanceof HTTPResponseError) {
                             ctx.body = e.getData().res.data;
                             ctx.status = e.getData().res.statusCode;
                         }
                     }
+                    ctx.state.logger.push({ ctx }).log('Response Context');
                 },
             );
         }

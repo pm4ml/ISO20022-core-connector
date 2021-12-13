@@ -8,5 +8,6 @@
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
  **************************************************************************/
 
+export * from './common';
 export * from './outbound';
 export * from './inbound';

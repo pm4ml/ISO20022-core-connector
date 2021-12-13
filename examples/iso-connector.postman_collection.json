@@ -1,0 +1,180 @@
+{
+	"info": {
+		"_postman_id": "3238b99c-04b0-4e47-822a-80d91d7210c6",
+		"name": "iso-connector",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Outbound",
+			"item": [
+				{
+					"name": "1. POST PACS.008",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- POST /transfers -->\n<Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\">\n    <FIToFICstmrCdtTrf>\n        <GrpHdr>\n            <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>     <!-- This is The transaction ID -->\n            <CreDtTm>2021-02-10T15:07:38.6875000+03:00</CreDtTm>    <!-- Required by ISO, not used by Moja -->\n            <NbOfTxs>1</NbOfTxs>                                    <!-- One transaction -->\n            <SttlmInf>\n                <SttlmMtd>CLRG</SttlmMtd>\n            </SttlmInf>\n            <PmtTpInf>\n                <CtgyPurp>\n                    <Cd>code</Cd>\n                </CtgyPurp>\n            </PmtTpInf>\n        </GrpHdr>\n        <CdtTrfTxInf>\n            <PmtId>                                              \n              <InstrId>8c5d9f95</InstrId>\n              <EndToEndId>000400078911122</EndToEndId> <!-- This is the transfer ID  -->\n              <TxId>acd1ef76</TxId>\n            </PmtId>\n            <IntrBkSttlmAmt Ccy=\"RWF\">20200</IntrBkSttlmAmt>\n            <IntrBkSttlmDt>2021-07-13</IntrBkSttlmDt>\n            <ChrgBr>DEBT</ChrgBr>                                       <!-- Amount is the amount the creditor will receive... -->\n           <InitgPty>\n                <Nm>LAKE CITY BANK</Nm>\n                <Id>\n                    <OrgId>\n                        <Othr>\n                            <Id>INITGPTY_ID</Id>\n                        </Othr>\n                    </OrgId>\n                </Id>\n           </InitgPty>\n           <Dbtr>\n                <Nm>PAYER_NAME</Nm>\n                <CtctDtls>\n                    <MobNb>+1-574-265-1752</MobNb>\t                    <!-- Debtor is identified by a mobile number -->\n                </CtctDtls>\n            </Dbtr>\n            <DbtrAcct>\n                <Id>\n                    <Othr>\n                        <Id>+1-574-265-1752</Id>\n                    </Othr>\n                </Id>\n            </DbtrAcct>\n            <DbtrAgt>\n\t\t\t\t<FinInstnId>\n\t\t\t\t\t<BICFI>LAKCUS33</BICFI>\n\t\t\t\t\t<Nm>LAKE CITY BANK</Nm>\t                            <!-- Included for information - not required by ISO or Moja -->\n                    <Othr>\n                        <Id>LAKCUS33</Id>\n                    </Othr>\n\t\t\t\t</FinInstnId>\n            </DbtrAgt>\n            <CdtrAgt>\n                <FinInstnId>\n                    <BICFI>EQBLRWRWXXX</BICFI>\n                    <Nm>EQUITY BANK RWANDA LIMITED</Nm>\t                <!-- Creditor's DFSP -->\n                    <Othr>\n                        <Id>EQBLRWRWXXX</Id>\n                    </Othr>\n                </FinInstnId>\n            </CdtrAgt>\n           <Cdtr>\n                <Nm>PAYEE_NAME</Nm>\n                <CtctDtls>\n                    <MobNb>+250-70610388</MobNb>\t                    <!-- Creditor is identified by a mobile number -->\n                </CtctDtls>\n            </Cdtr>\n            <CdtrAcct>\n                <Id>\n                    <Othr>\n                        <Id>+250-70610388</Id>\n                    </Othr>\n                </Id>\n            </CdtrAcct>\n           <RmtInf>\n                <Ustrd>d7d91837-4402-4c8f-9b73-20255b0ec40c</Ustrd>\n                <Strd>\n                    <RfrdDocInf>\n                        <Nb>hsuikdfgdgg</Nb>\n                        <RltdDt>2021-07-13</RltdDt>\n                    </RfrdDocInf>\n                </Strd>\n           </RmtInf>\n        </CdtTrfTxInf>\n    </FIToFICstmrCdtTrf>\n</Document>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. POST PACS.002",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10\">\n  <FIToFIPmtStsRpt>\n    <GrpHdr>\n      <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>\n      <CreDtTm>2021-12-03T14:09:39.288Z</CreDtTm>\n    </GrpHdr>\n    <TxInfAndSts>\n      <OrgnlInstrId>8c5d9f95</OrgnlInstrId>\n      <OrgnlEndToEndId>000400078911122</OrgnlEndToEndId>\n      <OrgnlTxId>acd1ef76</OrgnlTxId>\n      <TxSts>ACSC</TxSts>\n    </TxInfAndSts>\n  </FIToFIPmtStsRpt>\n</Document>\n",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inbound",
+			"item": [
+				{
+					"name": "2. POST transfers",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transferId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n    \"quote\": {\n        \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n        \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n        \"transferAmount\": \"10\",\n        \"transferAmountCurrency\": \"RWF\",\n        \"payeeReceiveAmount\": \"10\",\n        \"payeeReceiveAmountCurrency\": \"RWF\",\n        \"expiration\": \"2021-12-01T18:20:00.326Z\"\n    },\n    \"from\": {\n        \"idType\": \"MSISDN\",\n        \"idValue\": \"25644444444\",\n        \"fspId\": \"pm4mlsenderfsp\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"LAKE CITY BANK\"\n            }\n        ],\n        \"displayName\": \"PayerFirst PayerLast\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"0789493999\",\n        \"fspId\": \"cogebanquesbx\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n            }\n        ]\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"RWF\",\n    \"amount\": \"10\",\n    \"transactionType\": \"TRANSFER\",\n    \"ilpPacket\": {\n        \"data\": {\n            \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n            \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n            \"payee\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"0789493999\",\n                    \"fspId\": \"cogebanquesbx\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n                            }\n                        ]\n                    }\n                }\n            },\n            \"payer\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"MSISDN\",\n                    \"partyIdentifier\": \"25644444444\",\n                    \"fspId\": \"pm4mlsenderfsp\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"LAKE CITY BANK\"\n                            }\n                        ]\n                    }\n                },\n                \"name\": \"PayerFirst PayerLast\"\n            },\n            \"amount\": {\n                \"amount\": \"10\",\n                \"currency\": \"RWF\"\n            },\n            \"transactionType\": {\n                \"scenario\": \"TRANSFER\",\n                \"initiator\": \"PAYER\",\n                \"initiatorType\": \"CONSUMER\"\n            }\n        }\n    },\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": {\n        \"0\": {\n            \"key\": \"MSGID\",\n            \"value\": \"RNDPS/4e9b19494e5f0c7d61a607\"\n        },\n        \"1\": {\n            \"key\": \"CREDT\",\n            \"value\": \"2021-02-10T15:07:38.6875000+03:00\"\n        },\n        \"2\": {\n            \"key\": \"INSTRID\",\n            \"value\": \"8c5d9f95\"\n        },\n        \"3\": {\n            \"key\": \"ENDTOENDID\",\n            \"value\": \"000400078911122\"\n        },\n        \"4\": {\n            \"key\": \"TXID\",\n            \"value\": \"acd1ef76\"\n        },\n        \"5\": {\n            \"key\": \"SETTLEDATE\",\n            \"value\": \"2021-07-13\"\n        },\n        \"6\": {\n            \"key\": \"USTRD\",\n            \"value\": \"000400078911122\"\n        },\n        \"7\": {\n            \"key\": \"REFDOC\",\n            \"value\": \"hsuikdfgdgg\"\n        },\n        \"8\": {\n            \"key\": \"DOCDATE\",\n            \"value\": \"2021-07-13\"\n        }\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/transfers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MockServer",
+			"item": [
+				{
+					"name": "test mock - POST localhost:1080/outbound/transfers",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "localhost:1080/outbound/transfers",
+							"host": [
+								"localhost"
+							],
+							"port": "1080",
+							"path": [
+								"outbound",
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test mock - PUT localhost:1080/outbound/transfers/12435",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "localhost:1080/outbound/transfers/12435",
+							"host": [
+								"localhost"
+							],
+							"port": "1080",
+							"path": [
+								"outbound",
+								"transfers",
+								"12435"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test mock - POST localhost:1080/backend/transfers",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "localhost:1080/backend/transfers",
+							"host": [
+								"localhost"
+							],
+							"port": "1080",
+							"path": [
+								"backend",
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

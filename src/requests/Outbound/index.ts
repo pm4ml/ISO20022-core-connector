@@ -6,32 +6,24 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
-import axios, { AxiosResponse } from 'axios';
-import { Config } from '../../config';
-import { IPartiesByIdParams, IPostQuotesBody, ITransferContinuationQuote } from '../../interfaces';
+import { AxiosResponse } from 'axios';
+import {
+    IPartiesByIdParams,
+    IPostQuotesBody,
+    ITransferContinuationQuote,
+} from '../../interfaces';
+import { buildJSONHeaders } from '../headers';
+import { BaseRequester } from '../baseRequester';
 
-const request = axios.create({
-    baseURL: Config.outboundEndpoint,
-    timeout: Config.requestTimeout,
-});
+export default class Requester extends BaseRequester {
+    getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => this.axiosInstance.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildJSONHeaders() });
 
-/**
- * Utility method to build a set of headers required by the SDK outbound API
- *
- * @returns {object} - Object containing key/value pairs of HTTP headers
- */
-export const buildHeaders = (): Record<string, any> => {
-    const headers = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Date: new Date().toUTCString(),
-    };
+    requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => this.axiosInstance.post('/transfers', postQuotesBody, { headers: buildJSONHeaders() });
 
-    return headers;
-};
-
-export const getParties = (params: IPartiesByIdParams): Promise<AxiosResponse<any>> => request.get(`/parties/${params.idType}/${params.idValue}`, { headers: buildHeaders() });
-export const requestQuotes = (postQuotesBody: IPostQuotesBody): Promise<AxiosResponse<any>> => request.post('/transfers', postQuotesBody, { headers: buildHeaders() });
-export const acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => request.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildHeaders() });
+    acceptQuotes = (transferId: string, acceptQuotesBody: ITransferContinuationQuote): Promise<AxiosResponse<any>> => this.axiosInstance.put(`/transfers/${transferId}`, acceptQuotesBody, { headers: buildJSONHeaders() });
+}

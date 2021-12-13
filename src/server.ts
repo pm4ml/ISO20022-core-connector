@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Murthy Kakarlamudi - murthy@modusbox.com                         *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import Koa from 'koa';
@@ -24,6 +27,7 @@ import middlewares from './middlewares';
 import { ApiContext } from './types';
 import { Config, IServiceConfig } from './config';
 import { bodyParser as xmlBodyParser } from './lib/koaXmlBody';
+import Cache from './lib/cache';
 
 export default class Server {
     _conf: IServiceConfig;
@@ -34,11 +38,14 @@ export default class Server {
 
     _logger: Logger.Logger | undefined;
 
+    _cache: any; // TODO: fix this
+
     constructor(conf: IServiceConfig) {
         this._conf = conf;
         this._api = null;
         this._server = null;
         this._logger = conf.logger;
+        this._cache = null;
     }
 
     async setupApi(): Promise<http.Server> {
@@ -51,6 +58,10 @@ export default class Server {
                 file: apiSpecPath,
                 endpoint: '/openapi.json',
                 uiEndpoint: '/',
+                validatePaths: [ // TODO: this should be removed once all ISO paths are handled by the api.yml. This is here because the ISO paths are not properly handled by the api.yml validation
+                    '/quoterequests',
+                    '/transfers',
+                ],
             });
         } catch (e) {
             throw new Error(
@@ -58,10 +69,19 @@ export default class Server {
             );
         }
 
+        // Setup cache
+        this._cache = new Cache({
+            ...this._conf.cache,
+            logger: this._logger?.push({ component: 'cache' }),
+            enabledTestFeatures: this._conf?.cache?.enabledTestFeatures,
+        });
+        await this._cache.connect();
+
         this._api.use(async (ctx: ApiContext, next: () => Promise<any>) => {
             ctx.state = {
                 conf: this._conf,
                 logger: this._logger,
+                cache: this._cache,
             };
             await next();
         });

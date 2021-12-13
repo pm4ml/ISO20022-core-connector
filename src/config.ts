@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       Steven Oderayi - steven.oderayi@modusbox.com                     *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import * as env from 'env-var';
@@ -22,7 +25,8 @@ export interface IServiceConfig {
     logger?: Logger.Logger,
     xmlOptions: IXMLOptions,
     templatesPath: string
-
+    cache: CacheConfig,
+    callbackTimeout: number,
 }
 
 export interface IXMLOptions {
@@ -57,6 +61,12 @@ const xmlOptions: IXMLOptions = {
     arrayMode: false,
 };
 
+export interface CacheConfig {
+    host: string,
+    port: number,
+    enabledTestFeatures?: boolean,
+}
+
 export const Config: IServiceConfig = {
     port: env.get('LISTEN_PORT').default('3003').asPortNumber(),
     outboundEndpoint: env.get('OUTBOUND_ENDPOINT').required().asString(),
@@ -64,4 +74,10 @@ export const Config: IServiceConfig = {
     requestTimeout: env.get('REQUEST_TIMEOUT').default(2000).asInt(),
     templatesPath: env.get('TEMPLATES_PATH').default('templates').asString(),
     xmlOptions,
+    cache: {
+        host: env.get('CACHE_HOST').default('localhost').asString(),
+        port: env.get('CACHE_PORT').default(6379).asPortNumber(),
+        enabledTestFeatures: env.get('CACHE_ENABLED_TEST_FEATURES').asBool() || false,
+    },
+    callbackTimeout: env.get('CALLBACK_TIMEOUT').default(30).asInt(),
 };

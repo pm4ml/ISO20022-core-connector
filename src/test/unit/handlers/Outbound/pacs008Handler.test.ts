@@ -6,74 +6,138 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *      Steven Oderayi - steven.oderayi@modusbox.com                      *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
+
+// @ts-nocheck11
 
 'use strict'
 
-import { AxiosResponse } from 'axios';
+import {
+    AxiosResponse
+} from 'axios';
 import fs from 'fs';
 import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
-import pacs008Handler from '../../../../handlers/Outbound/pacs008Handler';
-import { IExtensionItem, IPacs008, IPostQuotesBody, IPostQuotesResponseBody, ITransferError, ITransferSuccess, TransferStatus } from '../../../../interfaces';
-import { XML, XSD } from '../../../../lib/xmlUtils';
+import { 
+    IExtensionItem,
+    IPacs002,
+    IPacs008,
+    IPostQuotesBody,
+    IPostQuotesResponseBody,
+    ITransferError,
+    ITransferSuccess,
+    TransferStatus,
+    TxStsEnum,
+} from '../../../../interfaces';
+import {
+    XML,
+    XSD,
+} from '../../../../lib/xmlUtils';
+import {
+    pacs008ToPostQuotesBody, transferResponseToPacs002,
+} from '../../../../transformers';
+import * as pacs008Handler from '../../../../handlers/Outbound/pacs008Handler';
+import XmlFileMap from '../../../helpers/xmlFiles'
+import {
+    InboundRequester,
+    OutboundRequester,
+} from '../../../../requests';
+import {
+    mockInboundRequesterHelper,
+    mockOutboundRequesterHelper
+} from '../../../helpers/mockRequesters';
+import { BaseError } from '../../../../errors';
 
-import { requestQuotes, acceptQuotes } from '../../../../requests/Outbound'
-import { pacs008ToPostQuotesBody } from '../../../../transformers';
-jest.mock('../../../../requests/Outbound');
-const mockedRequestQuotes = mocked(requestQuotes, true);
-const mockedAcceptQuotes = mocked(acceptQuotes, true);
+// Mock Requesters
+jest.mock('../../../../requests');
+const MockedInboundRequester = mocked(InboundRequester, true);
+const MockedOutboundRequester = mocked(OutboundRequester, true);
 
+// Mock axios
+jest.mock('axios');
 
-describe('pacs008Handler', () => {
+interface ITestData {
+    ctx: any,
+    xmlStr: string,
+    postQuotesBody: IPostQuotesBody,
+    quoteRequestExtensions: Array<IExtensionItem>,
+};
+
+const getTestData = (importXmlFile: string = '../../data/pacs.008.outgoing.valid.xml'): ITestData => {
     let ctx: any;
     let xmlStr: string;
     let postQuotesBody: IPostQuotesBody;
     let quoteRequestExtensions: Array<IExtensionItem>;
+    xmlStr = fs.readFileSync(path.join(__dirname, importXmlFile)).toString();
+    ctx = {
+        request: {
+            body: null,
+            rawBody: '',
+        },
+        state: {
+            conf: {
+                backendEndpoint: 'donotcall',
+                outboundEndpoint: 'donocall',
+                requestTimeout: 0,
+            },
+            logger: {
+                error: jest.fn(),
+                debug: jest.fn(),
+                log: jest.fn(),
+                push: () => {
+                    return {
+                        error: jest.fn(),
+                        debug: jest.fn(),
+                        log: jest.fn(),
+                    }
+                },
+            }
+        },
+        response: { type: null, status: null, body: '', data: {} as any }
+    };
+    ctx.request.body = XML.fromXml(xmlStr) as any;
+    ctx.request.rawBody = xmlStr;
+    postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as unknown as IPacs008);
+    quoteRequestExtensions = [
+        {
+            key: 'MSGID',
+            value: (ctx.request.body as unknown as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId,
+        },
+        {
+            key: 'INSTRID',
+            value: (ctx.request.body as unknown as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId,
+        },
+        {
+            key: 'TXID',
+            value: (ctx.request.body as unknown as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId,
+        },
+        {
+            key: 'ENDTOENDID',
+            value: (ctx.request.body as unknown as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
+        },
+
+    ];
+    return {
+        ctx,
+        xmlStr,
+        postQuotesBody,
+        quoteRequestExtensions,
+    }
+}
+
+describe('pacs008Handler', () => {
+
+    const transferId = 'mock-transfer-id';
 
     beforeAll(async () => {
-        xmlStr = fs.readFileSync(path.join(__dirname, '../../data/pacs.008.xml')).toString();
-        ctx = {
-            request: {
-                body: null,
-                rawBody: '',
-            },
-            state: {
-                logger: {
-                    error: jest.fn(),
-                    debug: jest.fn(),
-                    log: jest.fn()
-                }
-            },
-            response: { type: null, status: null, body: '', data: {} as any }
-        };
-        ctx.request.body = XML.fromXml(xmlStr) as any;
-        ctx.request.rawBody = xmlStr;
-        postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as unknown as IPacs008)
-        quoteRequestExtensions = [
-            {
-                key: 'MSGID',
-                value: 'msg-id',
-            },
-            {
-                key: 'INSTRID',
-                value: 'instr-id'
-            },
-            {
-                key: 'TXID',
-                value: 'tx-id'
-            },
-            {
-                key: 'ENDTOENDID',
-                value: 'e2e-id'
-            },
-
-        ]
+        // nothing to do here
     })
 
     beforeEach(async () => {
-        mockedRequestQuotes.mockResolvedValue({} as any);
-        mockedAcceptQuotes.mockResolvedValue({} as any);
+        // nothing to do here
     })
 
     afterEach(async () => {
@@ -81,85 +145,456 @@ describe('pacs008Handler', () => {
     })
 
     it('should initiate quotes request', async () => {
-        const response = ctx.response;
-        response.data = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId: 'mock_transfer_id' } as unknown as IPostQuotesResponseBody
-        mockedRequestQuotes.mockResolvedValue(response as any);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(mockedAcceptQuotes).toBeCalledWith(response.data.transferId, { acceptQuote: true })
-    });
+        // ### setup
+        const { ctx, quoteRequestExtensions } = getTestData(XmlFileMap.PACS_008_001_09.valid);
 
-    it('should handle exception when quotes request fails', async () => {
-        const error = new Error('Mojaloop Connector unreachable');
-        mockedRequestQuotes.mockRejectedValue(error);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(ctx.state.logger.error).toBeCalledWith(error);
-        expect(mockedAcceptQuotes).not.toBeCalled();
-    });
+        const transferState = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId };
 
-    it('should handle error if quoting error is returned', async () => {
-        const response = ctx.response;
-        response.data = { transferState: { quoteRequestExtensions } } as unknown as ITransferError
-        mockedRequestQuotes.mockResolvedValue(response as unknown as AxiosResponse<any>);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(ctx.state.logger.error).toBeCalledWith(response.data);
-        expect(ctx.response.type).toEqual('application/xml');
-        expect(XML.fromXml(ctx.response.body)).toBeTruthy();
-        expect(XSD.validate(ctx.response.body, XSD.paths.pacs_002)).toBe(true);
-        expect(ctx.response.status).toEqual(400);
-        expect(mockedAcceptQuotes).not.toBeCalled();
-    });
+        const requestQuotesResponse: AxiosResponse = {
+            data: { ...transferState } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
 
-    it('should handle error if quote acceptance/transfer request fails', async () => {
-        const response = ctx.response;
-        response.data = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId: 'mock_transfer_id' } as unknown as IPostQuotesResponseBody
-        mockedRequestQuotes.mockResolvedValue(response as any);
-        const error = new Error('Mojaloop Connector unreachable');
-        mockedAcceptQuotes.mockRejectedValue(error);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(ctx.state.logger.error).toBeCalledWith(error);
-        expect(mockedAcceptQuotes).toBeCalled();
-    })
-
-    it('should handle error if quote acceptance/transfer was unsuccessful', async () => {
-        const response = ctx.response;
-        response.data = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId: 'mock_transfer_id' } as unknown as IPostQuotesResponseBody
-        mockedRequestQuotes.mockResolvedValue(response as any);
-        const transferError = { transferState: { currentState: TransferStatus.ERROR_OCCURRED, quoteRequestExtensions } };
-        mockedAcceptQuotes.mockRejectedValue(transferError);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(ctx.state.logger.error).toBeCalledWith(transferError);
-        expect(XML.fromXml(ctx.response.body)).toBeTruthy();
-        expect(XSD.validate(ctx.response.body, XSD.paths.pacs_002)).toBe(true);
-        expect(ctx.response.status).toEqual(400);
-        expect(mockedAcceptQuotes).toBeCalled();
-    })
-
-    it('should translate happy path response to pacs.002', async () => {
-        const mockedRes = {
+        const acceptQuotesResponse: AxiosResponse = {
             data: {
                 currentState: TransferStatus.COMPLETED,
-                transferId: 'mock-transfer-id',
+                transferId,
                 quoteRequestExtensions
-            } as unknown as ITransferSuccess
-        } as AxiosResponse<any>;
-        mockedAcceptQuotes.mockResolvedValue(mockedRes);
-        ctx.response.data = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId: 'mock_transfer_id' } as unknown as IPostQuotesResponseBody
-        mockedRequestQuotes.mockResolvedValue(ctx.response as any);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(XML.fromXml(ctx.response.body)).toBeTruthy();
-        expect(XSD.validate(ctx.response.body, XSD.paths.pacs_002)).toBe(true);
+            } as unknown as ITransferSuccess,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponse,
+        })
+
+        // ### act
+        await pacs008Handler.default(ctx as any);
+
+        // ### test
         expect(ctx.response.type).toEqual('application/xml');
+        expect(ctx.response.body).toEqual('');
         expect(ctx.response.status).toEqual(200);
     });
 
+    it('should initiate quotes request with failed validation', async () => {
+        // ### setup
+        const { ctx, quoteRequestExtensions } = getTestData(XmlFileMap.PACS_008_001_09.invalid);
+
+        const transferState = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId };
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { ...transferState } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        const acceptQuotesResponse: AxiosResponse = {
+            data: {
+                currentState: TransferStatus.COMPLETED,
+                transferId: transferState.transferId,
+                quoteRequestExtensions
+            } as unknown as ITransferSuccess,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponse,
+        })
+
+        // ### act
+        await pacs008Handler.default(ctx as any);
+
+        // ### test
+        expect(ctx.response.type).toEqual('text/html');
+        expect(ctx.response.body).toEqual(null);
+        expect(ctx.response.status).toEqual(400);
+    });
+
+    it('should initiate quotes request async via processTransferRequest', async () => {
+        // ### setup
+        const { ctx, postQuotesBody, quoteRequestExtensions } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+
+        const transferState = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId };
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { ...transferState } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        const acceptQuotesResponse: AxiosResponse = {
+            data: {
+                currentState: TransferStatus.COMPLETED,
+                transferId: transferState.transferId,
+                quoteRequestExtensions
+            } as unknown as ITransferSuccess,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponse,
+        })
+
+        const sendPACS002toSenderBackendRequest = transferResponseToPacs002(acceptQuotesResponse.data);
+        const sendPACS002toSenderBackendRequestXml = XML.fromXml(sendPACS002toSenderBackendRequest);
+        delete (sendPACS002toSenderBackendRequestXml as unknown as any).Document.FIToFIPmtStsRpt.GrpHdr.CreDtTm;
+
+        // ### act
+        await pacs008Handler.processTransferRequest(ctx as any);
+
+        // ### test
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).toBeCalledWith(transferState.transferId as string, { acceptQuote: true });
+
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg);
+        delete (mockedSendPACS002toSenderBackendCalledArgXml as unknown as any)?.Document?.FIToFIPmtStsRpt?.GrpHdr?.CreDtTm;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml).toEqual(sendPACS002toSenderBackendRequestXml);
+    });
+
+    it('should handle exception when quotes request fails', async () => {
+        // ### setup
+        const {
+            ctx,
+            postQuotesBody
+        } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+
+        const requestQuotesResponseError = new Error('Mojaloop Connector unreachable');;
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponseError,
+        })
+
+        let caughtError: Error | undefined = undefined;
+        
+        // ### act
+        try {
+            await pacs008Handler.processTransferRequest(ctx as any);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        // ### test
+        expect((caughtError as BaseError).params?.error).toEqual(requestQuotesResponseError);
+        expect(caughtError?.name).toEqual('SystemError');
+        expect(ctx.state.logger.error).toBeCalledWith(requestQuotesResponseError);
+
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).not.toBeCalled();
+
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml: IPacs002 | undefined = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg) as unknown as IPacs002;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts).toEqual(TxStsEnum.RJCT);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
+    });
+
+    it('should handle error if quoting error is returned', async () => {
+        // ### setup
+        const {
+            ctx,
+            postQuotesBody,
+            quoteRequestExtensions
+        } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { transferState: { quoteRequestExtensions } } as unknown as ITransferError,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+        })
+
+        let caughtError: Error | undefined = undefined;
+
+        // ### act
+        try {
+            await pacs008Handler.processTransferRequest(ctx as any);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        // ### test
+        expect(caughtError?.message).toEqual('requestQuotes response transferState.currentState=undefined is invalid');
+        expect(ctx.state.logger.error).toBeCalledWith(caughtError);
+
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).not.toBeCalled();
+        
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml: IPacs002 | undefined = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg) as unknown as IPacs002;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts).toEqual(TxStsEnum.RJCT);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
+    });
+
+    it('should handle error if quote acceptance/transfer request fails', async () => {
+        // ### setup
+        const {
+            ctx,
+            postQuotesBody,
+        } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+        const acceptQuotesResponseError = new Error('Mojaloop Connector unreachable');
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponseError,
+        })
+
+        let caughtError: Error | undefined = undefined;
+
+        // ### act
+        try {
+            await pacs008Handler.processTransferRequest(ctx as any);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        // ### Test
+        expect((caughtError as BaseError).params?.error).toEqual(acceptQuotesResponseError);
+        expect(caughtError?.name).toEqual('SystemError');
+        expect(ctx.state.logger.error).toBeCalledWith(acceptQuotesResponseError);
+
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).toBeCalled();
+
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml: IPacs002 | undefined = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg) as unknown as IPacs002;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts).toEqual(TxStsEnum.RJCT);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
+    })
+
+    it('should handle error if quote acceptance/transfer was unsuccessful', async () => {
+        // ### setup
+        const { ctx, postQuotesBody, quoteRequestExtensions } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        const acceptQuotesResponse: AxiosResponse = {
+            data: {
+                statusCode: '500',
+                message: "this is an error",
+                transferState: { currentState: TransferStatus.ERROR_OCCURRED, quoteRequestExtensions },
+            } as unknown as ITransferError,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponse,
+        })
+
+        let caughtError: Error | undefined = undefined;
+        
+        // ### act
+        try {
+            await pacs008Handler.processTransferRequest(ctx as any);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        // ### Test
+        expect(caughtError).toBeTruthy();
+
+        expect(ctx.state.logger.error).toBeCalledWith(caughtError);
+
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).toBeCalled();
+
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml: IPacs002 | undefined = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg) as unknown as IPacs002;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts).toEqual(TxStsEnum.RJCT);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
+    })
+
+    it('should translate happy path response to pacs.002', async () => {
+        // ### setup
+        const { ctx, postQuotesBody, quoteRequestExtensions } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        const acceptQuotesResponse: AxiosResponse = {
+            data: {
+                currentState: TransferStatus.COMPLETED,
+                transferId,
+                quoteRequestExtensions
+            } as unknown as ITransferSuccess,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponse,
+        })
+
+        let caughtError: Error | undefined = undefined;
+        
+        // ### act
+        try {
+            await pacs008Handler.processTransferRequest(ctx as any);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        // ### Test
+        expect(caughtError).toBeUndefined();
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).toBeCalledWith(acceptQuotesResponse.data.transferId as string, { acceptQuote: true });
+
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml: IPacs002 | undefined = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg) as unknown as IPacs002;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts).toEqual(TxStsEnum.ACSC);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
+    });
+
     it('should translate unhappy path response to pacs.002', async () => {
-        const mockedRes = {
+        // ### setup
+        const { ctx, postQuotesBody } = getTestData(XmlFileMap.PACS_008_001_09.valid);
+
+        const requestQuotesResponse: AxiosResponse = {
+            data: { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId } as unknown as IPostQuotesResponseBody,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        const acceptQuotesResponse: AxiosResponse = {
             data: {
                 transferState: {
                     currentState: TransferStatus.ERROR_OCCURRED,
@@ -184,16 +619,50 @@ describe('pacs008Handler', () => {
 
                     ]
                 }
-            } as ITransferError
-        } as AxiosResponse<any>;
-        mockedAcceptQuotes.mockResolvedValue(mockedRes);
-        ctx.response.data = { currentState: TransferStatus.WAITING_FOR_QUOTE_ACCEPTANCE, transferId: 'mock_transfer_id' } as unknown as IPostQuotesResponseBody
-        mockedRequestQuotes.mockResolvedValue(ctx.response as any);
-        await pacs008Handler(ctx as any);
-        expect(mockedRequestQuotes).toBeCalledWith(postQuotesBody);
-        expect(XML.fromXml(ctx.response.body)).toBeTruthy();
-        expect(XSD.validate(ctx.response.body, XSD.paths.pacs_002)).toBe(true);
-        expect(ctx.response.type).toEqual('application/xml');
-        expect(ctx.response.status).toEqual(400);
+            } as ITransferError,
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+
+        mockInboundRequesterHelper(MockedInboundRequester);
+
+        mockOutboundRequesterHelper(MockedOutboundRequester, {
+            requestQuotesResponse: requestQuotesResponse,
+            acceptQuotesResponse: acceptQuotesResponse,
+        })
+
+        let caughtError: Error | undefined = undefined;
+        
+        // ### act
+        try {
+            await pacs008Handler.processTransferRequest(ctx as any);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        // ### Test
+        expect(caughtError).toBeTruthy();
+
+        expect(MockedOutboundRequester.mock.results[0].value.requestQuotes).toBeCalledWith(postQuotesBody);
+        
+        expect(MockedOutboundRequester.mock.results[0].value.acceptQuotes).toBeCalledWith(requestQuotesResponse.data.transferId as string, { acceptQuote: true });
+        
+        expect(MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend).toBeCalled();
+        const mockedSendPACS002toSenderBackendCalledArg = MockedInboundRequester.mock.results[0].value.sendPACS002toSenderBackend.mock.calls[0][0]
+        let validateResult: boolean | Array<Record<string, unknown>> = false;
+        try {
+            validateResult = XSD.validate(mockedSendPACS002toSenderBackendCalledArg, XSD.paths.pacs_002)
+        } catch (error) {
+            fail(error);
+        }
+        expect(validateResult).toBe(true);
+        const mockedSendPACS002toSenderBackendCalledArgXml: IPacs002 | undefined = XML.fromXml(mockedSendPACS002toSenderBackendCalledArg) as unknown as IPacs002;
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.GrpHdr?.MsgId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.GrpHdr.MsgId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts).toEqual(TxStsEnum.RJCT);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlInstrId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.InstrId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlEndToEndId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId);
+        expect(mockedSendPACS002toSenderBackendCalledArgXml?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.OrgnlTxId).toEqual((ctx.request.body as IPacs008).Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.TxId);
     });
 });

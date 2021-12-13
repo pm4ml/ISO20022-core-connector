@@ -1,8 +1,8 @@
-curl --location --request POST 'http://localhost:5000/outbound/iso20022' \
+curl --location --request POST 'http://localhost:3003/outbound/iso20022' \
 --header 'Content-Type: application/xml' \
 --data-raw '<?xml version="1.0" encoding="utf-8"?>
 <!-- POST /transfers -->
-<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09">
+<Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
     <FIToFICstmrCdtTrf>
         <GrpHdr>
             <MsgId>7e2599df-80a1-4f6e-b381-99536c4d2691</MsgId>     <!-- This is The transaction ID -->

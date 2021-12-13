@@ -534,7 +534,7 @@ components:
                   pattern: 'http://www.w3.org/2001/XMLSchema-instance'
                 xmlns:
                   type: string
-                  pattern: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09'
+                  pattern: 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08'
               required:
                 - xmlns
           required:

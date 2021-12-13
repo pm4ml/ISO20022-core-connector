@@ -5,31 +5,23 @@
  *  specified in the corresponding source code repository.                *
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
- *       Shashikant Hirugade - shashikant.hirugade@modusbox.com                     *
+ *       Shashikant Hirugade - shashikant.hirugade@modusbox.com           *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
-import axios, { AxiosResponse } from 'axios';
-import { Config } from '../../config';
+import { AxiosResponse } from 'axios';
+import { IErrorInformation, ITransferFulfilment } from '../../interfaces';
+import { buildJSONHeaders, buildXMLHeaders } from '../headers';
+import { BaseRequester } from '../baseRequester';
 
-const request = axios.create({
-    baseURL: Config.backendEndpoint,
-    timeout: Config.requestTimeout,
-});
+export default class Requester extends BaseRequester {
+    sendPACS008toReceiverBackend = (postTransfersBody: string): Promise<AxiosResponse<any>> => this.axiosInstance.post('', postTransfersBody, { headers: buildXMLHeaders() });
 
-/**
-  * Utility method to build a set of headers required by the ISO inbound API
-  *
-  * @returns {object} - Object containing key/value pairs of HTTP headers
-  */
-export const buildHeaders = (): Record<string, any> => {
-    const headers = {
-        'Content-Type': 'application/xml',
-        Accept: 'application/xml',
-        Date: new Date().toUTCString(),
-    };
+    sendPACS002toSenderBackend = (xmlBody: string): Promise<AxiosResponse<any>> => this.axiosInstance.post('', xmlBody, { headers: buildXMLHeaders() });
 
-    return headers;
-};
+    acceptBackendTransfers = (transferId: string, putTransfersBody: ITransferFulfilment): Promise<AxiosResponse<any>> => this.axiosInstance.post(`/transfers/${transferId}`, putTransfersBody, { headers: buildJSONHeaders() });
 
-// Send request to external ISO switch (e.g. RSWITCH)
-export const requestBackendTransfers = (postTransfersBody: string): Promise<AxiosResponse<any>> => request.post('/transfers', postTransfersBody, { headers: buildHeaders() });
+    sendTransfersError = (transferId: string, putTransfersErrorBody: IErrorInformation): Promise<AxiosResponse<any>> => this.axiosInstance.post(`/transfers/${transferId}/error`, putTransfersErrorBody, { headers: buildJSONHeaders() });
+}

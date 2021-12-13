@@ -6,6 +6,9 @@
  *                                                                        *
  *  ORIGINAL AUTHOR:                                                      *
  *       James Bush - james.bush@modusbox.com                             *
+ *                                                                        *
+ *  CONTRIBUTORS:                                                         *
+ *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
 import Koa from 'koa';
@@ -14,6 +17,10 @@ import { IServiceConfig } from './config';
 export interface ApiState {
     conf: IServiceConfig;
     logger: any;
+    cache: any; // TODO: Fix this to a type
+    meta?: {
+        [key: string]: any;
+    }
 }
 
 export interface ApiContext extends Koa.Context {
@@ -26,5 +33,8 @@ export interface HandlerMap {
 }
 
 export interface OutboundHandlerMap {
-    [key: string]: (ctx: ApiContext, next?: Koa.Next) => void
+    [key: string]: {
+        callback: (ctx: ApiContext, next?: Koa.Next) => void
+        xsd: string,
+    }
 }

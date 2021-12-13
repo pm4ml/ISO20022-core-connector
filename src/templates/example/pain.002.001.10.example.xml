@@ -1,0 +1,19 @@
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.002.001.10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.002.001.10 pain.002.001.10.xsd">
+  <CstmrPmtStsRpt>
+    <GrpHdr>
+      <MsgId>RNDPS/84d00d3f3450d895dbf0ff</MsgId>
+      <CreDtTm>2021-11-24T16:37:04+02:00</CreDtTm>
+    </GrpHdr>
+    <OrgnlGrpInfAndSts>
+      <OrgnlMsgId/>
+      <OrgnlMsgNmId>pain.001.001.09</OrgnlMsgNmId>
+      <OrgnlCreDtTm/>
+      <OrgnlNbOfTxs/>
+    </OrgnlGrpInfAndSts>
+    <OrgnlPmtInfAndSts>
+      <TxInfAndSts>
+        <TxSts>PDNG</TxSts>
+      </TxInfAndSts>
+    </OrgnlPmtInfAndSts>
+  </CstmrPmtStsRpt>
+</Document>

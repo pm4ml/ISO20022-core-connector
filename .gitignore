@@ -8,3 +8,6 @@ node_modules
 .env
 junit.xml
 coverage
+
+# Ignore *.env files unless we want to explicitly add them.
+**/*.env
