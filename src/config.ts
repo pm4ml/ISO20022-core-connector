@@ -28,6 +28,7 @@ export interface IServiceConfig {
     cache: ICacheConfig,
     callbackTimeout: number,
     dfspIdMap?: DfspIdMapType,
+    enableDummyALSResponse?: boolean, // TODO: Remove this hack
 }
 
 export interface IXMLOptions {
@@ -91,4 +92,5 @@ export const Config: IServiceConfig = {
     },
     callbackTimeout: env.get('CALLBACK_TIMEOUT').default(30).asInt(),
     dfspIdMap: env.get('DFSP_ID_MAP').default({}).asJsonObject() as DfspIdMapType,
+    enableDummyALSResponse: env.get('ALS_ENABLED_DUMMY_RESPONSE').asBool() || false, // TODO: Remove this hack
 };
