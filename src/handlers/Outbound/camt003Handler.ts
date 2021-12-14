@@ -54,7 +54,7 @@ export default async (ctx: ApiContext): Promise<void> => {
 
         ctx.state.logger.log(res.data);
         ctx.response.type = 'application/xml';
-        ctx.response.body = partiesByIdResponseToCamt004(res.data);
+        ctx.response.body = partiesByIdResponseToCamt004(res.data, ctx.state?.conf?.dfspIdMap);
         ctx.response.status = 200;
     } catch (e: unknown) {
         handleError(e as Error, ctx);

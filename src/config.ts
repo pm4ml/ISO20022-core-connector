@@ -25,8 +25,9 @@ export interface IServiceConfig {
     logger?: Logger.Logger,
     xmlOptions: IXMLOptions,
     templatesPath: string
-    cache: CacheConfig,
+    cache: ICacheConfig,
     callbackTimeout: number,
+    dfspIdMap?: DfspIdMapType,
 }
 
 export interface IXMLOptions {
@@ -61,11 +62,20 @@ const xmlOptions: IXMLOptions = {
     arrayMode: false,
 };
 
-export interface CacheConfig {
+export interface ICacheConfig {
     host: string,
     port: number,
     enabledTestFeatures?: boolean,
 }
+
+export type DfspIdMapType = {
+    outbound: {
+        [key: string]: string,
+    },
+    inbound: {
+        [key: string]: string,
+    },
+};
 
 export const Config: IServiceConfig = {
     port: env.get('LISTEN_PORT').default('3003').asPortNumber(),
@@ -80,4 +90,5 @@ export const Config: IServiceConfig = {
         enabledTestFeatures: env.get('CACHE_ENABLED_TEST_FEATURES').asBool() || false,
     },
     callbackTimeout: env.get('CALLBACK_TIMEOUT').default(30).asInt(),
+    dfspIdMap: env.get('DFSP_ID_MAP').default({}).asJsonObject() as DfspIdMapType,
 };
