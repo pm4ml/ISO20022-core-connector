@@ -11,12 +11,12 @@
  *       miguel de Barros - miguel.de.barros@modusbox.com                 *
  **************************************************************************/
 
+import { AxiosResponse } from 'axios';
 import { RequesterOptions, OutboundRequester } from '../../requests';
 import { SystemError, BaseError } from '../../errors';
 import { ICamt003, IErrorInformation } from '../../interfaces';
 import { camt003ToGetPartiesParams, fspiopErrorToCamt004Error, partiesByIdResponseToCamt004 } from '../../transformers';
 import { ApiContext } from '../../types';
-import { AxiosResponse } from 'axios';
 
 
 const handleError = (error: Error | IErrorInformation, ctx: ApiContext) => {
