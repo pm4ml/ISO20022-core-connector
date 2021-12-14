@@ -38,6 +38,151 @@
 					"response": []
 				},
 				{
+					"name": "1. POST PACS.008 Missing FinInstnId.nm",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- POST /transfers -->\n<Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\">\n    <FIToFICstmrCdtTrf>\n        <GrpHdr>\n            <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>     <!-- This is The transaction ID -->\n            <CreDtTm>2021-02-10T15:07:38.6875000+03:00</CreDtTm>    <!-- Required by ISO, not used by Moja -->\n            <NbOfTxs>1</NbOfTxs>                                    <!-- One transaction -->\n            <SttlmInf>\n                <SttlmMtd>CLRG</SttlmMtd>\n            </SttlmInf>\n            <PmtTpInf>\n                <CtgyPurp>\n                    <Cd>code</Cd>\n                </CtgyPurp>\n            </PmtTpInf>\n        </GrpHdr>\n        <CdtTrfTxInf>\n            <PmtId>                                              \n              <InstrId>8c5d9f95</InstrId>\n              <EndToEndId>000400078911122</EndToEndId> <!-- This is the transfer ID  -->\n              <TxId>acd1ef76</TxId>\n            </PmtId>\n            <IntrBkSttlmAmt Ccy=\"RWF\">20200</IntrBkSttlmAmt>\n            <IntrBkSttlmDt>2021-07-13</IntrBkSttlmDt>\n            <ChrgBr>DEBT</ChrgBr>                                       <!-- Amount is the amount the creditor will receive... -->\n           <InitgPty>\n                <Nm>LAKE CITY BANK</Nm>\n                <Id>\n                    <OrgId>\n                        <Othr>\n                            <Id>INITGPTY_ID</Id>\n                        </Othr>\n                    </OrgId>\n                </Id>\n           </InitgPty>\n           <Dbtr>\n                <Nm>PAYER_NAME</Nm>\n                <CtctDtls>\n                    <MobNb>+1-574-265-1752</MobNb>\t                    <!-- Debtor is identified by a mobile number -->\n                </CtctDtls>\n            </Dbtr>\n            <DbtrAcct>\n                <Id>\n                    <Othr>\n                        <Id>+1-574-265-1752</Id>\n                    </Othr>\n                </Id>\n            </DbtrAcct>\n            <DbtrAgt>\n\t\t\t\t<FinInstnId>\n\t\t\t\t\t<BICFI>LAKCUS33</BICFI>\n                    <Othr>\n                        <Id>LAKCUS33</Id>\n                    </Othr>\n\t\t\t\t</FinInstnId>\n            </DbtrAgt>\n            <CdtrAgt>\n                <FinInstnId>\n                    <BICFI>EQBLRWRWXXX</BICFI>\n                    <Othr>\n                        <Id>EQBLRWRWXXX</Id>\n                    </Othr>\n                </FinInstnId>\n            </CdtrAgt>\n           <Cdtr>\n                <Nm>PAYEE_NAME</Nm>\n                <CtctDtls>\n                    <MobNb>+250-70610388</MobNb>\t                    <!-- Creditor is identified by a mobile number -->\n                </CtctDtls>\n            </Cdtr>\n            <CdtrAcct>\n                <Id>\n                    <Othr>\n                        <Id>+250-70610388</Id>\n                    </Othr>\n                </Id>\n            </CdtrAcct>\n           <RmtInf>\n                <Ustrd>d7d91837-4402-4c8f-9b73-20255b0ec40c</Ustrd>\n                <Strd>\n                    <RfrdDocInf>\n                        <Nb>hsuikdfgdgg</Nb>\n                        <RltdDt>2021-07-13</RltdDt>\n                    </RfrdDocInf>\n                </Strd>\n           </RmtInf>\n        </CdtTrfTxInf>\n    </FIToFICstmrCdtTrf>\n</Document>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1. POST PACS.009 FAILURE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- POST /transfers -->\n<Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.09\">\n    <FIToFICstmrCdtTrf>\n        <GrpHdr>\n            <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>     <!-- This is The transaction ID -->\n            <CreDtTm>2021-02-10T15:07:38.6875000+03:00</CreDtTm>    <!-- Required by ISO, not used by Moja -->\n            <NbOfTxs>1</NbOfTxs>                                    <!-- One transaction -->\n            <SttlmInf>\n                <SttlmMtd>CLRG</SttlmMtd>\n            </SttlmInf>\n            <PmtTpInf>\n                <CtgyPurp>\n                    <Cd>code</Cd>\n                </CtgyPurp>\n            </PmtTpInf>\n        </GrpHdr>\n        <CdtTrfTxInf>\n            <PmtId>                                              \n              <InstrId>8c5d9f95</InstrId>\n              <EndToEndId>000400078911122</EndToEndId> <!-- This is the transfer ID  -->\n              <TxId>acd1ef76</TxId>\n            </PmtId>\n            <IntrBkSttlmAmt Ccy=\"RWF\">20200</IntrBkSttlmAmt>\n            <IntrBkSttlmDt>2021-07-13</IntrBkSttlmDt>\n            <ChrgBr>DEBT</ChrgBr>                                       <!-- Amount is the amount the creditor will receive... -->\n           <InitgPty>\n                <Nm>LAKE CITY BANK</Nm>\n                <Id>\n                    <OrgId>\n                        <Othr>\n                            <Id>INITGPTY_ID</Id>\n                        </Othr>\n                    </OrgId>\n                </Id>\n           </InitgPty>\n           <Dbtr>\n                <Nm>PAYER_NAME</Nm>\n                <CtctDtls>\n                    <MobNb>+1-574-265-1752</MobNb>\t                    <!-- Debtor is identified by a mobile number -->\n                </CtctDtls>\n            </Dbtr>\n            <DbtrAcct>\n                <Id>\n                    <Othr>\n                        <Id>+1-574-265-1752</Id>\n                    </Othr>\n                </Id>\n            </DbtrAcct>\n            <DbtrAgt>\n\t\t\t\t<FinInstnId>\n\t\t\t\t\t<BICFI>LAKCUS33</BICFI>\n\t\t\t\t\t<Nm>LAKE CITY BANK</Nm>\t                            <!-- Included for information - not required by ISO or Moja -->\n                    <Othr>\n                        <Id>LAKCUS33</Id>\n                    </Othr>\n\t\t\t\t</FinInstnId>\n            </DbtrAgt>\n            <CdtrAgt>\n                <FinInstnId>\n                    <BICFI>EQBLRWRWXXX</BICFI>\n                    <Nm>EQUITY BANK RWANDA LIMITED</Nm>\t                <!-- Creditor's DFSP -->\n                    <Othr>\n                        <Id>EQBLRWRWXXX</Id>\n                    </Othr>\n                </FinInstnId>\n            </CdtrAgt>\n           <Cdtr>\n                <Nm>PAYEE_NAME</Nm>\n                <CtctDtls>\n                    <MobNb>+250-70610388</MobNb>\t                    <!-- Creditor is identified by a mobile number -->\n                </CtctDtls>\n            </Cdtr>\n            <CdtrAcct>\n                <Id>\n                    <Othr>\n                        <Id>+250-70610388</Id>\n                    </Othr>\n                </Id>\n            </CdtrAcct>\n           <RmtInf>\n                <Ustrd>d7d91837-4402-4c8f-9b73-20255b0ec40c</Ustrd>\n                <Strd>\n                    <RfrdDocInf>\n                        <Nb>hsuikdfgdgg</Nb>\n                        <RltdDt>2021-07-13</RltdDt>\n                    </RfrdDocInf>\n                </Strd>\n           </RmtInf>\n        </CdtTrfTxInf>\n    </FIToFICstmrCdtTrf>\n</Document>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1. POST PACS.008 BusinessMessage Wrapper",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\"?>\n<BusinessMessage>\n  <AppHdr xmlns=\"urn:iso:std:iso:20022:tech:xsd:head.001.001.01\">\n    <ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n      <ds:SignedInfo>\n        <ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n        <ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/>\n        <ds:Reference URI=\"#996fca06-db08-41ab-835a-721578ba49d4\">\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>RADJV+HXE14zRuxjFibcyU5UOIYsV1a9p74W+DnErNc=</ds:DigestValue>\n        </ds:Reference>\n        <ds:Reference URI=\"\">\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>\n            <ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>cehRxP8BxyK5Xo+ozB3HDMQIlNBDLP5WAEo5sBLry4E=</ds:DigestValue>\n        </ds:Reference>\n        <ds:Reference>\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>KeTI9ZiUtajyjO08YeojoZwNpDLQNugXTsuhwt5SlAg=</ds:DigestValue>\n        </ds:Reference>\n      </ds:SignedInfo>\n      <ds:SignatureValue>tkf/dgPjOLjpqW0lCOgTEK8qK7PaytlzK3/ncCEpPb/GPY+0GRBhqL+T3+MM4dVAxd067si32Ppm knKH9gPJb5o5zahP1nkjIAFoTjvrqfKe0Jw99ScFzWsVG1yDBJiNlRyiBQbgyQAH5Ms7dFrZSOvD /1mKRKLu5+jjzlWtVz/0casJEUerCPQEGCgwlr8hZDiALEPAXfNzszXEUq2XQY9eqH2rrWNjxNnC N5e/EYynNRcjCyQeIMVur6jd6SzMzlW1C0TzfN/eeSKlZVdEy+MaMMZVh9Ovjhaiu04YCq/PbAKF 8tjMAxzFO2SGj2npMqPQ7lBQAwyElKIKWHyV6w==</ds:SignatureValue>\n      <ds:KeyInfo Id=\"996fca06-db08-41ab-835a-721578ba49d4\">\n        <ds:KeyValue>\n          <ds:RSAKeyValue>\n            <ds:Modulus>uUFRZyRC6kM4HS5yS4tL8VhvnoWMxvu+yoCyiZXJEhcXqY0DY1hD2Dcy8NOOsprJ4dZlqxcqYZEq ElC1q1IHmuZk4BVIMWqglZMKfVsYmYOSB0OrT1Crlhm/1y25IqTmDKISa2itHghFP/VXK8bkWQao d6MYOnnEjNFwPUGF+TPEEu5cFS/LNyET4QpxhY9ZzOszLLWXjbxksEpqtvIjj+COj/xgPTwzWcwv MmJm4f3o5b3Ez5GMHZK7AV1vi4Dt3UlbraFUWXSjMMZ4b3Jbjg3qGvDemNyLbZyoQGTkbT//3DOa 2YLYyd8ncHjotuMjY8ihLK2gA17S0p8Sho622Q==</ds:Modulus>\n            <ds:Exponent>AQAB</ds:Exponent>\n          </ds:RSAKeyValue>\n        </ds:KeyValue>\n        <ds:X509Data>\n          <ds:X509Certificate>MIID/zCCAuegAwIBAgIBBTANBgkqhkiG9w0BAQsFADCBjDELMAkGA1UEBhMCUlcxDzANBgNVBAgT BktpZ2FsaTELMAkGA1UEBxMCUlcxEDAOBgNVBAoTB1JTd2l0Y2gxDzANBgNVBAsTBlItTkRQUzEW MBQGA1UEAxMNUi1ORFBTIFNVQiBDQTEkMCIGCSqGSIb3DQEJARYVaW5mb3NlY0Byc3dpdGNoLmNv LnJ3MB4XDTE5MTAwNzA4NTEwMFoXDTI0MTAwNzA4NTEwMFowgZwxCzAJBgNVBAYTAlJXMQ8wDQYD VQQIEwZLaWdhbGkxDzANBgNVBAcTBktpZ2FsaTEUMBIGA1UEChMLUlN3aXRjaCBMdGQxFjAUBgNVBAsTDUlUIERlcGFydG1lbnQxGjAYBgNVBAMTEUludGVncmF0aW9uIExheWVyMSEwHwYJKoZIhvcN AQkBFhJpbmZvQHJzd2l0Y2guY28ucncwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC5 QVFnJELqQzgdLnJLi0vxWG+ehYzG+77KgLKJlckSFxepjQNjWEPYNzLw046ymsnh1mWrFyphkSoS ULWrUgea5mTgFUgxaqCVkwp9WxiZg5IHQ6tPUKuWGb/XLbkipOYMohJraK0eCEU/9VcrxuRZBqh3 oxg6ecSM0XA9QYX5M8QS7lwVL8s3IRPhCnGFj1nM6zMstZeNvGSwSmq28iOP4I6P/GA9PDNZzC8y Ymbh/ejlvcTPkYwdkrsBXW+LgO3dSVutoVRZdKMwxnhvcluODeoa8N6Y3IttnKhAZORtP//cM5rZ gtjJ3ydweOi24yNjyKEsraADXtLSnxKGjrbZAgMBAAGjWjBYMAkGA1UdEwQCMAAwHQYDVR0OBBYE FBfCLyY6cAjbHtZ+5sOgrE+jbR2JMB8GA1UdIwQYMBaAFBA/2uMlpd8NUn2CZlXSrD6H/sMiMAsG A1UdDwQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEATOUOuX+8U0MmZeY2sGZ6yMsSFtk4WGBpldSp OJh6PJqt68LoUdzEgPeVqI9r/WobmQxet6J04ILrMbkXqAXWN6bQ8yHEk7U6YP0CZuT3ti9yfKxK hXKym6f0/zcNvYzoa5Mi0XCMoX5iPFLSoBWvT8o7pDoX/m+xMkXlQGUsVu9b+ILudaz5lYXg2+tT ol3fQWx5ccf/KeEEoTDthLWUOkLmwyTHHS1JDPc5tOMZvAY5epJbBwB6MeO6SF/5y+nmbW/O/iN9 LKbtyZzKR5Li7c7+lvs61W3XezCuvgBzX6+R7QEH7RRL+fztfWdKp9cKEa62F9vudqkBbpxQMC88 9Q==</ds:X509Certificate>\n        </ds:X509Data>\n      </ds:KeyInfo>\n    </ds:Signature>\n  </AppHdr>\n  <Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\">\n    <FIToFICstmrCdtTrf>\n      <GrpHdr>\n        <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>        <!-- This is The transaction ID -->\n        <CreDtTm>2021-02-10T15:07:38.6875000+03:00</CreDtTm>        <!-- Required by ISO, not used by Moja -->\n        <NbOfTxs>1</NbOfTxs>        <!-- One transaction -->\n        <SttlmInf>\n          <SttlmMtd>CLRG</SttlmMtd>\n        </SttlmInf>\n        <PmtTpInf>\n          <CtgyPurp>\n            <Cd>code</Cd>\n          </CtgyPurp>\n        </PmtTpInf>\n      </GrpHdr>\n      <CdtTrfTxInf>\n        <PmtId>\n          <InstrId>8c5d9f95</InstrId>\n          <EndToEndId>000400078911122</EndToEndId>          <!-- This is the transfer ID  -->\n          <TxId>acd1ef76</TxId>\n        </PmtId>\n        <IntrBkSttlmAmt Ccy=\"RWF\">20200</IntrBkSttlmAmt>\n        <IntrBkSttlmDt>2021-07-13</IntrBkSttlmDt>\n        <ChrgBr>DEBT</ChrgBr>        <!-- Amount is the amount the creditor will receive... -->\n        <InitgPty>\n          <Nm>LAKE CITY BANK</Nm>\n          <Id>\n            <OrgId>\n              <Othr>\n                <Id>INITGPTY_ID</Id>\n              </Othr>\n            </OrgId>\n          </Id>\n        </InitgPty>\n        <Dbtr>\n          <Nm>PAYER_NAME</Nm>\n          <CtctDtls>\n            <MobNb>+1-574-265-1752</MobNb>            <!-- Debtor is identified by a mobile number -->\n          </CtctDtls>\n        </Dbtr>\n        <DbtrAcct>\n          <Id>\n            <Othr>\n              <Id>+1-574-265-1752</Id>\n            </Othr>\n          </Id>\n        </DbtrAcct>\n        <DbtrAgt>\n          <FinInstnId>\n            <BICFI>LAKCUS33</BICFI>\n            <Nm>LAKE CITY BANK</Nm>            <!-- Included for information - not required by ISO or Moja -->\n            <Othr>\n              <Id>LAKCUS33</Id>\n            </Othr>\n          </FinInstnId>\n        </DbtrAgt>\n        <CdtrAgt>\n          <FinInstnId>\n            <BICFI>EQBLRWRWXXX</BICFI>\n            <Nm>EQUITY BANK RWANDA LIMITED</Nm>            <!-- Creditor's DFSP -->\n            <Othr>\n              <Id>EQBLRWRWXXX</Id>\n            </Othr>\n          </FinInstnId>\n        </CdtrAgt>\n        <Cdtr>\n          <Nm>PAYEE_NAME</Nm>\n          <CtctDtls>\n            <MobNb>+250-70610388</MobNb>            <!-- Creditor is identified by a mobile number -->\n          </CtctDtls>\n        </Cdtr>\n        <CdtrAcct>\n          <Id>\n            <Othr>\n              <Id>+250-70610388</Id>\n            </Othr>\n          </Id>\n        </CdtrAcct>\n        <RmtInf>\n          <Ustrd>d7d91837-4402-4c8f-9b73-20255b0ec40c</Ustrd>\n          <Strd>\n            <RfrdDocInf>\n              <Nb>hsuikdfgdgg</Nb>\n              <RltdDt>2021-07-13</RltdDt>\n            </RfrdDocInf>\n          </Strd>\n        </RmtInf>\n      </CdtTrfTxInf>\n    </FIToFICstmrCdtTrf>\n  </Document>\n</BusinessMessage>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1. POST PACS.008 BusinessMessage Wrapper Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\"?>\n<BusinessMessage>\n  <AppHdr xmlns=\"urn:iso:std:iso:20022:tech:xsd:head00100101\">\n    <ds:Signature xmlns:ds=\"http://wwww3org/2000/09/xmldsig#\">\n      <ds:SignedInfo>\n        <ds:CanonicalizationMethod Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n        <ds:SignatureMethod Algorithm=\"http://wwww3org/2001/04/xmldsig-more#rsa-sha256\"/>\n        <ds:Reference URI=\"#e4f01413-04a4-489b-9aab-139331875286\">\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://wwww3org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>8e0Ql/0VHrFofWY1YIyIBE0JCWKCw8t6L7wrJY1OLLY=</ds:DigestValue>\n        </ds:Reference>\n        <ds:Reference URI=\"\">\n          <ds:Transforms><ds:Transform Algorithm=\"http://wwww3org/2000/09/xmldsig#enveloped-signature\"/>\n          <ds:Transform Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n        </ds:Transforms>\n        <ds:DigestMethod Algorithm=\"http://wwww3org/2001/04/xmlenc#sha256\"/>\n        <ds:DigestValue>cehRxP8BxyK5Xo+ozB3HDMQIlNBDLP5WAEo5sBLry4E=</ds:DigestValue>\n      </ds:Reference>\n      <ds:Reference><ds:Transforms><ds:Transform Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n    </ds:Transforms>\n    <ds:DigestMethod Algorithm=\"http://wwww3org/2001/04/xmlenc#sha256\"/>\n    <ds:DigestValue>qJBUpqXINew2xM2ind8EITWoSMo9SrEWa2lAa/JkCXs=</ds:DigestValue>\n  </ds:Reference>\n</ds:SignedInfo>\n<ds:SignatureValue>RAFba36JKiBYU02Deoc2zVIz0Yf+YUtpJKJtK0yT\n  ufk1CB8Nommmj7FkRB9LkzL97E3WU0235NgFsFB7hNRSfOZRBSo8tMRcx0H3gS793AI5sYou5uaVNXbN//gH7iLLWssnntL5gCGO70n7f96VfhaQJYq4cDv6Anrff8gAO5JiXz0mzmMckdfehEzQdbrLIOZOudySGYyXhJJ25uQtU4ScB7+bvH9/NviRuOfrm8fdIb41zyrXkUT2 nwCVjA7k/4CFNhJpjQBQ+IMu6J32zO/28Zzk7Ee8meZx4hfb4TLfY46YKr2h/DU/G/2RApu/M/tTYro+VLZ559HLScs1+A==</ds:SignatureValue>\n<ds:KeyInfo Id=\"e4f01413-04a4-489b-9aab-139331875286\">\n  <ds:KeyValue>\n    <ds:RSAKeyValue>\n      <ds:Modulus>uUFRZyRC6kM4HS5yS4tL8VhvnoWMxvu+yoCyiZXJEhcXqY0DY1hD2Dcy8NOOsprJ4dZlqxcqYZEqElC1q1IHmuZk4BVIMWqglZMKfVsYmYOSB0OrT1Crlhm/1y25IqTmDKISa2itHghFP/VXK8bkWQaod6MYOnnEjNFwPUGF +TPEEu5cFS/LNyET4QpxhY9ZzOszLLWXjbxksEpqtvIjj+COj/xgPTwzWcwvMmJm4f3o5b3Ez5GMHZK7AV1vi4Dt3UlbraFUWXSjMMZ4b3Jbjg3qGvDemNyLbZyoQGTkbT//3DOa2YLYyd8ncHjotuMjY8ihLK2gA17S0p8Sho622Q==</ds:Modulus>\n      <ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue><ds:X509Data><ds:X509Certificate>MIID/zCCAuegAwIBAgIBBTANBgkqhkiG9w0BAQsFADCBjDELMAkGA1UEBhMCUlcxDzANBgNVBAgTBktpZ2\n  FsaTELMAkGA1UEBxMCUlcxEDAOBgNVBAoTB1JTd2l0Y2gxDzANBgNVBAsTBlItTkRQUzEWMBQGA1UEAxMNUi1ORFBTIFNVQiBDQTEkMCIGCSqGSIb3DQEJARYVaW5mb3NlY0Byc3dpdGNoLmNvLnJ3MB4XDTE5MTAwNzA4NTEwMFoXDTI0MTAwNzA4NTEwMFowgZwxCzAJBgNVBAY\n  TAlJXMQ8wDQYDVQQIEwZLaWdhbGkxDzANBgNVBAcTBktpZ2FsaTEUMBIGA1UEChMLUlN3aXRjaCBMdGQxFjAUBgNVBAsTDUlUIERlcGFydG1lbnQxGjAYBgNVBAMTEUludGVncmF0aW9uIExheWVyMSEwHwYJKoZIhvcNAQkBFhJpbmZvQHJzd2l0Y2guY28ucncwggEiMA0GCSq\n  GSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC5QVFnJELqQzgdLnJLi0vxWG+ehYzG+77KgLKJlckSFxepjQNjWEPYNzLw046ymsnh1mWrFyphkSoSULWrUgea5mTgFUgxaqCVkwp9WxiZg5IHQ6tPUKuWGb/XLbkipOYMohJraK0eCEU/9VcrxuRZBqh3oxg6ecSM0XA9QYX5M8QS7lw\n  VL8s3IRPhCnGFj1nM6zMstZeNvGSwSmq28iOP4I6P/GA9PDNZzC8yYmbh/ejlvcTPkYwdkrsBXW+LgO3dSVutoVRZdKMwxnhvcluODeoa8N6Y3IttnKhAZORtP//cM5rZgtjJ3ydweOi24yNjyKEsraADXtLSnxKGjrbZAgMBAAGjWjBYMAkGA1UdEwQCMAAwHQYDVR0OBBYEFBf\n  CLyY6cAjbHtZ+5sOgrE+jbR2JMB8GA1UdIwQYMBaAFBA/2uMlpd8NUn2CZlXSrD6H/sMiMAsGA1UdDwQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEATOUOuX+8U0MmZeY2sGZ6yMsSFtk4WGBpldSpOJh6PJqt68LoUdzEgPeVqI9r/WobmQxet6J04ILrMbkXqAXWN6bQ8yHEk7U6\n  YP0CZuT3ti9yfKxKhXKym6f0/zcNvYzoa5Mi0XCMoX5iPFLSoBWvT8o7pDoX/m+xMkXlQGUsVu9b+ILudaz5lYXg2+tTol3fQWx5ccf/KeEEoTDthLWUOkLmwyTHHS1JDPc5tOMZvAY5epJbBwB6MeO6SF/5y+nmbW/O/iN9LKbtyZzKR5Li7c7+lvs61W3XezCuvgBzX6+R7QEH 7RRL+fztfWdKp9cKEa62F9vudqkBbpxQMC889Q==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></AppHdr>\n  <Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\"\n        xmlns:xsi=\"http://wwww3org/2001/XMLSchema-instance\"\n        xsi:schemaLocation=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 pacs.008.001.08.xsd\">\n        <FIToFICstmrCdtTrf>\n          <GrpHdr>\n            <MsgId>RNDPS/27148</MsgId>\n            <CreDtTm>2021-05-27T12:04:31+02:00</CreDtTm>\n            <NbOfTxs>1</NbOfTxs>\n            <SttlmInf>\n              <SttlmMtd>INDA</SttlmMtd>\n            </SttlmInf>\n            <InstgAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>078</Id>\n                </Othr>\n              </FinInstnId>\n            </InstgAgt>\n            <InstdAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>073</Id>\n                </Othr>\n              </FinInstnId>\n            </InstdAgt>\n          </GrpHdr>\n          <CdtTrfTxInf>\n            <PmtId>\n              <InstrId>27148</InstrId>\n              <EndToEndId>27148</EndToEndId>\n              <TxId>210527000001</TxId>\n            </PmtId>\n            <PmtTpInf/>\n            <IntrBkSttlmAmt Ccy=\"RWF\">500</IntrBkSttlmAmt>\n            <IntrBkSttlmDt>2021-05-28</IntrBkSttlmDt>\n            <ChrgBr>SHAR</ChrgBr>\n            <InitgPty>\n              <Nm>MTN</Nm>\n              <Id>\n                <OrgId>\n                  <Othr>\n                    <Id>33</Id>\n                    <SchmeNm>\n                      <Cd>CHAN</Cd>\n                    </SchmeNm>\n                  </Othr>\n                </OrgId>\n              </Id>\n            </InitgPty>\n            <Dbtr>\n              <Nm>NOT PROVIDED</Nm>\n            </Dbtr>\n            <DbtrAcct>\n              <Id>\n                <Othr>\n                  <Id>0789137915</Id>\n                </Othr>\n              </Id>\n            </DbtrAcct>\n            <DbtrAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>078</Id>\n                </Othr>\n              </FinInstnId>\n            </DbtrAgt>\n            <CdtrAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>073</Id>\n                </Othr>\n              </FinInstnId>\n            </CdtrAgt>\n            <Cdtr>\n              <Nm>NOT PROVIDED</Nm>\n            </Cdtr>\n            <CdtrAcct>\n              <Id>\n                <Othr>\n                  <Id>0738837168</Id>\n                </Othr>\n              </Id>\n            </CdtrAcct>\n            <Purp>\n              <Cd>GDDS</Cd>\n            </Purp>\n            <RmtInf>\n              <Ustrd>Cdt Transfer MTN To AIRTEL</Ustrd>\n              <Strd>\n                <RfrdDocInf>\n                  <Tp>\n                    <CdOrPrtry>\n                      <Cd>CINV</Cd>\n                    </CdOrPrtry>\n                  </Tp>\n                  <Nb>210527000001</Nb>\n                  <RltdDt>2021-05-27</RltdDt>\n                </RfrdDocInf>\n              </Strd>\n            </RmtInf>\n          </CdtTrfTxInf>\n        </FIToFICstmrCdtTrf>\n      </Document>\n    </BusinessMessage>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1. POST PACS.008 BusinessMessage Wrapper Copy 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\"?>\n<BusinessMessage>\n  <AppHdr xmlns=\"urn:iso:std:iso:20022:tech:xsd:head00100101\">\n    <ds:Signature xmlns:ds=\"http://wwww3org/2000/09/xmldsig#\">\n      <ds:SignedInfo>\n        <ds:CanonicalizationMethod Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n        <ds:SignatureMethod Algorithm=\"http://wwww3org/2001/04/xmldsig-more#rsa-sha256\"/>\n        <ds:Reference URI=\"#e4f01413-04a4-489b-9aab-139331875286\">\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://wwww3org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>8e0Ql/0VHrFofWY1YIyIBE0JCWKCw8t6L7wrJY1OLLY=</ds:DigestValue>\n        </ds:Reference>\n        <ds:Reference URI=\"\">\n          <ds:Transforms><ds:Transform Algorithm=\"http://wwww3org/2000/09/xmldsig#enveloped-signature\"/>\n          <ds:Transform Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n        </ds:Transforms>\n        <ds:DigestMethod Algorithm=\"http://wwww3org/2001/04/xmlenc#sha256\"/>\n        <ds:DigestValue>cehRxP8BxyK5Xo+ozB3HDMQIlNBDLP5WAEo5sBLry4E=</ds:DigestValue>\n      </ds:Reference>\n      <ds:Reference><ds:Transforms><ds:Transform Algorithm=\"http://wwww3org/2001/10/xml-exc-c14n#\"/>\n    </ds:Transforms>\n    <ds:DigestMethod Algorithm=\"http://wwww3org/2001/04/xmlenc#sha256\"/>\n    <ds:DigestValue>qJBUpqXINew2xM2ind8EITWoSMo9SrEWa2lAa/JkCXs=</ds:DigestValue>\n  </ds:Reference>\n</ds:SignedInfo>\n<ds:SignatureValue>RAFba36JKiBYU02Deoc2zVIz0Yf+YUtpJKJtK0yT\n  ufk1CB8Nommmj7FkRB9LkzL97E3WU0235NgFsFB7hNRSfOZRBSo8tMRcx0H3gS793AI5sYou5uaVNXbN//gH7iLLWssnntL5gCGO70n7f96VfhaQJYq4cDv6Anrff8gAO5JiXz0mzmMckdfehEzQdbrLIOZOudySGYyXhJJ25uQtU4ScB7+bvH9/NviRuOfrm8fdIb41zyrXkUT2 nwCVjA7k/4CFNhJpjQBQ+IMu6J32zO/28Zzk7Ee8meZx4hfb4TLfY46YKr2h/DU/G/2RApu/M/tTYro+VLZ559HLScs1+A==</ds:SignatureValue>\n<ds:KeyInfo Id=\"e4f01413-04a4-489b-9aab-139331875286\">\n  <ds:KeyValue>\n    <ds:RSAKeyValue>\n      <ds:Modulus>uUFRZyRC6kM4HS5yS4tL8VhvnoWMxvu+yoCyiZXJEhcXqY0DY1hD2Dcy8NOOsprJ4dZlqxcqYZEqElC1q1IHmuZk4BVIMWqglZMKfVsYmYOSB0OrT1Crlhm/1y25IqTmDKISa2itHghFP/VXK8bkWQaod6MYOnnEjNFwPUGF +TPEEu5cFS/LNyET4QpxhY9ZzOszLLWXjbxksEpqtvIjj+COj/xgPTwzWcwvMmJm4f3o5b3Ez5GMHZK7AV1vi4Dt3UlbraFUWXSjMMZ4b3Jbjg3qGvDemNyLbZyoQGTkbT//3DOa2YLYyd8ncHjotuMjY8ihLK2gA17S0p8Sho622Q==</ds:Modulus>\n      <ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue><ds:X509Data><ds:X509Certificate>MIID/zCCAuegAwIBAgIBBTANBgkqhkiG9w0BAQsFADCBjDELMAkGA1UEBhMCUlcxDzANBgNVBAgTBktpZ2\n  FsaTELMAkGA1UEBxMCUlcxEDAOBgNVBAoTB1JTd2l0Y2gxDzANBgNVBAsTBlItTkRQUzEWMBQGA1UEAxMNUi1ORFBTIFNVQiBDQTEkMCIGCSqGSIb3DQEJARYVaW5mb3NlY0Byc3dpdGNoLmNvLnJ3MB4XDTE5MTAwNzA4NTEwMFoXDTI0MTAwNzA4NTEwMFowgZwxCzAJBgNVBAY\n  TAlJXMQ8wDQYDVQQIEwZLaWdhbGkxDzANBgNVBAcTBktpZ2FsaTEUMBIGA1UEChMLUlN3aXRjaCBMdGQxFjAUBgNVBAsTDUlUIERlcGFydG1lbnQxGjAYBgNVBAMTEUludGVncmF0aW9uIExheWVyMSEwHwYJKoZIhvcNAQkBFhJpbmZvQHJzd2l0Y2guY28ucncwggEiMA0GCSq\n  GSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC5QVFnJELqQzgdLnJLi0vxWG+ehYzG+77KgLKJlckSFxepjQNjWEPYNzLw046ymsnh1mWrFyphkSoSULWrUgea5mTgFUgxaqCVkwp9WxiZg5IHQ6tPUKuWGb/XLbkipOYMohJraK0eCEU/9VcrxuRZBqh3oxg6ecSM0XA9QYX5M8QS7lw\n  VL8s3IRPhCnGFj1nM6zMstZeNvGSwSmq28iOP4I6P/GA9PDNZzC8yYmbh/ejlvcTPkYwdkrsBXW+LgO3dSVutoVRZdKMwxnhvcluODeoa8N6Y3IttnKhAZORtP//cM5rZgtjJ3ydweOi24yNjyKEsraADXtLSnxKGjrbZAgMBAAGjWjBYMAkGA1UdEwQCMAAwHQYDVR0OBBYEFBf\n  CLyY6cAjbHtZ+5sOgrE+jbR2JMB8GA1UdIwQYMBaAFBA/2uMlpd8NUn2CZlXSrD6H/sMiMAsGA1UdDwQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEATOUOuX+8U0MmZeY2sGZ6yMsSFtk4WGBpldSpOJh6PJqt68LoUdzEgPeVqI9r/WobmQxet6J04ILrMbkXqAXWN6bQ8yHEk7U6\n  YP0CZuT3ti9yfKxKhXKym6f0/zcNvYzoa5Mi0XCMoX5iPFLSoBWvT8o7pDoX/m+xMkXlQGUsVu9b+ILudaz5lYXg2+tTol3fQWx5ccf/KeEEoTDthLWUOkLmwyTHHS1JDPc5tOMZvAY5epJbBwB6MeO6SF/5y+nmbW/O/iN9LKbtyZzKR5Li7c7+lvs61W3XezCuvgBzX6+R7QEH 7RRL+fztfWdKp9cKEa62F9vudqkBbpxQMC889Q==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></AppHdr>\n  <Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08\"\n        xmlns:xsi=\"http://wwww3org/2001/XMLSchema-instance\">\n        <FIToFICstmrCdtTrf>\n          <GrpHdr>\n            <MsgId>RNDPS/27148</MsgId>\n            <CreDtTm>2021-05-27T12:04:31+02:00</CreDtTm>\n            <NbOfTxs>1</NbOfTxs>\n            <SttlmInf>\n              <SttlmMtd>INDA</SttlmMtd>\n            </SttlmInf>\n            <InstgAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>078</Id>\n                </Othr>\n              </FinInstnId>\n            </InstgAgt>\n            <InstdAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>073</Id>\n                </Othr>\n              </FinInstnId>\n            </InstdAgt>\n          </GrpHdr>\n          <CdtTrfTxInf>\n            <PmtId>\n              <InstrId>27148</InstrId>\n              <EndToEndId>27148</EndToEndId>\n              <TxId>210527000001</TxId>\n            </PmtId>\n            <PmtTpInf/>\n            <IntrBkSttlmAmt Ccy=\"RWF\">500</IntrBkSttlmAmt>\n            <IntrBkSttlmDt>2021-05-28</IntrBkSttlmDt>\n            <ChrgBr>SHAR</ChrgBr>\n            <InitgPty>\n              <Nm>MTN</Nm>\n              <Id>\n                <OrgId>\n                  <Othr>\n                    <Id>33</Id>\n                    <SchmeNm>\n                      <Cd>CHAN</Cd>\n                    </SchmeNm>\n                  </Othr>\n                </OrgId>\n              </Id>\n            </InitgPty>\n            <Dbtr>\n              <Nm>NOT PROVIDED</Nm>\n            </Dbtr>\n            <DbtrAcct>\n              <Id>\n                <Othr>\n                  <Id>0789137915</Id>\n                </Othr>\n              </Id>\n            </DbtrAcct>\n            <DbtrAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>078</Id>\n                </Othr>\n              </FinInstnId>\n            </DbtrAgt>\n            <CdtrAgt>\n              <FinInstnId>\n                <Othr>\n                  <Id>073</Id>\n                </Othr>\n              </FinInstnId>\n            </CdtrAgt>\n            <Cdtr>\n              <Nm>NOT PROVIDED</Nm>\n            </Cdtr>\n            <CdtrAcct>\n              <Id>\n                <Othr>\n                  <Id>0738837168</Id>\n                </Othr>\n              </Id>\n            </CdtrAcct>\n            <Purp>\n              <Cd>GDDS</Cd>\n            </Purp>\n            <RmtInf>\n              <Ustrd>Cdt Transfer MTN To AIRTEL</Ustrd>\n              <Strd>\n                <RfrdDocInf>\n                  <Tp>\n                    <CdOrPrtry>\n                      <Cd>CINV</Cd>\n                    </CdOrPrtry>\n                  </Tp>\n                  <Nb>210527000001</Nb>\n                  <RltdDt>2021-05-27</RltdDt>\n                </RfrdDocInf>\n              </Strd>\n            </RmtInf>\n          </CdtTrfTxInf>\n        </FIToFICstmrCdtTrf>\n      </Document>\n    </BusinessMessage>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "3. POST PACS.002",
 					"request": {
 						"method": "POST",
@@ -45,6 +190,35 @@
 						"body": {
 							"mode": "raw",
 							"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10\">\n  <FIToFIPmtStsRpt>\n    <GrpHdr>\n      <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>\n      <CreDtTm>2021-12-03T14:09:39.288Z</CreDtTm>\n    </GrpHdr>\n    <TxInfAndSts>\n      <OrgnlInstrId>8c5d9f95</OrgnlInstrId>\n      <OrgnlEndToEndId>000400078911122</OrgnlEndToEndId>\n      <OrgnlTxId>acd1ef76</OrgnlTxId>\n      <TxSts>ACSC</TxSts>\n    </TxInfAndSts>\n  </FIToFIPmtStsRpt>\n</Document>\n",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/outbound/iso20022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"outbound",
+								"iso20022"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. POST PACS.002 BusnessMessage Wrapper",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<BusinessMessage>\n  <AppHdr xmlns=\"urn:iso:std:iso:20022:tech:xsd:head.001.001.01\">\n    <ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n      <ds:SignedInfo>\n        <ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n        <ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/>\n        <ds:Reference URI=\"#996fca06-db08-41ab-835a-721578ba49d4\">\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>RADJV+HXE14zRuxjFibcyU5UOIYsV1a9p74W+DnErNc=</ds:DigestValue>\n        </ds:Reference>\n        <ds:Reference URI=\"\">\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>\n            <ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>cehRxP8BxyK5Xo+ozB3HDMQIlNBDLP5WAEo5sBLry4E=</ds:DigestValue>\n        </ds:Reference>\n        <ds:Reference>\n          <ds:Transforms>\n            <ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n          </ds:Transforms>\n          <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n          <ds:DigestValue>KeTI9ZiUtajyjO08YeojoZwNpDLQNugXTsuhwt5SlAg=</ds:DigestValue>\n        </ds:Reference>\n      </ds:SignedInfo>\n      <ds:SignatureValue>tkf/dgPjOLjpqW0lCOgTEK8qK7PaytlzK3/ncCEpPb/GPY+0GRBhqL+T3+MM4dVAxd067si32Ppm knKH9gPJb5o5zahP1nkjIAFoTjvrqfKe0Jw99ScFzWsVG1yDBJiNlRyiBQbgyQAH5Ms7dFrZSOvD /1mKRKLu5+jjzlWtVz/0casJEUerCPQEGCgwlr8hZDiALEPAXfNzszXEUq2XQY9eqH2rrWNjxNnC N5e/EYynNRcjCyQeIMVur6jd6SzMzlW1C0TzfN/eeSKlZVdEy+MaMMZVh9Ovjhaiu04YCq/PbAKF 8tjMAxzFO2SGj2npMqPQ7lBQAwyElKIKWHyV6w==</ds:SignatureValue>\n      <ds:KeyInfo Id=\"996fca06-db08-41ab-835a-721578ba49d4\">\n        <ds:KeyValue>\n          <ds:RSAKeyValue>\n            <ds:Modulus>uUFRZyRC6kM4HS5yS4tL8VhvnoWMxvu+yoCyiZXJEhcXqY0DY1hD2Dcy8NOOsprJ4dZlqxcqYZEq ElC1q1IHmuZk4BVIMWqglZMKfVsYmYOSB0OrT1Crlhm/1y25IqTmDKISa2itHghFP/VXK8bkWQao d6MYOnnEjNFwPUGF+TPEEu5cFS/LNyET4QpxhY9ZzOszLLWXjbxksEpqtvIjj+COj/xgPTwzWcwv MmJm4f3o5b3Ez5GMHZK7AV1vi4Dt3UlbraFUWXSjMMZ4b3Jbjg3qGvDemNyLbZyoQGTkbT//3DOa 2YLYyd8ncHjotuMjY8ihLK2gA17S0p8Sho622Q==</ds:Modulus>\n            <ds:Exponent>AQAB</ds:Exponent>\n          </ds:RSAKeyValue>\n        </ds:KeyValue>\n        <ds:X509Data>\n          <ds:X509Certificate>MIID/zCCAuegAwIBAgIBBTANBgkqhkiG9w0BAQsFADCBjDELMAkGA1UEBhMCUlcxDzANBgNVBAgT BktpZ2FsaTELMAkGA1UEBxMCUlcxEDAOBgNVBAoTB1JTd2l0Y2gxDzANBgNVBAsTBlItTkRQUzEW MBQGA1UEAxMNUi1ORFBTIFNVQiBDQTEkMCIGCSqGSIb3DQEJARYVaW5mb3NlY0Byc3dpdGNoLmNv LnJ3MB4XDTE5MTAwNzA4NTEwMFoXDTI0MTAwNzA4NTEwMFowgZwxCzAJBgNVBAYTAlJXMQ8wDQYD VQQIEwZLaWdhbGkxDzANBgNVBAcTBktpZ2FsaTEUMBIGA1UEChMLUlN3aXRjaCBMdGQxFjAUBgNVBAsTDUlUIERlcGFydG1lbnQxGjAYBgNVBAMTEUludGVncmF0aW9uIExheWVyMSEwHwYJKoZIhvcN AQkBFhJpbmZvQHJzd2l0Y2guY28ucncwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC5 QVFnJELqQzgdLnJLi0vxWG+ehYzG+77KgLKJlckSFxepjQNjWEPYNzLw046ymsnh1mWrFyphkSoS ULWrUgea5mTgFUgxaqCVkwp9WxiZg5IHQ6tPUKuWGb/XLbkipOYMohJraK0eCEU/9VcrxuRZBqh3 oxg6ecSM0XA9QYX5M8QS7lwVL8s3IRPhCnGFj1nM6zMstZeNvGSwSmq28iOP4I6P/GA9PDNZzC8y Ymbh/ejlvcTPkYwdkrsBXW+LgO3dSVutoVRZdKMwxnhvcluODeoa8N6Y3IttnKhAZORtP//cM5rZ gtjJ3ydweOi24yNjyKEsraADXtLSnxKGjrbZAgMBAAGjWjBYMAkGA1UdEwQCMAAwHQYDVR0OBBYE FBfCLyY6cAjbHtZ+5sOgrE+jbR2JMB8GA1UdIwQYMBaAFBA/2uMlpd8NUn2CZlXSrD6H/sMiMAsG A1UdDwQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEATOUOuX+8U0MmZeY2sGZ6yMsSFtk4WGBpldSp OJh6PJqt68LoUdzEgPeVqI9r/WobmQxet6J04ILrMbkXqAXWN6bQ8yHEk7U6YP0CZuT3ti9yfKxK hXKym6f0/zcNvYzoa5Mi0XCMoX5iPFLSoBWvT8o7pDoX/m+xMkXlQGUsVu9b+ILudaz5lYXg2+tT ol3fQWx5ccf/KeEEoTDthLWUOkLmwyTHHS1JDPc5tOMZvAY5epJbBwB6MeO6SF/5y+nmbW/O/iN9 LKbtyZzKR5Li7c7+lvs61W3XezCuvgBzX6+R7QEH7RRL+fztfWdKp9cKEa62F9vudqkBbpxQMC88 9Q==</ds:X509Certificate>\n        </ds:X509Data>\n      </ds:KeyInfo>\n    </ds:Signature>\n  </AppHdr>\n    <Document xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xmlns=\"urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10\">\n    <FIToFIPmtStsRpt>\n        <GrpHdr>\n        <MsgId>RNDPS/4e9b19494e5f0c7d61a607</MsgId>\n        <CreDtTm>2021-12-03T14:09:39.288Z</CreDtTm>\n        </GrpHdr>\n        <TxInfAndSts>\n        <OrgnlInstrId>8c5d9f95</OrgnlInstrId>\n        <OrgnlEndToEndId>000400078911122</OrgnlEndToEndId>\n        <OrgnlTxId>acd1ef76</OrgnlTxId>\n        <TxSts>ACSC</TxSts>\n        </TxInfAndSts>\n    </FIToFIPmtStsRpt>\n    </Document>\n</BusinessMessage>\n",
 							"options": {
 								"raw": {
 									"language": "xml"
@@ -79,6 +253,118 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"transferId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n    \"quote\": {\n        \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n        \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n        \"transferAmount\": \"10\",\n        \"transferAmountCurrency\": \"RWF\",\n        \"payeeReceiveAmount\": \"10\",\n        \"payeeReceiveAmountCurrency\": \"RWF\",\n        \"expiration\": \"2021-12-01T18:20:00.326Z\"\n    },\n    \"from\": {\n        \"idType\": \"MSISDN\",\n        \"idValue\": \"25644444444\",\n        \"fspId\": \"pm4mlsenderfsp\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"LAKE CITY BANK\"\n            }\n        ],\n        \"displayName\": \"PayerFirst PayerLast\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"0789493999\",\n        \"fspId\": \"cogebanquesbx\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n            }\n        ]\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"RWF\",\n    \"amount\": \"10\",\n    \"transactionType\": \"TRANSFER\",\n    \"ilpPacket\": {\n        \"data\": {\n            \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n            \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n            \"payee\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"0789493999\",\n                    \"fspId\": \"cogebanquesbx\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n                            }\n                        ]\n                    }\n                }\n            },\n            \"payer\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"MSISDN\",\n                    \"partyIdentifier\": \"25644444444\",\n                    \"fspId\": \"pm4mlsenderfsp\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"LAKE CITY BANK\"\n                            }\n                        ]\n                    }\n                },\n                \"name\": \"PayerFirst PayerLast\"\n            },\n            \"amount\": {\n                \"amount\": \"10\",\n                \"currency\": \"RWF\"\n            },\n            \"transactionType\": {\n                \"scenario\": \"TRANSFER\",\n                \"initiator\": \"PAYER\",\n                \"initiatorType\": \"CONSUMER\"\n            }\n        }\n    },\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": {\n        \"0\": {\n            \"key\": \"MSGID\",\n            \"value\": \"RNDPS/4e9b19494e5f0c7d61a607\"\n        },\n        \"1\": {\n            \"key\": \"CREDT\",\n            \"value\": \"2021-02-10T15:07:38.6875000+03:00\"\n        },\n        \"2\": {\n            \"key\": \"INSTRID\",\n            \"value\": \"8c5d9f95\"\n        },\n        \"3\": {\n            \"key\": \"ENDTOENDID\",\n            \"value\": \"000400078911122\"\n        },\n        \"4\": {\n            \"key\": \"TXID\",\n            \"value\": \"acd1ef76\"\n        },\n        \"5\": {\n            \"key\": \"SETTLEDATE\",\n            \"value\": \"2021-07-13\"\n        },\n        \"6\": {\n            \"key\": \"USTRD\",\n            \"value\": \"000400078911122\"\n        },\n        \"7\": {\n            \"key\": \"REFDOC\",\n            \"value\": \"hsuikdfgdgg\"\n        },\n        \"8\": {\n            \"key\": \"DOCDATE\",\n            \"value\": \"2021-07-13\"\n        }\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/transfers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. POST transfers DFSP1 & DFSP2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transferId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n    \"quote\": {\n        \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n        \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n        \"transferAmount\": \"10\",\n        \"transferAmountCurrency\": \"RWF\",\n        \"payeeReceiveAmount\": \"10\",\n        \"payeeReceiveAmountCurrency\": \"RWF\",\n        \"expiration\": \"2021-12-01T18:20:00.326Z\"\n    },\n    \"from\": {\n        \"idType\": \"MSISDN\",\n        \"idValue\": \"25644444444\",\n        \"fspId\": \"DFSP1\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"LAKE CITY BANK\"\n            }\n        ],\n        \"displayName\": \"PayerFirst PayerLast\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"0789493999\",\n        \"fspId\": \"DFSP2\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n            }\n        ]\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"RWF\",\n    \"amount\": \"10\",\n    \"transactionType\": \"TRANSFER\",\n    \"ilpPacket\": {\n        \"data\": {\n            \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n            \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n            \"payee\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"0789493999\",\n                    \"fspId\": \"DFSP2\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n                            }\n                        ]\n                    }\n                }\n            },\n            \"payer\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"MSISDN\",\n                    \"partyIdentifier\": \"25644444444\",\n                    \"fspId\": \"DFSP1\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"LAKE CITY BANK\"\n                            }\n                        ]\n                    }\n                },\n                \"name\": \"PayerFirst PayerLast\"\n            },\n            \"amount\": {\n                \"amount\": \"10\",\n                \"currency\": \"RWF\"\n            },\n            \"transactionType\": {\n                \"scenario\": \"TRANSFER\",\n                \"initiator\": \"PAYER\",\n                \"initiatorType\": \"CONSUMER\"\n            }\n        }\n    },\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": {\n        \"0\": {\n            \"key\": \"MSGID\",\n            \"value\": \"RNDPS/4e9b19494e5f0c7d61a607\"\n        },\n        \"1\": {\n            \"key\": \"CREDT\",\n            \"value\": \"2021-02-10T15:07:38.6875000+03:00\"\n        },\n        \"2\": {\n            \"key\": \"INSTRID\",\n            \"value\": \"8c5d9f95\"\n        },\n        \"3\": {\n            \"key\": \"ENDTOENDID\",\n            \"value\": \"000400078911122\"\n        },\n        \"4\": {\n            \"key\": \"TXID\",\n            \"value\": \"acd1ef76\"\n        },\n        \"5\": {\n            \"key\": \"SETTLEDATE\",\n            \"value\": \"2021-07-13\"\n        },\n        \"6\": {\n            \"key\": \"USTRD\",\n            \"value\": \"000400078911122\"\n        },\n        \"7\": {\n            \"key\": \"REFDOC\",\n            \"value\": \"hsuikdfgdgg\"\n        },\n        \"8\": {\n            \"key\": \"DOCDATE\",\n            \"value\": \"2021-07-13\"\n        }\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/transfers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. POST transfers Copy 3",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transferId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n    \"quote\": {\n        \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n        \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n        \"transferAmount\": \"10\",\n        \"transferAmountCurrency\": \"RWF\",\n        \"payeeReceiveAmount\": \"10\",\n        \"payeeReceiveAmountCurrency\": \"RWF\",\n        \"expiration\": \"2021-12-01T18:20:00.326Z\"\n    },\n    \"from\": {\n        \"idType\": \"MSISDN\",\n        \"idValue\": \"25644444444\",\n        \"fspId\": \"pm4mlsenderfsp\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"LAKE CITY BANK\"\n            }\n        ],\n        \"displayName\": \"PayerFirst PayerLast\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"0789493999\",\n        \"fspId\": \"cogebanquesbx\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n            }\n        ]\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"RWF\",\n    \"amount\": \"10\",\n    \"transactionType\": \"TRANSFER\",\n    \"ilpPacket\": {\n        \"data\": {\n            \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n            \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n            \"payee\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"0789493999\",\n                    \"fspId\": \"cogebanquesbx\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n                            }\n                        ]\n                    }\n                }\n            },\n            \"payer\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"MSISDN\",\n                    \"partyIdentifier\": \"25644444444\",\n                    \"fspId\": \"pm4mlsenderfsp\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"LAKE CITY BANK\"\n                            }\n                        ]\n                    }\n                },\n                \"name\": \"PayerFirst PayerLast\"\n            },\n            \"amount\": {\n                \"amount\": \"10\",\n                \"currency\": \"RWF\"\n            },\n            \"transactionType\": {\n                \"scenario\": \"TRANSFER\",\n                \"initiator\": \"PAYER\",\n                \"initiatorType\": \"CONSUMER\"\n            }\n        }\n    },\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": {\n        \"0\": {\n            \"key\": \"MSGID\",\n            \"value\": \"RNDPS/4e9b19494e5f0c7d61a607\"\n        },\n        \"1\": {\n            \"key\": \"CREDT\",\n            \"value\": \"2021-02-10T15:07:38.6875000+03:00\"\n        },\n        \"2\": {\n            \"key\": \"INSTRID\",\n            \"value\": \"8c5d9f95\"\n        },\n        \"3\": {\n            \"key\": \"ENDTOENDID\",\n            \"value\": \"000400078911122\"\n        },\n        \"4\": {\n            \"key\": \"TXID\",\n            \"value\": \"acd1ef76\"\n        },\n        \"5\": {\n            \"key\": \"SETTLEDATE\",\n            \"value\": \"2021-07-13\"\n        },\n        \"6\": {\n            \"key\": \"USTRD\",\n            \"value\": \"000400078911122\"\n        },\n        \"7\": {\n            \"key\": \"REFDOC\",\n            \"value\": \"hsuikdfgdgg\"\n        },\n        \"8\": {\n            \"key\": \"DOCDATE\",\n            \"value\": \"2021-07-13\"\n        }\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/transfers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. POST transfers Copy 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transferId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n    \"quote\": {\n        \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n        \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n        \"transferAmount\": \"10\",\n        \"transferAmountCurrency\": \"RWF\",\n        \"payeeReceiveAmount\": \"10\",\n        \"payeeReceiveAmountCurrency\": \"RWF\",\n        \"expiration\": \"2021-12-01T18:20:00.326Z\"\n    },\n    \"from\": {\n        \"idType\": \"MSISDN\",\n        \"idValue\": \"25644444444\",\n        \"fspId\": \"pm4mlsenderfsp\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"LAKE CITY BANK\"\n            }\n        ],\n        \"displayName\": \"PayerFirst PayerLast\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"0789493999\",\n        \"fspId\": \"cogebanquesbx\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n            }\n        ]\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"RWF\",\n    \"amount\": \"10\",\n    \"transactionType\": \"TRANSFER\",\n    \"ilpPacket\": {\n        \"data\": {\n            \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n            \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n            \"payee\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"0789493999\",\n                    \"fspId\": \"cogebanquesbx\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n                            }\n                        ]\n                    }\n                }\n            },\n            \"payer\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"MSISDN\",\n                    \"partyIdentifier\": \"25644444444\",\n                    \"fspId\": \"pm4mlsenderfsp\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"LAKE CITY BANK\"\n                            }\n                        ]\n                    }\n                },\n                \"name\": \"PayerFirst PayerLast\"\n            },\n            \"amount\": {\n                \"amount\": \"10\",\n                \"currency\": \"RWF\"\n            },\n            \"transactionType\": {\n                \"scenario\": \"TRANSFER\",\n                \"initiator\": \"PAYER\",\n                \"initiatorType\": \"CONSUMER\"\n            }\n        }\n    },\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": {\n        \"0\": {\n            \"key\": \"MSGID\",\n            \"value\": \"RNDPS/4e9b19494e5f0c7d61a607\"\n        },\n        \"1\": {\n            \"key\": \"CREDT\",\n            \"value\": \"2021-02-10T15:07:38.6875000+03:00\"\n        },\n        \"2\": {\n            \"key\": \"INSTRID\",\n            \"value\": \"8c5d9f95\"\n        },\n        \"3\": {\n            \"key\": \"ENDTOENDID\",\n            \"value\": \"000400078911122\"\n        },\n        \"4\": {\n            \"key\": \"TXID\",\n            \"value\": \"acd1ef76\"\n        },\n        \"5\": {\n            \"key\": \"SETTLEDATE\",\n            \"value\": \"2021-07-13\"\n        },\n        \"6\": {\n            \"key\": \"USTRD\",\n            \"value\": \"000400078911122\"\n        },\n        \"7\": {\n            \"key\": \"REFDOC\",\n            \"value\": \"hsuikdfgdgg\"\n        },\n        \"8\": {\n            \"key\": \"DOCDATE\",\n            \"value\": \"2021-07-13\"\n        }\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3003/transfers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"transfers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. POST transfers Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transferId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n    \"quote\": {\n        \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n        \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n        \"transferAmount\": \"10\",\n        \"transferAmountCurrency\": \"RWF\",\n        \"payeeReceiveAmount\": \"10\",\n        \"payeeReceiveAmountCurrency\": \"RWF\",\n        \"expiration\": \"2021-12-01T18:20:00.326Z\"\n    },\n    \"from\": {\n        \"idType\": \"MSISDN\",\n        \"idValue\": \"25644444444\",\n        \"fspId\": \"pm4mlsenderfsp\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"LAKE CITY BANK\"\n            }\n        ],\n        \"displayName\": \"PayerFirst PayerLast\"\n    },\n    \"to\": {\n        \"idType\": \"ACCOUNT_ID\",\n        \"idValue\": \"0789493999\",\n        \"fspId\": \"cogebanquesbx\",\n        \"extensionList\": [\n            {\n                \"key\": \"NAME\",\n                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n            }\n        ]\n    },\n    \"amountType\": \"SEND\",\n    \"currency\": \"RWF\",\n    \"amount\": \"10\",\n    \"transactionType\": \"TRANSFER\",\n    \"ilpPacket\": {\n        \"data\": {\n            \"transactionId\": \"80f4f795-0415-4d1d-ae28-117ae5d2eae8\",\n            \"quoteId\": \"d20fc7c3-943e-4995-b6f2-2493e427fa6a\",\n            \"payee\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"ACCOUNT_ID\",\n                    \"partyIdentifier\": \"0789493999\",\n                    \"fspId\": \"cogebanquesbx\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"EQUITY BANK RWANDA LIMITED\"\n                            }\n                        ]\n                    }\n                }\n            },\n            \"payer\": {\n                \"partyIdInfo\": {\n                    \"partyIdType\": \"MSISDN\",\n                    \"partyIdentifier\": \"25644444444\",\n                    \"fspId\": \"pm4mlsenderfsp\",\n                    \"extensionList\": {\n                        \"extension\": [\n                            {\n                                \"key\": \"NAME\",\n                                \"value\": \"LAKE CITY BANK\"\n                            }\n                        ]\n                    }\n                },\n                \"name\": \"PayerFirst PayerLast\"\n            },\n            \"amount\": {\n                \"amount\": \"10\",\n                \"currency\": \"RWF\"\n            },\n            \"transactionType\": {\n                \"scenario\": \"TRANSFER\",\n                \"initiator\": \"PAYER\",\n                \"initiatorType\": \"CONSUMER\"\n            }\n        }\n    },\n    \"note\": \"test payment\",\n    \"quoteRequestExtensions\": {\n        \"0\": {\n            \"key\": \"MSGID\",\n            \"value\": \"RNDPS/4e9b19494e5f0c7d61a607\"\n        },\n        \"1\": {\n            \"key\": \"CREDT\",\n            \"value\": \"2021-02-10T15:07:38.6875000+03:00\"\n        },\n        \"2\": {\n            \"key\": \"INSTRID\",\n            \"value\": \"8c5d9f95\"\n        },\n        \"3\": {\n            \"key\": \"ENDTOENDID\",\n            \"value\": \"ABC/1414/2019-10-11\"\n        },\n        \"4\": {\n            \"key\": \"TXID\",\n            \"value\": \"acd1ef76\"\n        },\n        \"5\": {\n            \"key\": \"SETTLEDATE\",\n            \"value\": \"2021-07-13\"\n        },\n        \"6\": {\n            \"key\": \"USTRD\",\n            \"value\": \"000400078911122\"\n        },\n        \"7\": {\n            \"key\": \"REFDOC\",\n            \"value\": \"hsuikdfgdgg\"\n        },\n        \"8\": {\n            \"key\": \"DOCDATE\",\n            \"value\": \"2021-07-13\"\n        }\n    }\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
