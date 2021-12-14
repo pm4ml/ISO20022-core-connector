@@ -65,3 +65,4 @@ npm test
 - Add unit tests for [cache.js](./src/lib/cache.js) once Re-factored into Typescript
 - Error-response for ISO Outbound API-calls need to be addressed going forward, currently `text/plain` is returned with a text error message.
 - Incorporate the [rswitch-proxy](https://github.com/mdebarros/rswitch-proxy) simulator into this code-base either under the `./src/test` folder or a new root level folder.
+- Make ISO XSDs specific so we can properly validate "mandatory" fields as required by the "scheme".
