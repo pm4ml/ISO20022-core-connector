@@ -110,7 +110,7 @@ const postTransfers = async (ctx: ApiContext): Promise<void> => new Promise(asyn
     let pacsState: IPacsState | undefined;
 
     try {
-        const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload);
+        const postTransfersBodyPacs008 = postTransferBodyToPacs008(payload, ctx.state?.conf?.dfspIdMap);
         const pacs008 = XML.fromXml(postTransfersBodyPacs008) as IPacs008;
 
         // map to

@@ -69,7 +69,7 @@ export const processTransferRequest = async (ctx: ApiContext): Promise<void> => 
     const outboundRequester = new OutboundRequester(outboundRequesterOps);
 
     try {
-        const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008);
+        const postQuotesBody = pacs008ToPostQuotesBody(ctx.request.body as IPacs008, ctx.state?.conf?.dfspIdMap);
 
         // map to
         pacsState = {};

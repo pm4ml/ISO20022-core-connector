@@ -23,6 +23,7 @@ import {
     IPacsState,
 } from '../interfaces';
 import { generateMsgId } from '../lib/iso20022';
+import { DfspIdMapType } from '../config';
 
 
 /**
@@ -51,8 +52,15 @@ export const camt003ToGetPartiesParams = (camt003: Record<string, unknown> | ICa
  */
 export const partiesByIdResponseToCamt004 = (
     partiesByIdResponse: Record<string, unknown> | IPartiesByIdResponse,
+    dfspIdMap?: DfspIdMapType,
 ): string => {
     const { body } = partiesByIdResponse as IPartiesByIdResponse;
+
+    let fspId: string = body?.party?.partyIdInfo?.fspId;
+    if(dfspIdMap) {
+        fspId = dfspIdMap?.inbound[fspId] || fspId;
+    }
+
     const acctOrErr = {
         Acct: {
             Ownr: {
@@ -63,7 +71,7 @@ export const partiesByIdResponseToCamt004 = (
             Svcr: {
                 FinInstnId: {
                     Othr: {
-                        Id: body.party.partyIdInfo.fspId,
+                        Id: fspId,
                     },
                 },
             },
@@ -158,9 +166,17 @@ export const fspiopErrorToCamt004Error = (_errorInformation: IErrorInformation, 
  * @param {Record<string, unknown> | IPacs008} pacs008
  * @returns {IPostQuotesBody}
  */
-export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs008)
+export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs008, dfspIdMap?: DfspIdMapType)
 : IPostQuotesBody => {
     const body = pacs008 as IPacs008;
+
+    let fromFspId: string = body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id;
+    let toFspId: string = body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id;
+    if(dfspIdMap) {
+        fromFspId = dfspIdMap?.outbound[fromFspId] || fromFspId;
+        toFspId = dfspIdMap?.outbound[toFspId] || toFspId;
+    }
+
     const postQuotesBody: IPostQuotesBody = {
         homeTransactionId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.PmtId.EndToEndId,
         amountType: AmountType.SEND,
@@ -170,13 +186,13 @@ export const pacs008ToPostQuotesBody = (pacs008: Record<string, unknown> | IPacs
             displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Dbtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.DbtrAcct.Id.Othr.Id,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.InitgPty.Id.OrgId.Othr.Id,
+            fspId: fromFspId,
         },
         to: {
             displayName: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.Cdtr.Nm,
             idType: PartyIdType.ACCOUNT_ID,
             idValue: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAcct.Id.Othr.Id,
-            fspId: body.Document.FIToFICstmrCdtTrf.CdtTrfTxInf.CdtrAgt.FinInstnId.Othr.Id,
+            fspId: toFspId,
         },
         transactionType: TransactionType.TRANSFER,
         skipPartyLookup: true,
@@ -344,9 +360,17 @@ export const transferResponseToPacs002 = (
  */
 export const postTransferBodyToPacs008 = (
     transferRequest: IPostTransferRequestBody,
+    dfspIdMap?: DfspIdMapType,
 ): string => {
     const extensionList: Array<IExtensionItem> = transferRequest.quoteRequestExtensions;
     let [msgId, instrId, endToEndId, txId, createdDateTime, sttlmDt, ustrd, refDoc, docDate, payerExtName] = ['', '', '', '', '', '', '', '', '', ''];
+
+    let payerFspId: string = transferRequest.ilpPacket.data.payer.partyIdInfo.fspId;
+    let payeeFspId: string = transferRequest.ilpPacket.data.payee.partyIdInfo.fspId;
+    if(dfspIdMap) {
+        payerFspId = dfspIdMap?.inbound[payerFspId] || payerFspId;
+        payeeFspId = dfspIdMap?.inbound[payeeFspId] || payeeFspId;
+    }
 
     Object.values(extensionList).forEach(extItem => {
         if(extItem.key === 'MSGID') {
@@ -396,14 +420,14 @@ export const postTransferBodyToPacs008 = (
                     InstgAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId, // payerFsp.fspId
+                                Id: payerFspId, // payerFsp.fspId
                             },
                         },
                     },
                     InstdAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.fspId, // payeeFsp.fspId
+                                Id: payeeFspId, // payeeFsp.fspId
                             },
                         },
                     },
@@ -433,7 +457,7 @@ export const postTransferBodyToPacs008 = (
                         Id: {
                             OrgId: {
                                 Othr: {
-                                    Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId || '', // payerFsp.fspId
+                                    Id: payerFspId || '', // payerFsp.fspId
                                     SchmeNm: {
                                         Cd: 'CHAN', // fixed value CHAN
                                     },
@@ -447,21 +471,21 @@ export const postTransferBodyToPacs008 = (
                     DbtrAcct: {
                         Id: {
                             Othr: {
-                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.partyIdentifier, // ilpPacket.data.payer.partyIdInfo.partyIdentifier
+                                Id: payeeFspId, // ilpPacket.data.payer.partyIdInfo.partyIdentifier
                             },
                         },
                     },
                     DbtrAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.ilpPacket.data.payer.partyIdInfo.fspId, // payerFsp.fspId
+                                Id: payerFspId, // payerFsp.fspId
                             },
                         },
                     },
                     CdtrAgt: {
                         FinInstnId: {
                             Othr: {
-                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.fspId, // payeeFsp.fspId
+                                Id: payeeFspId, // payeeFsp.fspId
                             },
                         },
                     },
@@ -471,7 +495,7 @@ export const postTransferBodyToPacs008 = (
                     CdtrAcct: {
                         Id: {
                             Othr: {
-                                Id: transferRequest.ilpPacket.data.payee.partyIdInfo.partyIdentifier, // ilpPacket.data.payee.partyIdInfo.partyIdentifier
+                                Id: payeeFspId, // ilpPacket.data.payee.partyIdInfo.partyIdentifier
                             },
                         },
                     },
@@ -513,6 +537,7 @@ export const postTransferBodyToPacs008 = (
 export const pacs002ToPutTransfersBody = (pacs002: Record<string, unknown> | IPacs002)
 : ITransferFulfilment => {
     const body = pacs002 as IPacs002;
+
     const putTransfersBody: ITransferFulfilment = {
         completedTimestamp: body?.Document?.FIToFIPmtStsRpt?.GrpHdr?.CreDtTm,
         transferState: body?.Document?.FIToFIPmtStsRpt?.TxInfAndSts?.TxSts === TxStsEnum.ACSC ? MojaloopTransferState.COMMITTED : MojaloopTransferState.ABORTED,
